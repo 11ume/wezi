@@ -1,16 +1,8 @@
-import http, { IncomingMessage, ServerResponse } from 'http'
+import { IncomingMessage, ServerResponse } from 'http'
 import { send, sendError } from 'senders'
-import Trouter from 'trouter'
 
 export type NextFunction = (err?: Error) => void
-export type RequestListener = (req: IncomingMessage, res: ServerResponse, next?: NextFunction) => void
-
-type Routes<T> = {
-    keys: string[]
-    , pattern: string
-    , method: string
-    , handlers: T
-}
+export type RequestListener = (req: IncomingMessage, res: ServerResponse, next?: NextFunction) => unknown
 
 function requestListener(
     req: IncomingMessage
@@ -35,44 +27,27 @@ function requestListener(
 
 function nextFn(req: IncomingMessage
     , res: ServerResponse
-    , routes: Routes<RequestListener>[]) {
+    , middlewares: RequestListener[]) {
     return (err?: Error) => {
         if (err) return
-        loop(req, res, routes)
+        loop(req, res, middlewares)
     }
 }
 
 function loop(req: IncomingMessage
     , res: ServerResponse
-    , routes: Routes<RequestListener>[]) {
+    , middlewares: RequestListener[]) {
     let i = 0
     if (res.writableEnded) return
-    if (i < routes.length) {
-        const route = routes[i++]
-        const next = nextFn(req, res, routes)
-        const handler = route.handlers[0]
+    if (i < middlewares.length) {
+        const handler = middlewares[i++]
+        const next = nextFn(req, res, middlewares)
         requestListener(req, res, next, handler)
     }
 }
 
-export class App extends Trouter<RequestListener> {
-    server: http.Server
-    routes: Trouter.Routes<RequestListener>[]
-
-    handler(req: IncomingMessage, res: ServerResponse) {
-        loop(req, res, this.routes)
-    }
-
-    use(pattern: string | RegExp, ...handlers: RequestListener[]): this
-    use(...handlers: RequestListener[]): this
-    use(pattern: string | RegExp | RequestListener, ...handlers: RequestListener[]): this {
-        if (pattern && handlers) { }
-        return this
-    }
-
-    listen(port = 3000, callback?: (err?: Error) => void) {
-        this.server = http.createServer(this.handler)
-        this.server.listen(port, callback)
-        return this
+export const createApp = (middlewares: RequestListener[]) => {
+    return (req: IncomingMessage, res: ServerResponse) => {
+        loop(req, res, middlewares)
     }
 }
