@@ -1,9 +1,16 @@
 import http, { IncomingMessage, ServerResponse } from 'http'
 import { send, sendError } from 'senders'
-import Trouter, { Routes } from 'trouter'
+import Trouter from 'trouter'
 
-type NextFunction = (err?: Error) => void
-type RequestListener = (req: IncomingMessage, res: ServerResponse, next?: NextFunction) => void
+export type NextFunction = (err?: Error) => void
+export type RequestListener = (req: IncomingMessage, res: ServerResponse, next?: NextFunction) => void
+
+type Routes<T> = {
+    keys: string[]
+    , pattern: string
+    , method: string
+    , handlers: T
+}
 
 function requestListener(
     req: IncomingMessage
@@ -50,13 +57,14 @@ function loop(req: IncomingMessage
 
 export class App extends Trouter<RequestListener> {
     server: http.Server
+    routes: Trouter.Routes<RequestListener>[]
+
     handler(req: IncomingMessage, res: ServerResponse) {
         loop(req, res, this.routes)
     }
 
     use(pattern: string | RegExp, ...handlers: RequestListener[]): this
     use(...handlers: RequestListener[]): this
-
     use(pattern: string | RegExp | RequestListener, ...handlers: RequestListener[]): this {
         if (pattern && handlers) { }
         return this
@@ -64,9 +72,7 @@ export class App extends Trouter<RequestListener> {
 
     listen(port = 3000, callback?: (err?: Error) => void) {
         this.server = http.createServer(this.handler)
-        this.server.on('error', callback)
-        this.server.on('listening', callback)
-        this.server.listen(port)
+        this.server.listen(port, callback)
         return this
     }
 }
