@@ -28,20 +28,25 @@ const getParamsAndQuery = (pattern: UrlPattern | string, url: string) => {
     }
 }
 
-const methodFn = (method: string) => (givenPath: UrlPattern | string, handler: RequestListener) => {
-    return (req: IncomingMessage, res: ServerResponse, next: NextFunction, namespace: string) => {
+const methodFn = (method: string
+    , givenPath: RegExp | string
+    , handler: RequestListener) => {
+    return (req: IncomingMessage, res: ServerResponse, next: NextFunction) => {
         const path = givenPath === '/' ? '(/)' : givenPath
         const route = path instanceof UrlPattern
             ? path
-            : new UrlPattern(`${namespace}${path}`, patternOpts)
+            : new UrlPattern((path as string), patternOpts)
 
         const { params, query } = getParamsAndQuery(route, req.url)
-
         if (params && req.method === method) {
-            return handler(Object.assign(req, {
+            const mergeReq = Object.assign(req, {
                 params, query
-            }), res)
+            })
+
+            return handler(mergeReq, res, next)
         }
+
+        return null
     }
 }
 
@@ -51,10 +56,14 @@ const findRoute = (funcs: RequestListener[]) => async (
     , next: NextFunction) => {
     for (const fn of funcs) {
         const result = await fn(req, res, next)
-        if (result || res.headersSent) return result
+        if (res.headersSent) return
+        return result
     }
 }
 
-export const router = (...funcs: RequestListener[]) => findRoute(funcs)
-export const withNamespace = (namespace: string) => (...funcs: RequestListener[]) => findRoute(funcs)
-export const get = () => methodFn('get')
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const withNamespace = (_namespace: string) => (...funcs: RequestListener[]) => findRoute(funcs)
+export const get = (givenPath: RegExp | string, handler: RequestListener) => methodFn('get', givenPath, handler)
+
+const router = (...funcs: RequestListener[]) => findRoute(funcs)
+export default router

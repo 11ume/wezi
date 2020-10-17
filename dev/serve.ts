@@ -1,8 +1,14 @@
-import { App } from '../index'
+import http from 'http'
+import createApp from 'application'
+import router, { get } from 'router'
 
-const app = new App()
-// app.use((_req, res) => {
-//     res.statusCode = 300
-// })
-app.use('/app', () => 'foo')
-app.listen(5000, () => console.log('listen'))
+const r = router(
+    get('/', () => {
+        return 'foo'
+    })
+)
+
+const app = createApp([r])
+http
+    .createServer(app)
+    .listen(5000)

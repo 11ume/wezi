@@ -2,7 +2,7 @@ import { IncomingMessage, ServerResponse } from 'http'
 import { send, sendError } from 'senders'
 
 export type NextFunction = (err?: Error) => void
-export type RequestListener = (req: IncomingMessage, res: ServerResponse, next?: NextFunction) => unknown
+export type RequestListener = (req: IncomingMessage, res: ServerResponse, next?: NextFunction) => any
 
 function requestListener(
     req: IncomingMessage
@@ -27,7 +27,7 @@ function requestListener(
 
 function nextFn(req: IncomingMessage
     , res: ServerResponse
-    , middlewares: RequestListener[]) {
+    , middlewares: RequestListener | RequestListener[]) {
     return (err?: Error) => {
         if (err) return
         loop(req, res, middlewares)
@@ -36,7 +36,7 @@ function nextFn(req: IncomingMessage
 
 function loop(req: IncomingMessage
     , res: ServerResponse
-    , middlewares: RequestListener[]) {
+    , middlewares: RequestListener | RequestListener[]) {
     let i = 0
     if (res.writableEnded) return
     if (i < middlewares.length) {
@@ -46,8 +46,10 @@ function loop(req: IncomingMessage
     }
 }
 
-export const createApp = (middlewares: RequestListener[]) => {
+const createApp = (middlewares: RequestListener | RequestListener[]) => {
     return (req: IncomingMessage, res: ServerResponse) => {
         loop(req, res, middlewares)
     }
 }
+
+export default createApp
