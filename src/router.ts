@@ -2,9 +2,16 @@
 import { parse } from 'url'
 import UrlPattern from 'url-pattern'
 import { RequestListener, NextFunction } from 'application'
-import { IncomingMessage, ServerResponse } from 'http'
+import { IncomingMessage as IMessage, ServerResponse } from 'http'
 
 // const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
+
+interface IncomingMessage<P, Q> extends IMessage {
+    params?: P
+    , query?: Q
+}
+
+type RequestListenerRouter<P, Q> = (req: IncomingMessage<P, Q>, res: ServerResponse) => void
 
 const patternOpts = {
     segmentNameCharset: 'a-zA-Z0-9_-'
@@ -28,10 +35,10 @@ const getParamsAndQuery = (pattern: UrlPattern | string, url: string) => {
     }
 }
 
-const methodFn = (method: string
+const methodFn = <P, Q>(method: string
     , givenPath: RegExp | string
     , handler: RequestListener) => {
-    return (req: IncomingMessage, res: ServerResponse, next: NextFunction) => {
+    return (req: IncomingMessage<P, Q>, res: ServerResponse, next: NextFunction) => {
         const path = givenPath === '/' ? '(/)' : givenPath
         const route = path instanceof UrlPattern
             ? path
@@ -51,6 +58,6 @@ const methodFn = (method: string
 }
 
 // export const withNamespace = (_namespace: string) => (...funcs: RequestListener[]) => composeRoute(funcs)
-export const get = (givenPath: RegExp | string, handler: RequestListener) => methodFn('GET', givenPath, handler)
+export const get = <P, Q = void>(givenPath: RegExp | string, handler: RequestListenerRouter<P, Q>) => methodFn<P, Q>('GET', givenPath, handler)
 const router = (...funcs: RequestListener[]) => funcs
 export default router

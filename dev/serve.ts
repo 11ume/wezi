@@ -3,9 +3,13 @@ import createApp from 'application'
 import { send } from 'senders'
 import router, { get } from 'router'
 
-const getUserById = get('/user/:id', () => ({
-    name: 'foo'
-}))
+type Params = {
+    email: string
+}
+
+const getUserById = get<Params>('/user/:id', (req) => {
+    return req.params
+})
 
 const notFound = (_req, res) => {
     return send(res, 404)
