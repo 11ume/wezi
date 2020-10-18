@@ -50,20 +50,7 @@ const methodFn = (method: string
     }
 }
 
-const findRoute = (funcs: RequestListener[]) => async (
-    req: IncomingMessage
-    , res: ServerResponse
-    , next: NextFunction) => {
-    for (const fn of funcs) {
-        const result = await fn(req, res, next)
-        if (res.headersSent) return
-        return result
-    }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const withNamespace = (_namespace: string) => (...funcs: RequestListener[]) => findRoute(funcs)
-export const get = (givenPath: RegExp | string, handler: RequestListener) => methodFn('get', givenPath, handler)
-
-const router = (...funcs: RequestListener[]) => findRoute(funcs)
+// export const withNamespace = (_namespace: string) => (...funcs: RequestListener[]) => composeRoute(funcs)
+export const get = (givenPath: RegExp | string, handler: RequestListener) => methodFn('GET', givenPath, handler)
+const router = (...funcs: RequestListener[]) => funcs
 export default router

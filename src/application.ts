@@ -1,10 +1,10 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { send, sendError } from 'senders'
+import { send, sendEmpty, sendError } from 'senders'
 
 export type NextFunction = (err?: Error) => void
-export type RequestListener = (req: IncomingMessage, res: ServerResponse, next?: NextFunction) => any
+export type RequestListener = (req: IncomingMessage, res: ServerResponse, next?: NextFunction) => void
 
-function requestListener(
+function asyncHandler(
     req: IncomingMessage
     , res: ServerResponse
     , next: NextFunction
@@ -12,7 +12,7 @@ function requestListener(
     return new Promise(resolve => resolve(handler(req, res, next)))
         .then((val: unknown) => {
             if (val === null) {
-                send(res, 204, null)
+                sendEmpty(res, 204)
                 return
             }
 
@@ -27,28 +27,28 @@ function requestListener(
 
 function nextFn(req: IncomingMessage
     , res: ServerResponse
-    , middlewares: RequestListener | RequestListener[]) {
+    , handlers: RequestListener | RequestListener[]) {
     return (err?: Error) => {
         if (err) return
-        loop(req, res, middlewares)
+        loop(req, res, handlers)
     }
 }
 
 function loop(req: IncomingMessage
     , res: ServerResponse
-    , middlewares: RequestListener | RequestListener[]) {
+    , handlers: RequestListener | RequestListener[]) {
     let i = 0
     if (res.writableEnded) return
-    if (i < middlewares.length) {
-        const handler = middlewares[i++]
-        const next = nextFn(req, res, middlewares)
-        requestListener(req, res, next, handler)
+    if (i < handlers.length) {
+        const handler = handlers[i++]
+        const next = nextFn(req, res, handlers)
+        asyncHandler(req, res, next, handler)
     }
 }
 
-const createApp = (middlewares: RequestListener | RequestListener[]) => {
+const createApp = (handlers: RequestListener[]) => {
     return (req: IncomingMessage, res: ServerResponse) => {
-        loop(req, res, middlewares)
+        loop(req, res, handlers)
     }
 }
 

@@ -31,15 +31,15 @@ export const sendStream = (res: ServerResponse, obj: Readable) => {
     res.end()
 }
 
+export const sendEmpty = (res: ServerResponse, statusCode: number) => {
+    res.statusCode = statusCode
+    res.end()
+}
+
 export const send = <T>(res: ServerResponse
     , statusCode = 200
     , obj: T = null) => {
     res.statusCode = statusCode
-
-    if (obj === null) {
-        res.end()
-    }
-
     const payload = JSON.stringify(obj)
     if (noContentType(res)) {
         res.setHeader('Content-Type', 'application/json charset=utf-8')
@@ -49,9 +49,9 @@ export const send = <T>(res: ServerResponse
     res.end(payload)
 }
 
-export const sendError = (res: ServerResponse, errorObj: ErrorObj) => {
-    const statusCode = errorObj.statusCode || 500
-    const message = errorObj.message || 'Internal Server Error'
-    const payload = isDev() ? errorObj.stack : message
+export const sendError = (res: ServerResponse, err: ErrorObj) => {
+    const statusCode = err.statusCode || 500
+    const message = err.message || 'Internal Server Error'
+    const payload = isDev() ? err.stack : message
     send(res, statusCode, payload)
 }
