@@ -46,7 +46,7 @@ const methodFn = (method: string
             return handler(mergeReq, res, next)
         }
 
-        return null
+        next()
     }
 }
 

@@ -3,6 +3,7 @@ import { send, sendEmpty, sendError } from 'senders'
 
 export type NextFunction = (err?: Error) => void
 export type RequestListener = (req: IncomingMessage, res: ServerResponse, next?: NextFunction) => void
+type Loop = (req: IncomingMessage, res: ServerResponse) => void
 
 function asyncHandler(
     req: IncomingMessage
@@ -25,31 +26,24 @@ function asyncHandler(
         })
 }
 
-function nextFn(req: IncomingMessage
-    , res: ServerResponse
-    , handlers: RequestListener | RequestListener[]) {
-    return (err?: Error) => {
+function nextFn(req: IncomingMessage, res: ServerResponse, loop: Loop) {
+    return function next(err?: Error) {
         if (err) return
-        loop(req, res, handlers)
+        loop(req, res)
     }
 }
 
-function loop(req: IncomingMessage
-    , res: ServerResponse
-    , handlers: RequestListener | RequestListener[]) {
+function loopFn(handlers: RequestListener[]) {
     let i = 0
-    if (res.writableEnded) return
-    if (i < handlers.length) {
-        const handler = handlers[i++]
-        const next = nextFn(req, res, handlers)
-        asyncHandler(req, res, next, handler)
+    return function loop(req: IncomingMessage, res: ServerResponse) {
+        if (res.writableEnded) return
+        if (i < handlers.length) {
+            const handler = handlers[i++]
+            const next = nextFn(req, res, loop)
+            asyncHandler(req, res, next, handler)
+        }
     }
 }
 
-const createApp = (handlers: RequestListener[]) => {
-    return (req: IncomingMessage, res: ServerResponse) => {
-        loop(req, res, handlers)
-    }
-}
-
+const createApp = (handlers: RequestListener[]) => (req: IncomingMessage, res: ServerResponse) => loopFn(handlers)(req, res)
 export default createApp
