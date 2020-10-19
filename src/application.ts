@@ -4,7 +4,6 @@ import { send, sendError } from 'senders'
 export interface Context {
     req: IncomingMessage
     , res: ServerResponse
-    , error?: Error
 }
 
 export type NextFunction = (err?: Error) => void
@@ -47,10 +46,13 @@ function loopFn(handlers: RequestListener[]) {
     }
 }
 
-const createApp = (...handlers: RequestListener[]) => (req: IncomingMessage, res: ServerResponse) => {
-    loopFn(handlers)({
-        req
-        , res
-    })
+const createApp = (handler: RequestListener | RequestListener[], ...handlers: RequestListener[]) => {
+    const mergeHandlers = Array.isArray(handler) ? [...handler, ...handlers] : [handler, ...handlers]
+    return (req: IncomingMessage, res: ServerResponse) => {
+        loopFn(mergeHandlers)({
+            req
+            , res
+        })
+    }
 }
 export default createApp

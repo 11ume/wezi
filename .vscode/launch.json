@@ -20,6 +20,7 @@
             "protocol": "inspector",
             "env": {
                 "NODE_PATH": "./src"
+                , "NODE_ENV": "development"
             }
         }
     ]

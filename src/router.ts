@@ -56,5 +56,7 @@ const methodFn = (method: string
 
 // export const withNamespace = (_namespace: string) => (...funcs: RequestListener[]) => composeRoute(funcs)
 export const get = (givenPath: RegExp | string, handler: RequestListener) => methodFn('GET', givenPath, handler)
+export const post = (givenPath: RegExp | string, handler: RequestListener) => methodFn('POST', givenPath, handler)
+
 const router = (...funcs: RequestListener[]) => funcs
 export default router

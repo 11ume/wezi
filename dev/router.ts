@@ -1,24 +1,29 @@
-import router, { ContextRouter, get } from 'router'
-import { NextFunction } from 'application'
+import router, { ContextRouter, get, post } from 'router'
+import { json } from 'recibers'
 
 type Params = {
     id: string
 }
 
-const getUserById = get('/user/:id', (_ctx: ContextRouter<Params>, next: NextFunction) => {
-    // ctx.params.id
-    next()
-})
+type User = {
+    name: string
+}
 
+const getById = get('/user/:id', (ctx: ContextRouter<Params>) => ctx.params.id)
+const create = post('/user', async (ctx: ContextRouter) => {
+    const { name } = await json<User>(ctx)
+    return name
+})
 const getAll = get('/user', () => [
     {
         name: 'foo'
     }
 ])
 
-const r = router(
-    getUserById
+const usersRouter = router(
+    getById
+    , create
     , getAll
 )
 
-export default r
+export default usersRouter

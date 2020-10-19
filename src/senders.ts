@@ -49,9 +49,9 @@ export const send = <T>(ctx: Context
     ctx.res.end(payload)
 }
 
-export const sendError = (ctx: Context, err: ErrorObj) => {
-    const statusCode = err.statusCode || 500
-    const message = err.message || 'Internal Server Error'
-    const payload = isDev() ? err.stack : message
+export const sendError = (ctx: Context, error: ErrorObj) => {
+    const statusCode = error.statusCode || 500
+    const message = error.message || 'Internal Server Error'
+    const payload = isDev() ? error.stack : message
     send(ctx, statusCode, payload)
 }
