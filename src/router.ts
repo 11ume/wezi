@@ -32,20 +32,6 @@ const getParamsAndQuery = (pattern: UrlPattern | string, url: string) => {
     }
 }
 
-const orderPathOrHandler = (givenPathOrHandler: RegExp | string | RequestListener, handler: RequestListener) => {
-    if (typeof givenPathOrHandler === 'function') {
-        return {
-            givePath: ''
-            , listener: givenPathOrHandler
-        }
-    }
-
-    return {
-        givePath: givenPathOrHandler
-        , listener: handler
-    }
-}
-
 const findMethod = (method: string, givePath: RegExp | string, handler: RequestListener) => {
     return function matcher(ctx: ContextRoute, next: NextFunction, namespace = '') {
         const path = givePath === '/' ? '(/)' : givePath
@@ -69,10 +55,9 @@ const findMethod = (method: string, givePath: RegExp | string, handler: RequestL
 
 const router = (...funcs: MethodFunction[]) => funcs
 
-export const createMethod = (method: string) => (givenPathOrHandler: RegExp | string | RequestListener, handler?: RequestListener) => {
+export const createMethod = (method: string) => (path: RegExp | string, handler?: RequestListener) => {
     const upperMethod = method.toUpperCase()
-    const { givePath, listener } = orderPathOrHandler(givenPathOrHandler, handler)
-    return findMethod(upperMethod, givePath, listener)
+    return findMethod(upperMethod, path, handler)
 }
 
 export const whitNamespace = (namespace: string) => (...funcs: MethodFunction[]) => funcs.map((handler) => {
