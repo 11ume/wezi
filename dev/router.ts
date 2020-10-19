@@ -1,8 +1,5 @@
 import router, { ContextRoute, get, post, put } from 'router'
 import { json } from 'recibers'
-import { NextFunction } from 'application'
-import { createError } from 'error'
-// import { users } from './store'
 
 type UserBody = {
     name: string
@@ -12,8 +9,8 @@ type UserByIdParams = {
     id: string
 }
 
-const getAll = (_, next: NextFunction) => {
-    next(createError(400, 'bad request'))
+const getAll = () => {
+    throw Error('test')
 }
 const getById = (ctx: ContextRoute<UserByIdParams>) => ctx.params.id
 const create = async (ctx: ContextRoute) => json<UserBody>(ctx)
