@@ -1,8 +1,9 @@
-import createApp, { Context, NextFunction } from 'application'
+import app, { Context, NextFunction } from 'application'
 import { isDev } from 'utils'
 import { send } from 'senders'
 import { createError } from 'error'
 import router from './router'
+// import cors from '../packages/cors'
 
 const handleNotFound = (_ctx: Context, next: NextFunction) => next(createError(404, 'Not found'))
 const handleErrors = (ctx: Context) => {
@@ -12,10 +13,8 @@ const handleErrors = (ctx: Context) => {
     send(ctx, statusCode, payload)
 }
 
-const app = createApp(
-    router
+export default app(
+    router('/api/v1')
     , handleNotFound
     , handleErrors
 )
-
-export default app
