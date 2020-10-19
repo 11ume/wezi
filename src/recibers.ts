@@ -1,8 +1,9 @@
 import { IncomingMessage } from 'http'
 import contentType from 'content-type'
 import getRawBody, { Options as GetRawBodyOptions, RawBodyError } from 'raw-body'
-import { createError, parseJSON } from 'utils'
+import { parseJSON } from 'utils'
 import { Context } from 'application'
+import { createError } from 'error'
 
 // Maps requests to buffered raw bodies so that
 // multiple calls to `json` work as expected

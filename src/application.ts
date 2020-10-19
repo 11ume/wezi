@@ -1,12 +1,13 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { send, sendError } from 'senders'
+import { ErrorObj } from 'error'
 
 export interface Context {
     req: IncomingMessage
     , res: ServerResponse
 }
 
-export type NextFunction = (err?: Error) => void
+export type NextFunction = (err?: ErrorObj) => void
 export type RequestListener = (ctx: Context, next?: NextFunction) => void
 type Loop = (ctx: Context) => void
 
@@ -28,8 +29,12 @@ function asyncHandler(ctx: Context, next: NextFunction, handler: RequestListener
 }
 
 function nextFn(ctx: Context, loop: Loop) {
-    return function next(err?: Error) {
-        if (err) return
+    return function next(err?: ErrorObj) {
+        if (err) {
+            sendError(ctx, err)
+            return
+        }
+
         loop(ctx)
     }
 }
