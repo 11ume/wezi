@@ -1,5 +1,6 @@
 import { Stream, Readable } from 'stream'
 import { createError } from 'error'
+import { RequestListener } from 'application'
 
 export const isDev = () => process.env.NODE_ENV === 'development'
 
@@ -14,6 +15,8 @@ export const isReadable = (stream: Readable) => {
 	stream.readable !== false &&
 	typeof stream._read === 'function'
 }
+
+export const mergeHandlers = (handler: RequestListener | RequestListener[], handlers: RequestListener[]) => Array.isArray(handler) ? [...handler, ...handlers] : [handler, ...handlers]
 
 export const parseJSON = (str: string) => {
     try {
