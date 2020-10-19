@@ -3,11 +3,12 @@ import { parse } from 'url'
 import UrlPattern from 'url-pattern'
 import { Context, RequestListener, NextFunction } from 'application'
 
-// const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
-export interface ContextRouter<P = void, Q = void> extends Context {
+export interface ContextRoute<P = void, Q = void> extends Context {
     params?: P
     , query?: Q
 }
+
+type MethodFunction = (ctx: ContextRoute, next: NextFunction, namespace?: string) => void
 
 const patternOpts = {
     segmentNameCharset: 'a-zA-Z0-9_-'
@@ -31,14 +32,28 @@ const getParamsAndQuery = (pattern: UrlPattern | string, url: string) => {
     }
 }
 
-const methodFn = (method: string
-    , givenPath: RegExp | string
+const orderPathOrHandler = (givenPathOrHandler: RegExp | string | RequestListener, handler: RequestListener) => {
+    if (typeof givenPathOrHandler === 'function') {
+        return {
+            givePath: ''
+            , listener: givenPathOrHandler
+        }
+    }
+
+    return {
+        givePath: givenPathOrHandler
+        , listener: handler
+    }
+}
+
+const findMethod = (method: string
+    , givePath: RegExp | string
     , handler: RequestListener) => {
-    return (ctx: ContextRouter, next: NextFunction) => {
-        const path = givenPath === '/' ? '(/)' : givenPath
+    return (ctx: ContextRoute, next: NextFunction, namespace = '') => {
+        const path = givePath === '/' ? '(/)' : givePath
         const route = path instanceof UrlPattern
             ? path
-            : new UrlPattern((path as string), patternOpts)
+            : new UrlPattern(`${namespace}${path}`, patternOpts)
 
         const { params, query } = getParamsAndQuery(route, ctx.req.url)
         if (params && ctx.req.method === method) {
@@ -54,9 +69,24 @@ const methodFn = (method: string
     }
 }
 
-// export const withNamespace = (_namespace: string) => (...funcs: RequestListener[]) => composeRoute(funcs)
-export const get = (givenPath: RegExp | string, handler: RequestListener) => methodFn('GET', givenPath, handler)
-export const post = (givenPath: RegExp | string, handler: RequestListener) => methodFn('POST', givenPath, handler)
+const router = (...funcs: MethodFunction[]) => funcs
 
-const router = (...funcs: RequestListener[]) => funcs
+export const createMethod = (method: string) => (givenPathOrHandler: RegExp | string | RequestListener, handler?: RequestListener) => {
+    const upperMethod = method.toUpperCase()
+    const { givePath, listener } = orderPathOrHandler(givenPathOrHandler, handler)
+    return findMethod(upperMethod, givePath, listener)
+}
+
+export const whitNamespace = (namespace: string) => (...funcs: MethodFunction[]) => funcs.map((handler) => {
+    return (ctx: ContextRoute, next: NextFunction) => handler(ctx, next, namespace)
+})
+
+export const get = createMethod('get')
+export const del = createMethod('del')
+export const put = createMethod('put')
+export const path = createMethod('path')
+export const post = createMethod('post')
+export const head = createMethod('heat')
+export const options = createMethod('options')
+
 export default router
