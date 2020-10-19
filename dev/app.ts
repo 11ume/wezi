@@ -1,4 +1,3 @@
-import http from 'http'
 import createApp, { Context, NextFunction } from 'application'
 import { isDev } from 'utils'
 import { send } from 'senders'
@@ -13,7 +12,10 @@ const handleErrors = (ctx: Context) => {
     send(ctx, statusCode, payload)
 }
 
-const app = createApp(router, handleNotFound, handleErrors)
-http
-    .createServer(app)
-    .listen(5000)
+const app = createApp(
+    router
+    , handleNotFound
+    , handleErrors
+)
+
+export default app

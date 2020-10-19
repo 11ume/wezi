@@ -2,8 +2,6 @@ import { Stream, Readable } from 'stream'
 import { isReadable } from 'utils'
 import { Context } from 'application'
 
-export type Send = <T>(ctx: Context, statusCode: number, obj: T) => void
-
 export const noContentType = (ctx: Context) => !ctx.res.getHeader('Content-Type')
 
 export const sendBuffer = (ctx: Context, obj: Buffer) => {

@@ -1,4 +1,4 @@
-import router, { ContextRoute, get, post, put } from 'router'
+import { ContextRoute, whitNamespace, get, post, put } from 'router'
 import { json } from 'recibers'
 
 type UserBody = {
@@ -9,14 +9,13 @@ type UserByIdParams = {
     id: string
 }
 
-const getAll = () => {
-    throw Error('test')
-}
+const getAll = () => [1, 2, 3]
 const getById = (ctx: ContextRoute<UserByIdParams>) => ctx.params.id
 const create = async (ctx: ContextRoute) => json<UserBody>(ctx)
 const update = async (ctx: ContextRoute) => json<UserBody>(ctx)
 
-const r = router(
+const v1 = whitNamespace('/api')
+const r = v1(
     get('/users', getAll)
     , get('/users/:id', getById)
     , post('/users', create)

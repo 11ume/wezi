@@ -27,7 +27,7 @@ function handleAsyncReturn(ctx: Context) {
 }
 
 // controll the async flow of all handlers
-function asyncHandler(ctx: Context, next: NextFunction, handler: RequestListener) {
+function asyncHandlerWrapper(ctx: Context, next: NextFunction, handler: RequestListener) {
     return new Promise(resolve => resolve(handler(ctx, next)))
         .then(handleAsyncReturn(ctx))
         .catch(next)
@@ -41,7 +41,7 @@ function nextCreator(ctx: Context, loop: Loop) {
     }
 }
 
-// handlers loop logic
+// works whit handler pile and the loop logic
 function loopCreator(handlers: RequestListener[]) {
     let i = 0
     return function loop(ctx: Context) {
@@ -53,7 +53,7 @@ function loopCreator(handlers: RequestListener[]) {
         if (i < handlers.length) {
             const handler = handlers[i++]
             const next = nextCreator(ctx, loop)
-            asyncHandler(ctx, next, handler)
+            asyncHandlerWrapper(ctx, next, handler)
         }
     }
 }

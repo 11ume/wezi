@@ -8,7 +8,7 @@ export interface ContextRoute<P = void, Q = void> extends Context {
     , query?: Q
 }
 
-type MethodFunction = (ctx: ContextRoute, next: NextFunction, namespace?: string) => void
+type handlerFunction = (ctx: ContextRoute, next: NextFunction, namespace?: string) => void
 
 const patternOpts = {
     segmentNameCharset: 'a-zA-Z0-9_-'
@@ -32,61 +32,69 @@ const getParamsAndQuery = (pattern: UrlPattern | string, url: string) => {
     }
 }
 
-const orderPathOrHandler = (givenPathOrHandler: RegExp | string | RequestListener, handler: RequestListener) => {
-    if (typeof givenPathOrHandler === 'function') {
-        return {
-            givePath: ''
-            , listener: givenPathOrHandler
-        }
-    }
-
-    return {
-        givePath: givenPathOrHandler
-        , listener: handler
-    }
+type HandlerStackItem = {
+    path: RegExp | string
+    method: string
+    handler: handlerFunction
+    pattern?: UrlPattern
+    namespace?: string
 }
 
-const findMethod = (method: string
-    , givePath: RegExp | string
-    , handler: RequestListener) => {
-    return (ctx: ContextRoute, next: NextFunction, namespace = '') => {
-        const path = givePath === '/' ? '(/)' : givePath
-        const route = path instanceof UrlPattern
+const routeStackPrepare = (handlerStackItems: HandlerStackItem[], namespace = ''): HandlerStackItem[] => {
+    return handlerStackItems.map((item) => {
+        const path = item.path === '/' ? '(/)' : item.path
+        const pattern = path instanceof UrlPattern
             ? path
             : new UrlPattern(`${namespace}${path}`, patternOpts)
+        return {
+            ...item
+            , pattern
+            , namespace
+        }
+    })
+}
 
-        const { params, query } = getParamsAndQuery(route, ctx.req.url)
-        if (params && ctx.req.method === method) {
-            const context = Object.assign(ctx, {
-                params
-                , query
-            })
+const prepareRoutes = (handlerStackItems: HandlerStackItem[], namespace?: string) => {
+    const routeStack = routeStackPrepare(handlerStackItems, namespace)
+    return function find(ctx: ContextRoute, next: NextFunction) {
+        for (let i = 0, len = routeStack.length; i < len; i++) {
+            const item = routeStack[i]
+            const { params, query } = getParamsAndQuery(item.pattern, ctx.req.url)
+            if (params && ctx.req.method === item.method) {
+                const context = Object.assign(ctx, {
+                    params
+                    , query
+                })
 
-            return handler(context, next)
+                return item.handler(context, next)
+            }
         }
 
         next()
     }
 }
 
-const router = (...funcs: MethodFunction[]) => funcs
+const router = (...handlerStackItems: HandlerStackItem[]) => prepareRoutes(handlerStackItems)
 
-export const createMethod = (method: string) => (givenPathOrHandler: RegExp | string | RequestListener, handler?: RequestListener) => {
+const createHandlerMethod = (method: string) => (path: RegExp | string, handler: RequestListener): HandlerStackItem => {
     const upperMethod = method.toUpperCase()
-    const { givePath, listener } = orderPathOrHandler(givenPathOrHandler, handler)
-    return findMethod(upperMethod, givePath, listener)
+    return {
+        method: upperMethod
+        , path
+        , handler
+    }
 }
 
-export const whitNamespace = (namespace: string) => (...funcs: MethodFunction[]) => funcs.map((handler) => {
-    return (ctx: ContextRoute, next: NextFunction) => handler(ctx, next, namespace)
-})
+export const whitNamespace = (namespace: string) => (...handlerStackItems: HandlerStackItem[]) => {
+    return prepareRoutes(handlerStackItems, namespace)
+}
 
-export const get = createMethod('get')
-export const del = createMethod('del')
-export const put = createMethod('put')
-export const path = createMethod('path')
-export const post = createMethod('post')
-export const head = createMethod('heat')
-export const options = createMethod('options')
+export const get = createHandlerMethod('get')
+export const del = createHandlerMethod('del')
+export const put = createHandlerMethod('put')
+export const path = createHandlerMethod('path')
+export const post = createHandlerMethod('post')
+export const head = createHandlerMethod('heat')
+export const options = createHandlerMethod('options')
 
 export default router
