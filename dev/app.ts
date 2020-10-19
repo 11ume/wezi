@@ -3,8 +3,8 @@ import { isDev } from 'utils'
 import { send } from 'senders'
 import { createError } from 'error'
 import router from './router'
+// import cors from '../packages/cors'
 
-const log = (ctx: Context) => console.log(ctx.req.method)
 const handleNotFound = (_ctx: Context, next: NextFunction) => next(createError(404, 'Not found'))
 const handleErrors = (ctx: Context) => {
     const statusCode = ctx.error.statusCode || 500
@@ -14,8 +14,7 @@ const handleErrors = (ctx: Context) => {
 }
 
 export default app(
-    log
-    , router
+    router('/api/v1')
     , handleNotFound
     , handleErrors
 )

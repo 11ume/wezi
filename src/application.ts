@@ -50,10 +50,7 @@ function nextCreator(ctx: Context, loop: Loop) {
 function loopCreator(handlers: RequestListener[]) {
     let i = 0
     return function loop(ctx: Context) {
-        if (ctx.error) {
-            // go to last handler
-            i = handlers.length - 1
-        }
+        if (ctx.error) i = handlers.length - 1 // go to last handler
         if (ctx.res.writableEnded) return
         if (i < handlers.length) {
             const handler = handlers[i++]
