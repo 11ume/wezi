@@ -42,12 +42,10 @@ const methodFn = (method: string
 
         const { params, query } = getParamsAndQuery(route, ctx.req.url)
         if (params && ctx.req.method === method) {
-            const context = {
-                req: ctx.req
-                , res: ctx.res
-                , params
+            const context = Object.assign(ctx, {
+                params
                 , query
-            }
+            })
 
             return handler(context, next)
         }

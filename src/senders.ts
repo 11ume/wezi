@@ -1,57 +1,57 @@
-import { ServerResponse } from 'http'
 import { Stream, Readable } from 'stream'
 import { isDev, isReadable, ErrorObj } from 'utils'
+import { Context } from 'application'
 
-export const noContentType = (res: ServerResponse) => !res.getHeader('Content-Type')
+export const noContentType = (ctx: Context) => !ctx.res.getHeader('Content-Type')
 
-export const sendBuffer = (res: ServerResponse, obj: Buffer) => {
+export const sendBuffer = (ctx: Context, obj: Buffer) => {
     if (Buffer.isBuffer(obj)) {
-        if (noContentType(res)) {
-            res.setHeader('Content-Type', 'application/octet-stream')
+        if (noContentType(ctx)) {
+            ctx.res.setHeader('Content-Type', 'application/octet-stream')
         }
 
-        res.setHeader('Content-Length', obj.length)
-        res.end(obj)
+        ctx.res.setHeader('Content-Length', obj.length)
+        ctx.res.end(obj)
         return
     }
 
-    res.end()
+    ctx.res.end()
 }
 
-export const sendStream = (res: ServerResponse, obj: Readable) => {
+export const sendStream = (ctx: Context, obj: Readable) => {
     if (obj instanceof Stream || isReadable(obj)) {
-        if (noContentType(res)) {
-            res.setHeader('Content-Type', 'application/octet-stream')
+        if (noContentType(ctx)) {
+            ctx.res.setHeader('Content-Type', 'application/octet-stream')
         }
 
-        obj.pipe(res)
+        obj.pipe(ctx.res)
         return
     }
 
-    res.end()
+    ctx.res.end()
 }
 
-export const send = <T>(res: ServerResponse
+export const send = <T>(ctx: Context
     , statusCode = 200
-    , obj?: T) => {
-    res.statusCode = statusCode
+    , obj: T = null) => {
+    ctx.res.statusCode = statusCode
     if (obj === null) {
-        res.end()
+        ctx.res.end()
         return
     }
 
     const payload = JSON.stringify(obj)
-    if (noContentType(res)) {
-        res.setHeader('Content-Type', 'application/json charset=utf-8')
+    if (noContentType(ctx)) {
+        ctx.res.setHeader('Content-Type', 'application/json charset=utf-8')
     }
 
-    res.setHeader('Content-Length', Buffer.byteLength(payload))
-    res.end(payload)
+    ctx.res.setHeader('Content-Length', Buffer.byteLength(payload))
+    ctx.res.end(payload)
 }
 
-export const sendError = (res: ServerResponse, err: ErrorObj) => {
+export const sendError = (ctx: Context, err: ErrorObj) => {
     const statusCode = err.statusCode || 500
     const message = err.message || 'Internal Server Error'
     const payload = isDev() ? err.stack : message
-    send(res, statusCode, payload)
+    send(ctx, statusCode, payload)
 }
