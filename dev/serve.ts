@@ -1,8 +1,14 @@
-import { App } from '../index'
+import http from 'http'
+import createApp, { Context } from 'application'
+import { send } from 'senders'
+import router from './router'
 
-const app = new App()
-// app.use((_req, res) => {
-//     res.statusCode = 300
-// })
-app.use('/app', () => 'foo')
-app.listen(5000, () => console.log('listen'))
+// const middle = () => {
+//     throw new Error('test')
+// }
+
+const handleNotFound = (ctx: Context) => send(ctx, 404)
+const app = createApp(router, handleNotFound)
+http
+    .createServer(app)
+    .listen(5000)

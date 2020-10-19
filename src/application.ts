@@ -1,53 +1,58 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { send, sendError } from 'senders'
 
-export type NextFunction = (err?: Error) => void
-export type RequestListener = (req: IncomingMessage, res: ServerResponse, next?: NextFunction) => unknown
-
-function requestListener(
+export interface Context {
     req: IncomingMessage
     , res: ServerResponse
-    , next: NextFunction
-    , handler: RequestListener) {
-    return new Promise(resolve => resolve(handler(req, res, next)))
+}
+
+export type NextFunction = (err?: Error) => void
+export type RequestListener = (ctx: Context, next?: NextFunction) => void
+type Loop = (ctx: Context) => void
+
+function asyncHandler(ctx: Context, next: NextFunction, handler: RequestListener) {
+    return new Promise(resolve => resolve(handler(ctx, next)))
         .then((val: unknown) => {
             if (val === null) {
-                send(res, 204, null)
+                send(ctx, 204)
                 return
             }
 
             if (val !== undefined) {
-                send(res, res.statusCode, val)
+                send(ctx, ctx.res.statusCode, val)
             }
         })
         .catch(err => {
-            sendError(res, err)
+            sendError(ctx, err)
         })
 }
 
-function nextFn(req: IncomingMessage
-    , res: ServerResponse
-    , middlewares: RequestListener[]) {
-    return (err?: Error) => {
+function nextFn(ctx: Context, loop: Loop) {
+    return function next(err?: Error) {
         if (err) return
-        loop(req, res, middlewares)
+        loop(ctx)
     }
 }
 
-function loop(req: IncomingMessage
-    , res: ServerResponse
-    , middlewares: RequestListener[]) {
+function loopFn(handlers: RequestListener[]) {
     let i = 0
-    if (res.writableEnded) return
-    if (i < middlewares.length) {
-        const handler = middlewares[i++]
-        const next = nextFn(req, res, middlewares)
-        requestListener(req, res, next, handler)
+    return function loop(ctx: Context) {
+        if (ctx.res.writableEnded) return
+        if (i < handlers.length) {
+            const handler = handlers[i++]
+            const next = nextFn(ctx, loop)
+            asyncHandler(ctx, next, handler)
+        }
     }
 }
 
-export const createApp = (middlewares: RequestListener[]) => {
+const createApp = (handler: RequestListener | RequestListener[], ...handlers: RequestListener[]) => {
+    const mergeHandlers = Array.isArray(handler) ? [...handler, ...handlers] : [handler, ...handlers]
     return (req: IncomingMessage, res: ServerResponse) => {
-        loop(req, res, middlewares)
+        loopFn(mergeHandlers)({
+            req
+            , res
+        })
     }
 }
+export default createApp

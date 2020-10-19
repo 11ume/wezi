@@ -1,10 +1,13 @@
 // eslint-disable-next-line node/no-deprecated-api
 import { parse } from 'url'
 import UrlPattern from 'url-pattern'
-import { RequestListener, NextFunction } from 'application'
-import { IncomingMessage, ServerResponse } from 'http'
+import { Context, RequestListener, NextFunction } from 'application'
 
 // const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
+export interface ContextRouter<P = void, Q = void> extends Context {
+    params?: P
+    , query?: Q
+}
 
 const patternOpts = {
     segmentNameCharset: 'a-zA-Z0-9_-'
@@ -28,33 +31,32 @@ const getParamsAndQuery = (pattern: UrlPattern | string, url: string) => {
     }
 }
 
-const methodFn = (method: string) => (givenPath: UrlPattern | string, handler: RequestListener) => {
-    return (req: IncomingMessage, res: ServerResponse, next: NextFunction, namespace: string) => {
+const methodFn = (method: string
+    , givenPath: RegExp | string
+    , handler: RequestListener) => {
+    return (ctx: ContextRouter, next: NextFunction) => {
         const path = givenPath === '/' ? '(/)' : givenPath
         const route = path instanceof UrlPattern
             ? path
-            : new UrlPattern(`${namespace}${path}`, patternOpts)
+            : new UrlPattern((path as string), patternOpts)
 
-        const { params, query } = getParamsAndQuery(route, req.url)
+        const { params, query } = getParamsAndQuery(route, ctx.req.url)
+        if (params && ctx.req.method === method) {
+            const context = Object.assign(ctx, {
+                params
+                , query
+            })
 
-        if (params && req.method === method) {
-            return handler(Object.assign(req, {
-                params, query
-            }), res)
+            return handler(context, next)
         }
+
+        next()
     }
 }
 
-const findRoute = (funcs: RequestListener[]) => async (
-    req: IncomingMessage
-    , res: ServerResponse
-    , next: NextFunction) => {
-    for (const fn of funcs) {
-        const result = await fn(req, res, next)
-        if (result || res.headersSent) return result
-    }
-}
+// export const withNamespace = (_namespace: string) => (...funcs: RequestListener[]) => composeRoute(funcs)
+export const get = (givenPath: RegExp | string, handler: RequestListener) => methodFn('GET', givenPath, handler)
+export const post = (givenPath: RegExp | string, handler: RequestListener) => methodFn('POST', givenPath, handler)
 
-export const router = (...funcs: RequestListener[]) => findRoute(funcs)
-export const withNamespace = (namespace: string) => (...funcs: RequestListener[]) => findRoute(funcs)
-export const get = () => methodFn('get')
+const router = (...funcs: RequestListener[]) => funcs
+export default router
