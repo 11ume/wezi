@@ -1,17 +1,13 @@
 // eslint-disable-next-line node/no-deprecated-api
 import { parse } from 'url'
 import UrlPattern from 'url-pattern'
-import { RequestListener, NextFunction } from 'application'
-import { IncomingMessage as IMessage, ServerResponse } from 'http'
+import { Context, RequestListener, NextFunction } from 'application'
 
 // const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
-
-interface IncomingMessage<P, Q> extends IMessage {
+export interface ContextRouter<P = void, Q = void> extends Context {
     params?: P
     , query?: Q
 }
-
-type RequestListenerRouter<P, Q> = (req: IncomingMessage<P, Q>, res: ServerResponse) => void
 
 const patternOpts = {
     segmentNameCharset: 'a-zA-Z0-9_-'
@@ -35,22 +31,25 @@ const getParamsAndQuery = (pattern: UrlPattern | string, url: string) => {
     }
 }
 
-const methodFn = <P, Q>(method: string
+const methodFn = (method: string
     , givenPath: RegExp | string
     , handler: RequestListener) => {
-    return (req: IncomingMessage<P, Q>, res: ServerResponse, next: NextFunction) => {
+    return (ctx: ContextRouter, next: NextFunction) => {
         const path = givenPath === '/' ? '(/)' : givenPath
         const route = path instanceof UrlPattern
             ? path
             : new UrlPattern((path as string), patternOpts)
 
-        const { params, query } = getParamsAndQuery(route, req.url)
-        if (params && req.method === method) {
-            const mergeReq = Object.assign(req, {
-                params, query
-            })
+        const { params, query } = getParamsAndQuery(route, ctx.req.url)
+        if (params && ctx.req.method === method) {
+            const context = {
+                req: ctx.req
+                , res: ctx.res
+                , params
+                , query
+            }
 
-            return handler(mergeReq, res, next)
+            return handler(context, next)
         }
 
         next()
@@ -58,6 +57,6 @@ const methodFn = <P, Q>(method: string
 }
 
 // export const withNamespace = (_namespace: string) => (...funcs: RequestListener[]) => composeRoute(funcs)
-export const get = <P, Q = void>(givenPath: RegExp | string, handler: RequestListenerRouter<P, Q>) => methodFn<P, Q>('GET', givenPath, handler)
+export const get = (givenPath: RegExp | string, handler: RequestListener) => methodFn('GET', givenPath, handler)
 const router = (...funcs: RequestListener[]) => funcs
 export default router

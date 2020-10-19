@@ -31,15 +31,15 @@ export const sendStream = (res: ServerResponse, obj: Readable) => {
     res.end()
 }
 
-export const sendEmpty = (res: ServerResponse, statusCode: number) => {
-    res.statusCode = statusCode
-    res.end()
-}
-
 export const send = <T>(res: ServerResponse
     , statusCode = 200
-    , obj: T = null) => {
+    , obj?: T) => {
     res.statusCode = statusCode
+    if (obj === null) {
+        res.end()
+        return
+    }
+
     const payload = JSON.stringify(obj)
     if (noContentType(res)) {
         res.setHeader('Content-Type', 'application/json charset=utf-8')

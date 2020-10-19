@@ -1,26 +1,23 @@
 import http from 'http'
-import createApp from 'application'
+import createApp, { Context } from 'application'
 import { send } from 'senders'
-import router, { get } from 'router'
+import router from './router'
 
-type Params = {
-    email: string
-}
+const notFound = (ctx: Context) => send(ctx.res, 404)
+// const serverError = (_req: IncomingMessage, res: ServerResponse) => {
+//     const error = isDev() ? err : null
+//     res.status(err.status || 500)
+//     if (error) send(err.status, error)
+//     else res.end()
+// }
 
-const getUserById = get<Params>('/user/:id', (req) => {
-    return req.params
-})
-
-const notFound = (_req, res) => {
-    return send(res, 404)
-}
-
-const r = router(
-    getUserById
+const middlewares = [
+    ...router
     , notFound
-)
+    // , serverError
+]
 
-const app = createApp(r)
+const app = createApp(middlewares)
 http
     .createServer(app)
     .listen(5000)
