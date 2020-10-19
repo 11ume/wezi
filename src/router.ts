@@ -46,10 +46,8 @@ const orderPathOrHandler = (givenPathOrHandler: RegExp | string | RequestListene
     }
 }
 
-const findMethod = (method: string
-    , givePath: RegExp | string
-    , handler: RequestListener) => {
-    return (ctx: ContextRoute, next: NextFunction, namespace = '') => {
+const findMethod = (method: string, givePath: RegExp | string, handler: RequestListener) => {
+    return function matcher(ctx: ContextRoute, next: NextFunction, namespace = '') {
         const path = givePath === '/' ? '(/)' : givePath
         const route = path instanceof UrlPattern
             ? path
@@ -78,7 +76,9 @@ export const createMethod = (method: string) => (givenPathOrHandler: RegExp | st
 }
 
 export const whitNamespace = (namespace: string) => (...funcs: MethodFunction[]) => funcs.map((handler) => {
-    return (ctx: ContextRoute, next: NextFunction) => handler(ctx, next, namespace)
+    return (ctx: ContextRoute, next: NextFunction) => {
+        return handler(ctx, next, namespace)
+    }
 })
 
 export const get = createMethod('get')

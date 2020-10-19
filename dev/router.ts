@@ -9,9 +9,7 @@ type UserByIdParams = {
     id: string
 }
 
-const getAll = () => {
-    throw Error('test')
-}
+const getAll = () => [1, 2, 3]
 const getById = (ctx: ContextRoute<UserByIdParams>) => ctx.params.id
 const create = async (ctx: ContextRoute) => json<UserBody>(ctx)
 const update = async (ctx: ContextRoute) => json<UserBody>(ctx)

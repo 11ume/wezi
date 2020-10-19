@@ -5,7 +5,7 @@
   "main": "main.ts",
   "types": "main.ts",
   "scripts": {
-    "start": "cross-env NODE_PATH=./build/src NODE_ENV='development' node build/dev/serve"
+    "start": "cross-env NODE_PATH=./build/src NODE_ENV='development' node build/dev/server"
     , "build": "tsc"
   },
   "author": {
