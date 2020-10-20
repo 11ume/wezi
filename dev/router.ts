@@ -16,7 +16,7 @@ const update = async (ctx: ContextRoute) => json<UserBody>(ctx)
 
 const router = (namespace: string) => whitNamespace(namespace)(
     get('/users', getAll)
-    , get('/users/:id', getById)
+    , get('/users/:id/foo', getById)
     , post('/users', create)
     , put('/users', update)
 )
