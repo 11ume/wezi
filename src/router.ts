@@ -1,7 +1,7 @@
 // eslint-disable-next-line node/no-deprecated-api
 import { parse } from 'url'
 import { Context, RequestListener, NextFunction } from 'application'
-import matchit from 'matchit'
+import matchit from 'regexparam'
 
 export interface ContextRoute<P = void, Q = void> extends Context {
     params?: P
