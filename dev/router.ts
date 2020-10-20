@@ -1,6 +1,10 @@
-import router, { ContextRoute, get, post, put, del } from 'router'
 import { json } from 'recibers'
 import { send } from 'senders'
+import router, { get
+    , post
+    , put
+    , del
+    , ContextRoute } from 'router'
 
 type User = {
     name: string
@@ -17,6 +21,7 @@ const getAll = (): User[] => [{
     name: 'foo'
     , surname: 'bar'
 }]
+
 const getById = (ctx: ContextRoute<UserByIdParams>) => ctx.params.id
 const findOne = async (ctx: ContextRoute) => {
     const body = await json<UserBodyPartial>(ctx)
