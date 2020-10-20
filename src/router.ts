@@ -1,42 +1,58 @@
 // eslint-disable-next-line node/no-deprecated-api
 import { parse } from 'url'
 import { Context, RequestListener, NextFunction } from 'application'
-import matchit from 'regexparam'
+import regexparam from 'regexparam'
 
 export interface ContextRoute<P = void, Q = void> extends Context {
     params?: P
     , query?: Q
 }
 
-type handlerFunction = (ctx: ContextRoute, next: NextFunction, namespace?: string) => void
+type HandlerStackItem = {
+    path: string
+    method: string
+    handler: HandlerFunction
+    route?: Route
+    namespace?: string
+}
 
-// const patternOpts = {
-//     segmentNameCharset: 'a-zA-Z0-9_-'
-//     , segmentValueCharset: 'a-zA-Z0-9@.+-_'
-// }
+type HandlerFunction = (ctx: ContextRoute, next: NextFunction, namespace?: string) => void
 
-const getParamsAndQuery = (url: string, routes: matchit.Route[]) => {
+type Route = {
+    keys: Array<string>
+    , pattern: RegExp
+}
+
+const exec = (path: string, result: Route) => {
+    let i = 0
+    const params = {}
+    const matches = result.pattern.exec(path)
+    // eslint-disable-next-line no-unmodified-loop-condition
+    while (matches && i < result.keys.length) {
+        const key = result.keys[i]
+        params[key] = matches[++i] || null
+    }
+
+    return {
+        params
+        , matches
+    }
+}
+
+const getParamsAndQuery = (url: string, route: Route) => {
     const { query } = parse(url, true)
-    const match = matchit.match(url, routes)
-    const params = matchit.exec(url, match)
+    const { params, matches } = exec(url, route)
 
     return {
         query
         , params
+        , matches
     }
-}
-
-type HandlerStackItem = {
-    path: string
-    method: string
-    handler: handlerFunction
-    route?: matchit.Route
-    namespace?: string
 }
 
 const routeStackPrepare = (handlerStackItems: HandlerStackItem[], namespace = ''): HandlerStackItem[] => {
     return handlerStackItems.map((item) => {
-        const route = matchit.parse(`${namespace}${item.path}`)
+        const route = regexparam(`${namespace}${item.path}`)
         return {
             ...item
             , route
@@ -45,68 +61,26 @@ const routeStackPrepare = (handlerStackItems: HandlerStackItem[], namespace = ''
     })
 }
 
-// find(method, url) {
-//     let isHEAD = (method === 'HEAD')
-//     let i = 0
-//     let j = 0
-//     let k
-//     let tmp
-//     let matches=[]
-//     let params={}
-//     let handlers=[]
-//     let arr = this.routes
-
-//     for (; i < arr.length; i++) {
-//         tmp = arr[i]
-
-//         if (tmp.method.length === 0
-//             || tmp.method === method
-//             || isHEAD && tmp.method === 'GET') {
-
-//             if (tmp.keys === false) {
-
-//                 matches = tmp.pattern.exec(url)
-//                 if (matches === null) continue
-//                 if (matches.groups !== void 0) {
-//                     for (k in matches.groups) {
-//                         params[k]=matches.groups[k]
-//                     }
-//                 }
-
-//                 tmp.handlers.length > 1 ? (handlers=handlers.concat(tmp.handlers)) : handlers.push(tmp.handlers[0])
-
-//             } else if (tmp.keys.length > 0) {
-
-//                 matches = tmp.pattern.exec(url)
-//                 if (matches === null) continue
-//                 for (j=0; j < tmp.keys.length;) params[tmp.keys[j]]=matches[++j];
-//                 tmp.handlers.length > 1 ? (handlers=handlers.concat(tmp.handlers)) : handlers.push(tmp.handlers[0]);
-
-//             } else if (tmp.pattern.test(url)) {
-
-//                 tmp.handlers.length > 1 ? (handlers=handlers.concat(tmp.handlers)) : handlers.push(tmp.handlers[0]);
-
-//             }
-//         } // else not a match
-//     }
-
-//     return { params, handlers };
-// }
+const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
 
 const prepareRoutes = (handlerStackItems: HandlerStackItem[], namespace?: string) => {
     const routeStack = routeStackPrepare(handlerStackItems, namespace)
-    const routes = routeStack.map((r) => r.route)
     return function find(ctx: ContextRoute, next: NextFunction) {
-        const { query, params } = getParamsAndQuery(ctx.req.url, routes)
         for (let i = 0, len = routeStack.length; i < len; i++) {
             const item = routeStack[i]
-            if (ctx.req.method === item.method) {
+            const { query, params, matches } = getParamsAndQuery(ctx.req.url, item.route)
+            if (matches && ctx.req.method === item.method) {
                 const context = Object.assign(ctx, {
                     query
                     , params
                 })
 
                 return item.handler(context, next)
+            }
+
+            if (matches && isHead(ctx)) {
+                ctx.res.end()
+                return
             }
         }
 
