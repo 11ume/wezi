@@ -1,32 +1,52 @@
-import { ContextRoute, whitNamespace, get, put } from 'router'
+import router, { ContextRoute, get, post, put, del } from 'router'
 import { json } from 'recibers'
-import { Context } from 'vm'
+import { send } from 'senders'
 
-type UserBody = {
+type User = {
     name: string
+    surname: string
 }
+
+type UserBodyPartial = Partial<User>
 
 type UserByIdParams = {
     id: string
 }
 
-const getAll = () => [1, 2, 3]
+const getAll = (): User[] => [{
+    name: 'foo'
+    , surname: 'bar'
+}]
 const getById = (ctx: ContextRoute<UserByIdParams>) => ctx.params.id
-// const create = async (ctx: ContextRoute) => json<UserBody>(ctx)
-const update = async (ctx: ContextRoute) => json<UserBody>(ctx)
-const other = (ctx: Context) => {
-    const { id, foo } = ctx.params
-    return {
-        id
-        , foo
+const findOne = async (ctx: ContextRoute) => {
+    const body = await json<UserBodyPartial>(ctx)
+    if (!body.name) {
+        send(ctx, 400)
+        return
     }
+
+    send(ctx, 200)
 }
 
-const router = (namespace: string) => whitNamespace(namespace)(
+const create = async (ctx: ContextRoute) => {
+    const { name } = await json<User>(ctx)
+    return name
+}
+
+const update = async (ctx: ContextRoute) => {
+    const { name } = await json<UserBodyPartial>(ctx)
+    return name
+}
+
+const remove = async (ctx: ContextRoute<UserByIdParams>) => ctx.params.id
+
+const r = router(
     get('/users', getAll)
+    , get('/users/find', findOne)
     , get('/users/:id', getById)
-    , get('/users/:id/:foo', other)
+    , post('/users', create)
     , put('/users', update)
+    , del('/users', remove)
 )
 
-export default router
+export default r

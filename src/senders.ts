@@ -31,9 +31,9 @@ export const sendStream = (ctx: Context, obj: Readable) => {
     ctx.res.end()
 }
 
-export const send = <T>(ctx: Context, statusCode = 200, obj: T = null) => {
+export const send = <T>(ctx: Context, statusCode = 200, obj?: T) => {
     ctx.res.statusCode = statusCode
-    if (obj === null) {
+    if (!obj) {
         ctx.res.end()
         return
     }

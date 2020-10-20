@@ -3,6 +3,8 @@ import { parse } from 'url'
 import { Context, RequestListener, NextFunction } from 'application'
 import regexparam from 'regexparam'
 
+const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
+
 export interface ContextRoute<P = void, Q = void> extends Context {
     params?: P
     , query?: Q
@@ -61,24 +63,22 @@ const routeStackPrepare = (handlerStackItems: HandlerStackItem[], namespace = ''
     })
 }
 
-const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
-
 const prepareRoutes = (handlerStackItems: HandlerStackItem[], namespace?: string) => {
     const routeStack = routeStackPrepare(handlerStackItems, namespace)
     return function find(ctx: ContextRoute, next: NextFunction) {
         for (let i = 0, len = routeStack.length; i < len; i++) {
             const item = routeStack[i]
-            const { query, params, matches } = getParamsAndQuery(ctx.req.url, item.route)
-            if (matches && ctx.req.method === item.method) {
+            const result = getParamsAndQuery(ctx.req.url, item.route)
+            if (result.matches && ctx.req.method === item.method) {
                 const context = Object.assign(ctx, {
-                    query
-                    , params
+                    query: result.query
+                    , params: result.params
                 })
 
                 return item.handler(context, next)
             }
 
-            if (matches && isHead(ctx)) {
+            if (result.matches && isHead(ctx)) {
                 ctx.res.end()
                 return
             }
@@ -99,7 +99,7 @@ const createHandlerMethod = (method: string) => (path: string, handler: RequestL
     }
 }
 
-export const whitNamespace = (namespace: string) => (...handlerStackItems: HandlerStackItem[]) => {
+export const routerNamespace = (namespace: string) => (...handlerStackItems: HandlerStackItem[]) => {
     return prepareRoutes(handlerStackItems, namespace)
 }
 

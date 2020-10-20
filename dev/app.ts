@@ -14,7 +14,7 @@ const handleErrors = (ctx: Context) => {
 }
 
 export default app(
-    router('/api/v1')
+    router
     , handleNotFound
     , handleErrors
 )
