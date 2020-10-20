@@ -1,72 +1,86 @@
 // eslint-disable-next-line node/no-deprecated-api
 import { parse } from 'url'
-import UrlPattern from 'url-pattern'
 import { Context, RequestListener, NextFunction } from 'application'
+import regexparam from 'regexparam'
 
 export interface ContextRoute<P = void, Q = void> extends Context {
     params?: P
     , query?: Q
 }
 
-type handlerFunction = (ctx: ContextRoute, next: NextFunction, namespace?: string) => void
-
-const patternOpts = {
-    segmentNameCharset: 'a-zA-Z0-9_-'
-    , segmentValueCharset: 'a-zA-Z0-9@.+-_'
+type HandlerStackItem = {
+    path: string
+    method: string
+    handler: HandlerFunction
+    route?: Route
+    namespace?: string
 }
 
-const isPattern = (pattern: UrlPattern | string) => {
-    return pattern instanceof UrlPattern
-        ? pattern
-        : new UrlPattern(pattern, patternOpts)
+type HandlerFunction = (ctx: ContextRoute, next: NextFunction, namespace?: string) => void
+
+type Route = {
+    keys: Array<string>
+    , pattern: RegExp
 }
 
-const getParamsAndQuery = (pattern: UrlPattern | string, url: string) => {
-    const { query, pathname } = parse(url, true)
-    const route = isPattern(pattern)
-    const params = route.match(pathname)
+const exec = (path: string, result: Route) => {
+    let i = 0
+    const params = {}
+    const matches = result.pattern.exec(path)
+    // eslint-disable-next-line no-unmodified-loop-condition
+    while (matches && i < result.keys.length) {
+        const key = result.keys[i]
+        params[key] = matches[++i] || null
+    }
+
+    return {
+        params
+        , matches
+    }
+}
+
+const getParamsAndQuery = (url: string, route: Route) => {
+    const { query } = parse(url, true)
+    const { params, matches } = exec(url, route)
 
     return {
         query
         , params
+        , matches
     }
-}
-
-type HandlerStackItem = {
-    path: RegExp | string
-    method: string
-    handler: handlerFunction
-    pattern?: UrlPattern
-    namespace?: string
 }
 
 const routeStackPrepare = (handlerStackItems: HandlerStackItem[], namespace = ''): HandlerStackItem[] => {
     return handlerStackItems.map((item) => {
-        const path = item.path === '/' ? '(/)' : item.path
-        const pattern = path instanceof UrlPattern
-            ? path
-            : new UrlPattern(`${namespace}${path}`, patternOpts)
+        const route = regexparam(`${namespace}${item.path}`)
         return {
             ...item
-            , pattern
+            , route
             , namespace
         }
     })
 }
+
+const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
 
 const prepareRoutes = (handlerStackItems: HandlerStackItem[], namespace?: string) => {
     const routeStack = routeStackPrepare(handlerStackItems, namespace)
     return function find(ctx: ContextRoute, next: NextFunction) {
         for (let i = 0, len = routeStack.length; i < len; i++) {
             const item = routeStack[i]
-            const { params, query } = getParamsAndQuery(item.pattern, ctx.req.url)
-            if (params && ctx.req.method === item.method) {
+            const { query, params, matches } = getParamsAndQuery(ctx.req.url, item.route)
+            if (matches && ctx.req.method === item.method) {
                 const context = Object.assign(ctx, {
-                    params
-                    , query
+                    query
+                    , params
                 })
 
                 return item.handler(context, next)
+            }
+
+            if (matches && isHead(ctx)) {
+                ctx.res.end()
+                return
             }
         }
 
@@ -76,7 +90,7 @@ const prepareRoutes = (handlerStackItems: HandlerStackItem[], namespace?: string
 
 const router = (...handlerStackItems: HandlerStackItem[]) => prepareRoutes(handlerStackItems)
 
-const createHandlerMethod = (method: string) => (path: RegExp | string, handler: RequestListener): HandlerStackItem => {
+const createHandlerMethod = (method: string) => (path: string, handler: RequestListener): HandlerStackItem => {
     const upperMethod = method.toUpperCase()
     return {
         method: upperMethod

@@ -13,7 +13,7 @@ export type NextFunction = (err?: ErrorObj) => void
 export type RequestListener = (ctx: Context, next?: NextFunction) => void
 type Loop = (ctx: Context) => void
 
-// asnyc handler executor sandbox
+// sandbox of asnyc handlers execution
 function handleAsyncReturn(ctx: Context, next: NextFunction) {
     return (val: unknown) => {
         if (ctx.error) return
@@ -46,11 +46,12 @@ function nextCreator(ctx: Context, loop: Loop) {
     }
 }
 
-// works whit handler pile and the loop logic
+// control the handler loop pile
 function loopCreator(handlers: RequestListener[]) {
     let i = 0
     return function loop(ctx: Context) {
-        if (ctx.error) i = handlers.length - 1 // go to last handler
+        // on error, go to last handler
+        if (ctx.error) i = handlers.length - 1
         if (ctx.res.writableEnded) return
         if (i < handlers.length) {
             const handler = handlers[i++]
@@ -69,4 +70,5 @@ const createApp = (handler: RequestListener | RequestListener[], ...handlers: Re
         })
     }
 }
+
 export default createApp
