@@ -1,5 +1,4 @@
-// eslint-disable-next-line node/no-deprecated-api
-import { parse } from 'url'
+import queryString from 'querystring'
 import { Context, RequestListener, NextFunction } from 'application'
 
 const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
@@ -68,13 +67,24 @@ const regExpExtractParams = (route: Route, match: RegExpExecArray) => {
     return params
 }
 
-const getParamsAndQuery = (url: string, route: Route, match: RegExpExecArray) => {
-    const { query } = parse(url, true)
-    const params = regExpExtractParams(route, match)
+const checkQuery = (url: string) => {
+    const index = url.indexOf('?', 1)
+    const isQuery = index !== -1
+    return {
+        index
+        , isQuery
+    }
+}
+
+const getQueryString = (url: string, idx: number) => {
+    const search = url.substring(idx)
+    const path = search.substring(1)
+    const pathname = url.substring(0, idx)
+    const query = queryString.parse(path)
 
     return {
         query
-        , params
+        , pathname
     }
 }
 
@@ -89,27 +99,48 @@ const routeStackPrepare = (handlerStackItems: RouteStackItem[], namespace = ''):
     })
 }
 
-const isPatternMatch = (ctx: Context, item: RouteStackItem) => item.route.pattern.exec(ctx.req.url)
+const isPatternMatch = (path: string, item: RouteStackItem) => item.route.pattern.exec(path)
+const isNotMethodMatch = (method: string, routeStack: RouteStackItem[], index: number) => method !== routeStack[index].method
+
+const getUrlQuery = (baseUrl: string) => {
+    const cq = checkQuery(baseUrl)
+    if (cq.isQuery) {
+        return getQueryString(baseUrl, cq.index)
+    }
+
+    return {
+        query: {}
+        , pathname: null
+    }
+}
+
+const getParams = (item: RouteStackItem, match: RegExpExecArray) => {
+    return match ? regExpExtractParams(item.route, match) : {}
+}
 
 const prepareRoutes = (handlerStackItems: RouteStackItem[], namespace?: string) => {
     const routeStack = routeStackPrepare(handlerStackItems, namespace)
     return function find(ctx: ContextRoute, next: NextFunction) {
+        const baseUrl = ctx.req.url
         const method = ctx.req.method
         for (let i = 0, len = routeStack.length; i < len; i++) {
-            if (method !== routeStack[i].method) continue
+            if (isNotMethodMatch(method, routeStack, i)) continue
             const item = routeStack[i]
-            const match = isPatternMatch(ctx, item)
-            if (match && method === item.method) {
-                const result = getParamsAndQuery(ctx.req.url, item.route, match)
+            const qs = getUrlQuery(baseUrl)
+            const match = isPatternMatch(qs.pathname || baseUrl, item)
+            const params = getParams(item, match)
+
+            if (match) {
                 const context = Object.assign(ctx, {
-                    query: result.query
-                    , params: result.params
+                    query: qs.query
+                    , params
                 })
 
                 return item.handler(context, next)
             }
 
-            if (match && isHead(ctx)) {
+            // send empty request for headers requests
+            if (isHead(ctx) && match) {
                 ctx.res.end()
                 return
             }
