@@ -1,7 +1,6 @@
 import queryString from 'querystring'
-import { Context, RequestListener, NextFunction } from 'application'
-
-const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
+import { Context, RequestListener, NextFunction } from 'wuok'
+import regexparam from './src/regexparam'
 
 export interface ContextRoute<P = void, Q = void> extends Context {
     params?: P
@@ -21,39 +20,6 @@ type HandlerFunction = (ctx: ContextRoute, next: NextFunction, namespace?: strin
 type Route = {
     keys: Array<string>
     , pattern: RegExp
-}
-
-const regexparam = (str: string, loose?: string) => {
-    let c = ''
-    let o = 0
-    let tmp = ''
-    let ext = 0
-    const keys = []
-    let pattern = ''
-    const arr = str.split('/')
-    arr[0] || arr.shift()
-
-    // eslint-disable-next-line no-cond-assign
-    while (tmp = arr.shift()) {
-        c = tmp[0]
-        if (c === '*') {
-            keys.push('wild')
-            pattern += '/(.*)'
-        } else if (c === ':') {
-            o = tmp.indexOf('?', 1)
-            ext = tmp.indexOf('.', 1)
-            keys.push(tmp.substring(1, ~o ? o : ~ext ? ext : tmp.length))
-            pattern += !!~o && !~ext ? '(?:/([^/]+?))?' : '/([^/]+?)'
-            if (~ext) pattern += (~o ? '?' : '') + '\\' + tmp.substring(ext)
-        } else {
-            pattern += '/' + tmp
-        }
-    }
-
-    return {
-        keys: keys
-        , pattern: new RegExp('^' + pattern + (loose ? '(?=$|/)' : '/?$'), 'i')
-    }
 }
 
 const regExpExtractParams = (route: Route, match: RegExpExecArray) => {
@@ -99,6 +65,7 @@ const routeStackPrepare = (handlerStackItems: RouteStackItem[], namespace = ''):
     })
 }
 
+const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
 const isPatternMatch = (path: string, item: RouteStackItem) => item.route.pattern.exec(path)
 const isNotMethodMatch = (method: string, routeStack: RouteStackItem[], index: number) => method !== routeStack[index].method
 
@@ -127,7 +94,8 @@ const prepareRoutes = (handlerStackItems: RouteStackItem[], namespace?: string) 
             if (isNotMethodMatch(method, routeStack, i)) continue
             const item = routeStack[i]
             const qs = getUrlQuery(baseUrl)
-            const match = isPatternMatch(qs.pathname || baseUrl, item)
+            const path = qs.pathname || baseUrl
+            const match = isPatternMatch(path, item)
             const params = getParams(item, match)
 
             if (match) {

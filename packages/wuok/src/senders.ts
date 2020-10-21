@@ -1,6 +1,6 @@
 import { Stream, Readable } from 'stream'
-import { isReadable } from 'utils'
-import { Context } from 'application'
+import { isReadable } from './utils'
+import { Context } from './app'
 
 export const noContentType = (ctx: Context) => !ctx.res.getHeader('Content-Type')
 

@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { mergeHandlers } from 'utils'
-import { ErrorObj } from 'error'
-import { send } from 'senders'
+import { mergeHandlers } from './utils'
+import { ErrorObj } from './error'
+import { send } from './senders'
 
 export interface Context {
     readonly req: IncomingMessage
@@ -62,7 +62,7 @@ function createLoop(handlers: RequestListener[]) {
 }
 
 // create app whit middlewares
-const createApp = (handler: RequestListener | RequestListener[], ...handlers: RequestListener[]) => {
+export const createApp = (handler: RequestListener | RequestListener[], ...handlers: RequestListener[]) => {
     const mergedHandlers = mergeHandlers(handler, handlers)
     return (req: IncomingMessage, res: ServerResponse) => {
         const runLoop = createLoop(mergedHandlers)
@@ -75,4 +75,3 @@ const createApp = (handler: RequestListener | RequestListener[], ...handlers: Re
     }
 }
 
-export default createApp
