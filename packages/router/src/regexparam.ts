@@ -1,11 +1,11 @@
-const regexparam = (str: string, loose?: string) => {
+const regexparam = (path: string, loose?: string) => {
     let c = ''
     let o = 0
-    let tmp = ''
     let ext = 0
-    const keys = []
+    let tmp = ''
     let pattern = ''
-    const arr = str.split('/')
+    const keys: string[] = []
+    const arr = path.split('/')
     arr[0] || arr.shift()
 
     // eslint-disable-next-line no-cond-assign
@@ -25,9 +25,10 @@ const regexparam = (str: string, loose?: string) => {
         }
     }
 
+    const finalePattern = new RegExp('^' + pattern + (loose ? '(?=$|/)' : '/?$'), 'i')
     return {
-        keys: keys
-        , pattern: new RegExp('^' + pattern + (loose ? '(?=$|/)' : '/?$'), 'i')
+        keys
+        , pattern: finalePattern
     }
 }
 
