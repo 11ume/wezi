@@ -23,7 +23,9 @@ export type RouteStackItem = {
 
 type HandlerFunction = (ctx: ContextRoute, next: NextFunction, namespace?: string) => void
 
-const routeStackPrepare = (handlerStackItems: RouteStackItem[], namespace = ''): RouteStackItem[] => {
+const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
+
+const prepareRouteStack = (handlerStackItems: RouteStackItem[], namespace = ''): RouteStackItem[] => {
     return handlerStackItems.map((item) => {
         const route = regexparam(`${namespace}${item.path}`)
         return {
@@ -33,8 +35,6 @@ const routeStackPrepare = (handlerStackItems: RouteStackItem[], namespace = ''):
         }
     })
 }
-
-const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
 
 // compares the incoming meter with one in the stack 
 const notMethodMatch = (method: string, routeStack: RouteStackItem[], index: number) => method !== routeStack[index].method
@@ -83,11 +83,9 @@ const findRouteMatch = (stack: RouteStackItem[]) => {
 
 // it make pre built of all router handlers
 const prepareRoutes = (handlerStackItems: RouteStackItem[], namespace?: string) => {
-    const stack = routeStackPrepare(handlerStackItems, namespace)
+    const stack = prepareRouteStack(handlerStackItems, namespace)
     return findRouteMatch(stack)
 }
-
-const router = (...handlerStackItems: RouteStackItem[]) => prepareRoutes(handlerStackItems)
 
 const createHandlerMethod = (method: string) => (path: string, handler: RequestListener): RouteStackItem => {
     const upperMethod = method.toUpperCase()
@@ -98,6 +96,10 @@ const createHandlerMethod = (method: string) => (path: string, handler: RequestL
     }
 }
 
+// create router
+const router = (...handlerStackItems: RouteStackItem[]) => prepareRoutes(handlerStackItems)
+
+// create router whit namespace ej: /api/v1
 export const routerNamespace = (namespace: string) => (...handlerStackItems: RouteStackItem[]) => {
     return prepareRoutes(handlerStackItems, namespace)
 }
