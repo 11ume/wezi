@@ -64,6 +64,7 @@ const prepareRoutes = (handlerStackItems: HandlerStackItem[], namespace?: string
     return function find(ctx: ContextRoute, next: NextFunction) {
         const method = ctx.req.method
         for (let i = 0, len = routeStack.length; i < len; i++) {
+            if (method !== routeStack[i].method) continue
             const item = routeStack[i]
             const match = isPatternMatch(ctx, item)
             if (match && method === item.method) {
