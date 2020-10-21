@@ -76,12 +76,7 @@ const checkQuery = (url: string) => {
     }
 }
 
-type GetQueryString = {
-    query: queryString.ParsedUrlQuery;
-    pathname: string;
-}
-
-const getQueryString = (url: string, idx: number): GetQueryString => {
+const getQueryString = (url: string, idx: number) => {
     const search = url.substring(idx)
     const path = search.substring(1)
     const pathname = url.substring(0, idx)
@@ -107,48 +102,45 @@ const routeStackPrepare = (handlerStackItems: RouteStackItem[], namespace = ''):
 const isPatternMatch = (path: string, item: RouteStackItem) => item.route.pattern.exec(path)
 const isNotMethodMatch = (method: string, routeStack: RouteStackItem[], index: number) => method !== routeStack[index].method
 
-// quitar match de aqui
-const findRouteHandler = (ctx: ContextRoute, baseUrl: string, item: RouteStackItem) => {
-    let qr: GetQueryString = {
+const getUrlQuery = (baseUrl: string) => {
+    const cq = checkQuery(baseUrl)
+    if (cq.isQuery) {
+        return getQueryString(baseUrl, cq.index)
+    }
+
+    return {
         query: {}
         , pathname: null
     }
+}
 
-    const cq = checkQuery(baseUrl)
-    if (cq.isQuery) {
-        qr = getQueryString(baseUrl, cq.index)
-    }
-
-    const match = isPatternMatch(qr.pathname || baseUrl, item)
-    const params = match ? regExpExtractParams(item.route, match) : {}
-
-    if (match) {
-        const context = Object.assign(ctx, {
-            query: qr.query
-            , params
-        })
-
-        return context
-    }
-
-    return null
+const getParams = (item: RouteStackItem, match: RegExpExecArray) => {
+    return match ? regExpExtractParams(item.route, match) : {}
 }
 
 const prepareRoutes = (handlerStackItems: RouteStackItem[], namespace?: string) => {
     const routeStack = routeStackPrepare(handlerStackItems, namespace)
     return function find(ctx: ContextRoute, next: NextFunction) {
-        const method = ctx.req.method
         const baseUrl = ctx.req.url
+        const method = ctx.req.method
         for (let i = 0, len = routeStack.length; i < len; i++) {
             if (isNotMethodMatch(method, routeStack, i)) continue
-
             const item = routeStack[i]
-            const context = findRouteHandler(ctx, baseUrl, item)
-            if (context) {
+            const qs = getUrlQuery(baseUrl)
+            const match = isPatternMatch(qs.pathname || baseUrl, item)
+            const params = getParams(item, match)
+
+            if (match) {
+                const context = Object.assign(ctx, {
+                    query: qs.query
+                    , params
+                })
+
                 return item.handler(context, next)
             }
 
-            if (context && isHead(ctx)) {
+            // send empty request for headers requests
+            if (isHead(ctx) && match) {
                 ctx.res.end()
                 return
             }
