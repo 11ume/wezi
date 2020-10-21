@@ -50,8 +50,8 @@ const r = router(
     , get('/users/find', findOne)
     , get('/users/:id', getById)
     , post('/users', create)
-    , put('/users', update)
     , del('/users', remove)
+    , put('/users', update)
 )
 
 export default r

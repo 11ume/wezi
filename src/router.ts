@@ -1,7 +1,6 @@
 // eslint-disable-next-line node/no-deprecated-api
 import { parse } from 'url'
 import { Context, RequestListener, NextFunction } from 'application'
-import regexparam from 'regexparam'
 
 const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
 
@@ -10,7 +9,7 @@ export interface ContextRoute<P = void, Q = void> extends Context {
     , query?: Q
 }
 
-type HandlerStackItem = {
+export type RouteStackItem = {
     path: string
     method: string
     route?: Route
@@ -23,6 +22,39 @@ type HandlerFunction = (ctx: ContextRoute, next: NextFunction, namespace?: strin
 type Route = {
     keys: Array<string>
     , pattern: RegExp
+}
+
+const regexparam = (str: string, loose?: string) => {
+    let c = ''
+    let o = 0
+    let tmp = ''
+    let ext = 0
+    const keys = []
+    let pattern = ''
+    const arr = str.split('/')
+    arr[0] || arr.shift()
+
+    // eslint-disable-next-line no-cond-assign
+    while (tmp = arr.shift()) {
+        c = tmp[0]
+        if (c === '*') {
+            keys.push('wild')
+            pattern += '/(.*)'
+        } else if (c === ':') {
+            o = tmp.indexOf('?', 1)
+            ext = tmp.indexOf('.', 1)
+            keys.push(tmp.substring(1, ~o ? o : ~ext ? ext : tmp.length))
+            pattern += !!~o && !~ext ? '(?:/([^/]+?))?' : '/([^/]+?)'
+            if (~ext) pattern += (~o ? '?' : '') + '\\' + tmp.substring(ext)
+        } else {
+            pattern += '/' + tmp
+        }
+    }
+
+    return {
+        keys: keys
+        , pattern: new RegExp('^' + pattern + (loose ? '(?=$|/)' : '/?$'), 'i')
+    }
 }
 
 const regExpExtractParams = (route: Route, match: RegExpExecArray) => {
@@ -46,7 +78,7 @@ const getParamsAndQuery = (url: string, route: Route, match: RegExpExecArray) =>
     }
 }
 
-const routeStackPrepare = (handlerStackItems: HandlerStackItem[], namespace = ''): HandlerStackItem[] => {
+const routeStackPrepare = (handlerStackItems: RouteStackItem[], namespace = ''): RouteStackItem[] => {
     return handlerStackItems.map((item) => {
         const route = regexparam(`${namespace}${item.path}`)
         return {
@@ -57,9 +89,9 @@ const routeStackPrepare = (handlerStackItems: HandlerStackItem[], namespace = ''
     })
 }
 
-const isPatternMatch = (ctx: Context, item: HandlerStackItem) => item.route.pattern.exec(ctx.req.url)
+const isPatternMatch = (ctx: Context, item: RouteStackItem) => item.route.pattern.exec(ctx.req.url)
 
-const prepareRoutes = (handlerStackItems: HandlerStackItem[], namespace?: string) => {
+const prepareRoutes = (handlerStackItems: RouteStackItem[], namespace?: string) => {
     const routeStack = routeStackPrepare(handlerStackItems, namespace)
     return function find(ctx: ContextRoute, next: NextFunction) {
         const method = ctx.req.method
@@ -87,9 +119,9 @@ const prepareRoutes = (handlerStackItems: HandlerStackItem[], namespace?: string
     }
 }
 
-const router = (...handlerStackItems: HandlerStackItem[]) => prepareRoutes(handlerStackItems)
+const router = (...handlerStackItems: RouteStackItem[]) => prepareRoutes(handlerStackItems)
 
-const createHandlerMethod = (method: string) => (path: string, handler: RequestListener): HandlerStackItem => {
+const createHandlerMethod = (method: string) => (path: string, handler: RequestListener): RouteStackItem => {
     const upperMethod = method.toUpperCase()
     return {
         method: upperMethod
@@ -98,7 +130,7 @@ const createHandlerMethod = (method: string) => (path: string, handler: RequestL
     }
 }
 
-export const routerNamespace = (namespace: string) => (...handlerStackItems: HandlerStackItem[]) => {
+export const routerNamespace = (namespace: string) => (...handlerStackItems: RouteStackItem[]) => {
     return prepareRoutes(handlerStackItems, namespace)
 }
 
