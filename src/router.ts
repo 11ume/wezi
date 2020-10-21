@@ -13,9 +13,9 @@ export interface ContextRoute<P = void, Q = void> extends Context {
 type HandlerStackItem = {
     path: string
     method: string
-    handler: HandlerFunction
     route?: Route
     namespace?: string
+    handler: HandlerFunction
 }
 
 type HandlerFunction = (ctx: ContextRoute, next: NextFunction, namespace?: string) => void
@@ -25,30 +25,24 @@ type Route = {
     , pattern: RegExp
 }
 
-const exec = (path: string, result: Route) => {
+const regExpExtractParams = (route: Route, match: RegExpExecArray) => {
     let i = 0
     const params = {}
-    const matches = result.pattern.exec(path)
-    // eslint-disable-next-line no-unmodified-loop-condition
-    while (matches && i < result.keys.length) {
-        const key = result.keys[i]
-        params[key] = matches[++i] || null
+    while (i < route.keys.length) {
+        const key = route.keys[i]
+        params[key] = match[++i] || null
     }
 
-    return {
-        params
-        , matches
-    }
+    return params
 }
 
-const getParamsAndQuery = (url: string, route: Route) => {
+const getParamsAndQuery = (url: string, route: Route, match: RegExpExecArray) => {
     const { query } = parse(url, true)
-    const { params, matches } = exec(url, route)
+    const params = regExpExtractParams(route, match)
 
     return {
         query
         , params
-        , matches
     }
 }
 
@@ -63,13 +57,17 @@ const routeStackPrepare = (handlerStackItems: HandlerStackItem[], namespace = ''
     })
 }
 
+const isPatternMatch = (ctx: Context, item: HandlerStackItem) => item.route.pattern.exec(ctx.req.url)
+
 const prepareRoutes = (handlerStackItems: HandlerStackItem[], namespace?: string) => {
     const routeStack = routeStackPrepare(handlerStackItems, namespace)
     return function find(ctx: ContextRoute, next: NextFunction) {
+        const method = ctx.req.method
         for (let i = 0, len = routeStack.length; i < len; i++) {
             const item = routeStack[i]
-            const result = getParamsAndQuery(ctx.req.url, item.route)
-            if (result.matches && ctx.req.method === item.method) {
+            const match = isPatternMatch(ctx, item)
+            if (match && method === item.method) {
+                const result = getParamsAndQuery(ctx.req.url, item.route, match)
                 const context = Object.assign(ctx, {
                     query: result.query
                     , params: result.params
@@ -78,7 +76,7 @@ const prepareRoutes = (handlerStackItems: HandlerStackItem[], namespace?: string
                 return item.handler(context, next)
             }
 
-            if (result.matches && isHead(ctx)) {
+            if (match && isHead(ctx)) {
                 ctx.res.end()
                 return
             }
