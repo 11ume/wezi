@@ -1,5 +1,4 @@
-// eslint-disable-next-line node/no-deprecated-api
-import { parse } from 'url'
+import queryString from 'querystring'
 import { Context, RequestListener, NextFunction } from 'application'
 
 const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
@@ -68,13 +67,29 @@ const regExpExtractParams = (route: Route, match: RegExpExecArray) => {
     return params
 }
 
-const getParamsAndQuery = (url: string, route: Route, match: RegExpExecArray) => {
-    const { query } = parse(url, true)
-    const params = regExpExtractParams(route, match)
+const checkQuery = (url: string) => {
+    const index = url.indexOf('?', 1)
+    const isQuery = index !== -1
+    return {
+        index
+        , isQuery
+    }
+}
+
+type GetQueryString = {
+    query: queryString.ParsedUrlQuery;
+    pathname: string;
+}
+
+const getQueryString = (url: string, idx: number): GetQueryString => {
+    const search = url.substring(idx)
+    const path = search.substring(1)
+    const pathname = url.substring(0, idx)
+    const query = queryString.parse(path)
 
     return {
         query
-        , params
+        , pathname
     }
 }
 
@@ -89,27 +104,51 @@ const routeStackPrepare = (handlerStackItems: RouteStackItem[], namespace = ''):
     })
 }
 
-const isPatternMatch = (ctx: Context, item: RouteStackItem) => item.route.pattern.exec(ctx.req.url)
+const isPatternMatch = (path: string, item: RouteStackItem) => item.route.pattern.exec(path)
+const isNotMethodMatch = (method: string, routeStack: RouteStackItem[], index: number) => method !== routeStack[index].method
+
+// quitar match de aqui
+const findRouteHandler = (ctx: ContextRoute, baseUrl: string, item: RouteStackItem) => {
+    let qr: GetQueryString = {
+        query: {}
+        , pathname: null
+    }
+
+    const cq = checkQuery(baseUrl)
+    if (cq.isQuery) {
+        qr = getQueryString(baseUrl, cq.index)
+    }
+
+    const match = isPatternMatch(qr.pathname || baseUrl, item)
+    const params = match ? regExpExtractParams(item.route, match) : {}
+
+    if (match) {
+        const context = Object.assign(ctx, {
+            query: qr.query
+            , params
+        })
+
+        return context
+    }
+
+    return null
+}
 
 const prepareRoutes = (handlerStackItems: RouteStackItem[], namespace?: string) => {
     const routeStack = routeStackPrepare(handlerStackItems, namespace)
     return function find(ctx: ContextRoute, next: NextFunction) {
         const method = ctx.req.method
+        const baseUrl = ctx.req.url
         for (let i = 0, len = routeStack.length; i < len; i++) {
-            if (method !== routeStack[i].method) continue
-            const item = routeStack[i]
-            const match = isPatternMatch(ctx, item)
-            if (match && method === item.method) {
-                const result = getParamsAndQuery(ctx.req.url, item.route, match)
-                const context = Object.assign(ctx, {
-                    query: result.query
-                    , params: result.params
-                })
+            if (isNotMethodMatch(method, routeStack, i)) continue
 
+            const item = routeStack[i]
+            const context = findRouteHandler(ctx, baseUrl, item)
+            if (context) {
                 return item.handler(context, next)
             }
 
-            if (match && isHead(ctx)) {
+            if (context && isHead(ctx)) {
                 ctx.res.end()
                 return
             }
