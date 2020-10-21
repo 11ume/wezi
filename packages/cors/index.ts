@@ -1,4 +1,4 @@
-import { Context } from 'application'
+import { Context } from 'wuok'
 
 const DEFAULT_ALLOW_METHODS: string[] = [
     'POST'

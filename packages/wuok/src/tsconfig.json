@@ -16,7 +16,7 @@
     "removeComments": true,
     "esModuleInterop": true,
     "outDir": "./build",
-    "baseUrl": "./src"
+    "baseUrl": "."
   },
   "exclude": [
     "test",
