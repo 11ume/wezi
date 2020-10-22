@@ -11,7 +11,7 @@ export interface ContextRoute<P = void, Q = void> extends Context {
 }
 
 export type Route = {
-    keys: Array<string> 
+    keys: Array<string>
     , pattern: RegExp
 }
 
@@ -36,9 +36,8 @@ const createNewContext = (ctx: ContextRoute, query: ParsedUrlQuery, params: {}) 
 
 // runs every time a request is made, and try match any route
 const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStackItem[]) => {
-    for (let i = 0, len = stack.length; i < len; i++) {
-        if (notMethodMatch(ctx.req.method, stack[i])) continue
-        const item = stack[i]
+    for (const item of stack) {
+        if (notMethodMatch(ctx.req.method, item)) continue
         const qp = getUrlQuery(ctx.req.url)
         const path = qp.pathname ?? ctx.req.url
         const match = exetPatternMatch(path, item)
@@ -88,9 +87,10 @@ const createStackItem = (giveMethod: string) => (path: string, handler: RequestL
     }
 }
 
-const router = (...handlerStackItems: RouteStackItem[]) => prepareRoutes(handlerStackItems)
+export const createRouter = (...handlerStackItems: RouteStackItem[]) => prepareRoutes(handlerStackItems)
 
-export const routerNamespace = (namespace: string) => (...handlerStackItems: RouteStackItem[]) => {
+// create router whit namespace
+export const whitNamespace = (namespace: string) => (...handlerStackItems: RouteStackItem[]) => {
     return prepareRoutes(handlerStackItems, namespace)
 }
 
@@ -102,4 +102,4 @@ export const post = createStackItem('post')
 export const head = createStackItem('heat')
 export const options = createStackItem('options')
 
-export default router
+
