@@ -111,7 +111,7 @@ export const withNamespace = (namespace: string) => (...handlerStackItems: Route
 }
 
 export const get = createStackItem('get')
-export const del = createStackItem('del')
+export const del = createStackItem('delete')
 export const put = createStackItem('put')
 export const path = createStackItem('path')
 export const post = createStackItem('post')

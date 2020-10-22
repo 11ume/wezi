@@ -1,14 +1,71 @@
 import test from 'ava'
 import http from 'http'
-import wuok, { RequestListener } from 'wuok'
-import router, { ContextRoute, withNamespace, get } from '..'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
-import { ContextRouteWild, head } from './route'
+import wuok, { RequestListener } from 'wuok'
+import router, {
+    ContextRoute
+    , ContextRouteWild
+    , withNamespace
+    , get
+    , head
+    , post
+    , put
+    , del
+} from '..'
 
 const server = (fn: RequestListener) => listen(http.createServer(wuok(fn)))
 
-test('different routes whit statics methods get', async (t) => {
+test('test base path', async t => {
+    const hello = () => 'hello'
+    const url = await server(router(get('/', hello)))
+    const res = await fetch(`${url}/`)
+    const r = await res.text()
+
+    t.is(r, 'hello')
+})
+
+test('different routes whit static paths diferent methods (CRUD)', async (t) => {
+    type User = {
+        id: string
+    }
+
+    const responses = {
+        getAll: [1, 2, 3]
+        , create: { action: 'create' }
+        , update: { action: 'update' }
+        , delete: { action: 'delete' }
+    }
+
+    const routes = router(
+        get('/users', () => responses.getAll)
+        , get('/users/:id', (ctx: ContextRoute<User>) => ctx.params.id)
+        , post('/users', () => responses.create)
+        , put('/users', () => responses.update)
+        , del('/users', () => responses.delete)
+    )
+
+    const url = await server(routes)
+    const getAll = await fetch(`${url}/users`)
+    const getById = await fetch(`${url}/users/1`)
+    const create = await fetch(`${url}/users`, { method: 'post' })
+    const update = await fetch(`${url}/users`, { method: 'put' })
+    const daleteOne = await fetch(`${url}/users`, { method: 'delete' })
+
+    const rAll = await getAll.json()
+    const rById = await getById.text()
+    const rCreaste = await create.json()
+    const rUpdate = await update.json()
+    const rDelete = await daleteOne.json()
+
+    t.deepEqual(rAll, responses.getAll)
+    t.is(rById, '1')
+    t.deepEqual(rCreaste, responses.create)
+    t.deepEqual(rUpdate, responses.update)
+    t.deepEqual(rDelete, responses.delete)
+})
+
+test('different routes whit static paths, method get', async (t) => {
     const routes = router(
         get('/foo', () => ({ name: 'foo' }))
         , get('/bar', () => ({ name: 'bar' }))
@@ -63,7 +120,7 @@ test('routes with matching optional param', async t => {
 test('routes with matching double optional params', async t => {
     const hello = (ctx: ContextRoute<{ foo?: string, bar?: string }>) => {
         if (ctx.params.foo && ctx.params.bar)
-        return `Hello ${ctx.params.foo} ${ctx.params.bar}`
+            return `Hello ${ctx.params.foo} ${ctx.params.bar}`
         else if (ctx.params.foo) return `Hello ${ctx.params.foo}`
         else return 'Hello'
     }
@@ -73,7 +130,7 @@ test('routes with matching double optional params', async t => {
     const res = await fetch(`${url}/path`)
     const resOptional = await fetch(`${url}/path/john`)
     const resOptionalWhitTwo = await fetch(`${url}/path/john/connor`)
-    
+
     const r = await res.text()
     const rOptional = await resOptional.text()
     const rOptionalWhitTwo = await resOptionalWhitTwo.text()
@@ -85,8 +142,8 @@ test('routes with matching double optional params', async t => {
 
 test('routes with matching params last optional only', async t => {
     const hello = (ctx: ContextRoute<{ foo: string, bar?: string }>) => {
-        if(ctx.params.bar) 
-        return `Hello ${ctx.params.foo} ${ctx.params.bar}`
+        if (ctx.params.bar)
+            return `Hello ${ctx.params.foo} ${ctx.params.bar}`
         else return `Hello ${ctx.params.foo}`
     }
 
@@ -94,7 +151,7 @@ test('routes with matching params last optional only', async t => {
     const url = await server(routes)
     const resOptional = await fetch(`${url}/path/john`)
     const resOptionalWhitLast = await fetch(`${url}/path/john/connor`)
-    
+
     const rOptional = await resOptional.text()
     const rOptionalWhitLast = await resOptionalWhitLast.text()
 
@@ -104,8 +161,8 @@ test('routes with matching params last optional only', async t => {
 
 test('routes with matching params first optional only', async t => {
     const hello = (ctx: ContextRoute<{ foo?: string, bar: string }>) => {
-        if (ctx.params.foo) 
-        return `Hello ${ctx.params.foo} ${ctx.params.bar}`
+        if (ctx.params.foo)
+            return `Hello ${ctx.params.foo} ${ctx.params.bar}`
         else return `Hello ${ctx.params.bar}`
     }
 
@@ -114,7 +171,7 @@ test('routes with matching params first optional only', async t => {
     const resOptional = await fetch(`${url}/path/john`)
     const resOptionalFirst = await fetch(`${url}/path/connor`)
     const resOptionalAll = await fetch(`${url}/path/john/connor`)
-    
+
     const rOptional = await resOptional.text()
     const rOptionalAll = await resOptionalAll.text()
     const rOptionalFirst = await resOptionalFirst.text()
@@ -172,9 +229,6 @@ test('multiple matching routes match whit wildcards', async t => {
     const url = await server(routes)
     const res = await fetch(`${url}/character/john/connor`)
     const r = await res.text()
-    
+
     t.is(r, 'john/connor')
 })
-
-// not match
-// base /:id
