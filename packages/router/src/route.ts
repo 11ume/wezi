@@ -25,9 +25,11 @@ export type RouteStackItem = {
 
 const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
 
-const notMethodMatch = (method: string, item: RouteStackItem) => method !== item.method
+const notMethodMatch = (method: string, itemMethod: string) => method !== itemMethod
 
-const exetPatternMatch = (path: string, item: RouteStackItem) => item.route.pattern.exec(path)
+const exetPatternMatch = (path: string, item: RouteStackItem) => {
+    return item.route.pattern.exec(path)
+}
 
 const createNewContext = (ctx: ContextRoute, query: ParsedUrlQuery, params: {}) => Object.assign(ctx, {
     query
@@ -37,7 +39,7 @@ const createNewContext = (ctx: ContextRoute, query: ParsedUrlQuery, params: {}) 
 // runs every time a request is made, and try match any route
 const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStackItem[]) => {
     for (const item of stack) {
-        if (notMethodMatch(ctx.req.method, item)) continue
+        if (notMethodMatch(ctx.req.method, item.method)) continue
         const qp = getUrlQuery(ctx.req.url)
         const path = qp.pathname ?? ctx.req.url
         const match = exetPatternMatch(path, item)
@@ -65,7 +67,7 @@ const prepareRoutes = (handlerStackItems: RouteStackItem[], namespace?: string) 
     return (ctx: ContextRoute, next: NextFunction) => findRouteMatch(ctx, next, stack)
 }
 
-const prepareRouteStack = (handlerStackItems: RouteStackItem[], namespace: string): RouteStackItem[] => {
+const prepareRouteStack = (handlerStackItems: RouteStackItem[], namespace = ''): RouteStackItem[] => {
     return handlerStackItems.map((item) => {
         const route = regexparam(`${namespace}${item.path}`)
         return {
