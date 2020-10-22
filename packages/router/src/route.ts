@@ -3,8 +3,6 @@ import { Context, RequestListener, NextFunction } from 'wuok'
 import { getUrlQuery, getUrlParams } from './extractors'
 import regexparam from './regexparam'
 
-type HandlerFunction = (ctx: ContextRoute, next: NextFunction, namespace?: string) => void
-
 export interface ContextRoute<P = void, Q = void> extends Context {
     params?: P
     , query?: Q
@@ -24,8 +22,8 @@ export type Route = {
 export type RouteStackItem = {
     path: string
     method: string
-    handler: HandlerFunction
     route: Route
+    handlers: RequestListener[]
     namespace: string
 }
 
@@ -53,7 +51,7 @@ const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStack
         if (match) {
             const params = getUrlParams(item, match)
             const context = createNewContext(ctx, qp.query, params)
-            return item.handler(context, next)
+            return item.handlers.forEach((handler) => handler(context, next))
         }
 
         // send empty request for head requests
@@ -90,12 +88,12 @@ const prepareRoutesWhitNamespace = (handlerStackItems: RouteStackItem[], namespa
     return prepareRouteStack(handlerStackItems, namespace)
 }
 
-const createStackItem = (giveMethod: string) => (path: string, handler: RequestListener): RouteStackItem => {
+const createStackItem = (giveMethod: string) => (path: string, ...handlers: RequestListener[]): RouteStackItem => {
     const method = giveMethod.toUpperCase()
     return {
         path
         , method
-        , handler
+        , handlers
         , route: null
         , namespace: ''
     }
