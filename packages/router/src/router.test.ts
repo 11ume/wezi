@@ -48,17 +48,17 @@ test('multiple matching routes', async t => {
   })
 
   test('routes with namespace', async t => {
-    const fooRoutes = withNamespace('/foo')
-    const barRoutes = withNamespace('/bWar')
+    const v1 = withNamespace('/v1')
+    const v2 = withNamespace('/v2')
   
     const routes = router(
-        fooRoutes(get('/test', () => 'foo'))
-        , barRoutes(get('/test', () => 'bar'))
+        v1(get('/test', () => 'foo'))
+        , v2(get('/test', () => 'bar'))
     )
   
     const url = await server(routes)
-    const fooGet = await fetch(`${url}/foo/test`)
-    const barGet = await fetch(`${url}/bar/test`)
+    const fooGet = await fetch(`${url}/v1/test`)
+    const barGet = await fetch(`${url}/v2/test`)
     const fooRes = await fooGet.text()
     const barRes = await barGet.text()
 
