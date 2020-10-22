@@ -1,6 +1,6 @@
 export default {
     cache: false,
-    timeout: '600s',
+    timeout: '1m',
     concurrency: 6,
     babel: {
         compileEnhancements: false

@@ -4,6 +4,7 @@ import wuok, { RequestListener } from 'wuok'
 import router, { ContextRoute, withNamespace, get } from '..'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
+import { head } from './route'
 
 const server = (fn: RequestListener) => listen(http.createServer(wuok(fn)))
 
@@ -47,16 +48,80 @@ test('routes with multi params', async (t) => {
 })
 
 test('routes with matching optional param', async t => {
-    const hello = (ctx: ContextRoute<{ id: string }>) => `Hello ${ctx.params.id ?? ''}`
-    const routes = router(get('/path/:id?', hello))
+    const hello = (ctx: ContextRoute<{ msg: string }>) => `Hello ${ctx.params.msg ?? ''}`
+    const routes = router(get('/path/:msg?', hello))
     const url = await server(routes)
     const res = await fetch(`${url}/path`)
-    const resOptional = await fetch(`${url}/path/1`)
+    const resOptional = await fetch(`${url}/path/world`)
     const r = await res.text()
     const rOptional = await resOptional.text()
 
-    t.is(r, 'Hello')
+    t.is(r, 'Hello ')
     t.is(rOptional, 'Hello world')
+})
+
+test('routes with matching double optional params', async t => {
+    const hello = (ctx: ContextRoute<{ foo?: string, bar?: string }>) => {
+        if (ctx.params.foo && ctx.params.bar)
+        return `Hello ${ctx.params.foo} ${ctx.params.bar}`
+        else if (ctx.params.foo) return `Hello ${ctx.params.foo}`
+        else return 'Hello'
+    }
+
+    const routes = router(get('/path/:foo?/:bar?', hello))
+    const url = await server(routes)
+    const res = await fetch(`${url}/path`)
+    const resOptional = await fetch(`${url}/path/john`)
+    const resOptionalWhitTwo = await fetch(`${url}/path/john/connor`)
+    
+    const r = await res.text()
+    const rOptional = await resOptional.text()
+    const rOptionalWhitTwo = await resOptionalWhitTwo.text()
+
+    t.is(r, 'Hello')
+    t.is(rOptional, 'Hello john')
+    t.is(rOptionalWhitTwo, 'Hello john connor')
+})
+
+test('routes with matching params last optional only', async t => {
+    const hello = (ctx: ContextRoute<{ foo: string, bar?: string }>) => {
+        if(ctx.params.bar) 
+        return `Hello ${ctx.params.foo} ${ctx.params.bar}`
+        else return `Hello ${ctx.params.foo}`
+    }
+
+    const routes = router(get('/path/:foo/:bar?', hello))
+    const url = await server(routes)
+    const resOptional = await fetch(`${url}/path/john`)
+    const resOptionalWhitLast = await fetch(`${url}/path/john/connor`)
+    
+    const rOptional = await resOptional.text()
+    const rOptionalWhitLast = await resOptionalWhitLast.text()
+
+    t.is(rOptional, 'Hello john')
+    t.is(rOptionalWhitLast, 'Hello john connor')
+})
+
+test('routes with matching params first optional only', async t => {
+    const hello = (ctx: ContextRoute<{ foo?: string, bar: string }>) => {
+        if (ctx.params.foo) 
+        return `Hello ${ctx.params.foo} ${ctx.params.bar}`
+        else return `Hello ${ctx.params.bar}`
+    }
+
+    const routes = router(get('/path/:foo?/:bar', hello))
+    const url = await server(routes)
+    const resOptional = await fetch(`${url}/path/john`)
+    const resOptionalFirst = await fetch(`${url}/path/connor`)
+    const resOptionalAll = await fetch(`${url}/path/john/connor`)
+    
+    const rOptional = await resOptional.text()
+    const rOptionalAll = await resOptionalAll.text()
+    const rOptionalFirst = await resOptionalFirst.text()
+
+    t.is(rOptional, 'Hello john')
+    t.is(rOptionalAll, 'Hello john connor')
+    t.is(rOptionalFirst, 'Hello connor')
 })
 
 test('multiple matching routes', async t => {
@@ -89,3 +154,32 @@ test('routes with namespace', async t => {
     t.is(fooRes, 'foo')
     t.is(barRes, 'bar')
 })
+
+test('match head, match route and return empty body', async t => {
+    const ping = () => 'hello'
+    const routes = router(head('/hello', ping))
+    const url = await server(routes)
+    const res = await fetch(`${url}/hello`, { method: 'head' })
+    const r = await res.blob()
+
+    t.is(r.size, 0)
+    t.is(res.status, 200)
+})
+
+// wildcards not working
+// test('multiple matching routes match whit wildcards', async t => {
+//     const hello = () => `Hello`
+
+//     const routes = router(get('/users/*', hello))
+//     const url = await server(routes)
+//     const res = await fetch(`${url}/users`)
+//     const resWild = await fetch(`${url}/users/any`)
+
+//     const r = await res.text()
+//     const rWild = await resWild.text()
+    
+//     t.is(r, 'Hello')
+//     t.is(rWild, 'Hello')
+// })
+
+// next test /:id

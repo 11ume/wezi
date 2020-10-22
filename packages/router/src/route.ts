@@ -109,7 +109,7 @@ export const del = createStackItem('del')
 export const put = createStackItem('put')
 export const path = createStackItem('path')
 export const post = createStackItem('post')
-export const head = createStackItem('heat')
+export const head = createStackItem('head')
 export const options = createStackItem('options')
 
 
