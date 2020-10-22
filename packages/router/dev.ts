@@ -2,9 +2,10 @@ import http from 'http'
 import wuok from 'wuok'
 import router, { ContextRoute, get } from './index'
 
+const hello = (ctx: ContextRoute<{ msg: string }, { time: number }>) => `Hello ${ctx.params.msg} ${ctx.query.time}`
+
 const r = router(
-    get('/users', () => [1, 2, 3])
-    , get('/users/:id', (ctx: ContextRoute<{id: string}>) => ctx.params.id)
+    get('/hello/:msg', hello)
 )
 
 const server = http.createServer(wuok(r))
