@@ -4,7 +4,8 @@ import { Context } from './app'
 
 export const noContentType = (ctx: Context) => !ctx.res.getHeader('Content-Type')
 
-export const sendBuffer = (ctx: Context, obj: Buffer) => {
+export const sendBuffer = (ctx: Context, statusCode = 200, obj: Buffer) => {
+    ctx.res.statusCode = statusCode
     if (Buffer.isBuffer(obj)) {
         if (noContentType(ctx)) {
             ctx.res.setHeader('Content-Type', 'application/octet-stream')
@@ -18,7 +19,8 @@ export const sendBuffer = (ctx: Context, obj: Buffer) => {
     ctx.res.end()
 }
 
-export const sendStream = (ctx: Context, obj: Readable) => {
+export const sendStream = (ctx: Context, statusCode = 200, obj: Readable) => {
+    ctx.res.statusCode = statusCode
     if (obj instanceof Stream || isReadable(obj)) {
         if (noContentType(ctx)) {
             ctx.res.setHeader('Content-Type', 'application/octet-stream')
@@ -31,18 +33,22 @@ export const sendStream = (ctx: Context, obj: Readable) => {
     ctx.res.end()
 }
 
-export const send = <T>(ctx: Context, statusCode = 200, obj?: T) => {
+export const send = (ctx: Context, statusCode = 200, obj = null) => {
     ctx.res.statusCode = statusCode
-    if (!obj) {
+    if (obj === null) {
         ctx.res.end()
         return
     }
 
-    const payload = JSON.stringify(obj)
-    if (noContentType(ctx)) {
-        ctx.res.setHeader('Content-Type', 'application/json charset=utf-8')
+    let payload = obj
+    if (typeof obj === 'object' || typeof obj === 'number') {
+        payload = JSON.stringify(obj)
+        if (noContentType(ctx)) {
+            ctx.res.setHeader('Content-Type', 'application/json charset=utf-8')
+        }
+    
+        ctx.res.setHeader('Content-Length', Buffer.byteLength(payload))
     }
-
-    ctx.res.setHeader('Content-Length', Buffer.byteLength(payload))
+    
     ctx.res.end(payload)
 }
