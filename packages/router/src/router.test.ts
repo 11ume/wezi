@@ -4,11 +4,11 @@ import wuok, { RequestListener } from 'wuok'
 import router, { ContextRoute, withNamespace, get } from '..'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
-import { head } from './route'
+import { ContextRouteWild, head } from './route'
 
 const server = (fn: RequestListener) => listen(http.createServer(wuok(fn)))
 
-test('different routes whit method get', async (t) => {
+test('different routes whit statics methods get', async (t) => {
     const routes = router(
         get('/foo', () => ({ name: 'foo' }))
         , get('/bar', () => ({ name: 'bar' }))
@@ -166,20 +166,15 @@ test('match head, match route and return empty body', async t => {
     t.is(res.status, 200)
 })
 
-// wildcards not working
-// test('multiple matching routes match whit wildcards', async t => {
-//     const hello = () => `Hello`
-
-//     const routes = router(get('/users/*', hello))
-//     const url = await server(routes)
-//     const res = await fetch(`${url}/users`)
-//     const resWild = await fetch(`${url}/users/any`)
-
-//     const r = await res.text()
-//     const rWild = await resWild.text()
+test('multiple matching routes match whit wildcards', async t => {
+    const hello = (ctx: ContextRouteWild) => ctx.params.wild
+    const routes = router(get('/character/*', hello))
+    const url = await server(routes)
+    const res = await fetch(`${url}/character/john/connor`)
+    const r = await res.text()
     
-//     t.is(r, 'Hello')
-//     t.is(rWild, 'Hello')
-// })
+    t.is(r, 'john/connor')
+})
 
-// next test /:id
+// not match
+// base /:id

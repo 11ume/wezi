@@ -10,6 +10,12 @@ export interface ContextRoute<P = void, Q = void> extends Context {
     , query?: Q
 }
 
+export interface ContextRouteWild extends Context {
+    params?: {
+        wild: string
+    }
+}
+
 export type Route = {
     keys: Array<string>
     , pattern: RegExp
