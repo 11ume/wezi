@@ -61,21 +61,27 @@ const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStack
     next()
 }
 
-// it make pre built of all router handlers
-const prepareRoutes = (handlerStackItems: RouteStackItem[], namespace?: string) => {
-    const stack = prepareRouteStack(handlerStackItems, namespace)
-    return (ctx: ContextRoute, next: NextFunction) => findRouteMatch(ctx, next, stack)
+const creteRouteStackItem = (item: RouteStackItem, namespace: string) => {
+    const route = item.route ?? regexparam(`${namespace}${item.path}`)
+    return {
+        ...item
+        , route
+        , namespace
+    }
 }
 
 const prepareRouteStack = (handlerStackItems: RouteStackItem[], namespace = ''): RouteStackItem[] => {
-    return handlerStackItems.map((item) => {
-        const route = regexparam(`${namespace}${item.path}`)
-        return {
-            ...item
-            , route
-            , namespace
-        }
-    })
+    return handlerStackItems.map((item) => creteRouteStackItem(item, namespace))
+}
+
+// it make pre built of all router handlers
+const prepareRoutes = (handlerStackItems: RouteStackItem[]) => {
+    const stack = prepareRouteStack(handlerStackItems)
+    return (ctx: ContextRoute, next: NextFunction) => findRouteMatch(ctx, next, stack)
+}
+
+const prepareRoutesWhitNamespace = (handlerStackItems: RouteStackItem[], namespace?: string) => {
+    return prepareRouteStack(handlerStackItems, namespace)
 }
 
 const createStackItem = (giveMethod: string) => (path: string, handler: RequestListener): RouteStackItem => {
@@ -89,11 +95,13 @@ const createStackItem = (giveMethod: string) => (path: string, handler: RequestL
     }
 }
 
-export const createRouter = (...handlerStackItems: RouteStackItem[]) => prepareRoutes(handlerStackItems)
+export const createRouter = (...handlerStackItems: RouteStackItem[] | RouteStackItem[][]) => {
+    return prepareRoutes(handlerStackItems.flat())
+}
 
 // create router whit namespace
-export const whitNamespace = (namespace: string) => (...handlerStackItems: RouteStackItem[]) => {
-    return prepareRoutes(handlerStackItems, namespace)
+export const withNamespace = (namespace: string) => (...handlerStackItems: RouteStackItem[]) => {
+    return prepareRoutesWhitNamespace(handlerStackItems, namespace)
 }
 
 export const get = createStackItem('get')
