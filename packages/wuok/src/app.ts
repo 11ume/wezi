@@ -74,4 +74,3 @@ export const createApp = (handler: RequestListener | RequestListener[], ...handl
         runLoop(context)
     }
 }
-
