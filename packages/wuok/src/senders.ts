@@ -46,10 +46,10 @@ export const send = (ctx: Context, statusCode = 200, obj = null) => {
         if (noContentType(ctx)) {
             ctx.res.setHeader('Content-Type', 'application/json charset=utf-8')
         }
-    
+
         ctx.res.setHeader('Content-Length', Buffer.byteLength(payload))
     }
-    
+
     ctx.res.end(payload)
 }
 

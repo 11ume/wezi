@@ -10,19 +10,19 @@ export interface Context {
 }
 
 export type NextFunction = (err?: ErrorObj) => void
-export type RequestListener = (ctx: Context, next?: NextFunction) => any
+export type Handler = (ctx: Context, next?: NextFunction) => any
 type Loop = (ctx: Context, next: NextFunction) => void
 type HandlerResponse = {
     context?: Context
-    , handlers?: RequestListener[]
+    , handlers?: Handler[]
     , $handlers?: Symbol
 }
 
-// symbol used for detect an stack of handlers
+// handler stack identifier
 export const $handlers = Symbol('handler_stack')
 
-// sandbox of asnyc handlers execution
-function handleAsyncReturn(ctx: Context, next: NextFunction, val: unknown) {
+// automatic handler response resolver 
+const handleAsyncReturn = (ctx: Context, next: NextFunction, val: unknown) => {
     if (val === null) {
         send(ctx, 204)
         return
@@ -32,32 +32,29 @@ function handleAsyncReturn(ctx: Context, next: NextFunction, val: unknown) {
         return
     }
 
-    // go to next handler in empty returns
     next()
 }
 
-// controll the async flow of all handlers
-async function asyncHandlerWrapper(ctx: Context
-    , next: NextFunction
-    , handler: RequestListener
-    , errorHandler: RequestListener) {
-        try {
-            const ret: HandlerResponse = await handler(ctx, next)
-            // any handler can return a stack of handlers
-            if (ret?.$handlers) {
-                const loop = createHandlersLoop(ret.handlers, errorHandler)
-                loop(ret.context)
-                return
-            }
+const isHandlerStack = (ctx: Context, next: NextFunction, errorHandler: Handler) => (value: HandlerResponse) => {
+    if (value?.$handlers) {
+        const loop = createHandlersLoop(value.handlers, errorHandler)
+        loop(value.context)
+        return
+    }
 
-            handleAsyncReturn(ctx, next, ret)
-        } catch(err) {
-            next(err)
-        }
+    handleAsyncReturn(ctx, next, value)
 }
 
-// an "next function" is used for increase a one position in the stack of handlers
-function createNextFn(ctx: Context, loop: Loop) {
+// used for controll the async execution of each handler in the stack
+const asyncHandlerWrapper = async (ctx: Context
+    , next: NextFunction
+    , handler: Handler
+    , errorHandler: Handler) => new Promise((resolve: (value: HandlerResponse) => void) => resolve(handler(ctx, next)))
+        .then(isHandlerStack(ctx, next, errorHandler))
+        .catch(next)
+
+// create a "next function" used for increase by one position in the stack of handlers
+const createNextFn = (ctx: Context, loop: Loop) => {
     return function next(err?: ErrorObj) {
         if (err) ctx.error = err
         loop(ctx, next)
@@ -65,13 +62,13 @@ function createNextFn(ctx: Context, loop: Loop) {
 }
 
 // default error handler
-function handlerErrors(ctx: Context) {
+const handlerErrors = (ctx: Context) => {
     ctx.res.statusCode = ctx.error.statusCode || 500
     end(ctx)
 }
 
-// creates a loop handler stack controller, used for execute each handler secuencially  
-function createHandlersLoop(handlers: RequestListener[], errorHandler: RequestListener = handlerErrors) {
+// creates a loop handler stack controller, used for execute each handler secuencially
+const createHandlersLoop = (handlers: Handler[], errorHandler: Handler = handlerErrors) => {
     let i = 0
     return function loop(ctx: Context, next: NextFunction = null) {
         if (ctx.error) {
@@ -86,13 +83,11 @@ function createHandlersLoop(handlers: RequestListener[], errorHandler: RequestLi
             return
         }
 
-        // if it reaches this point, it is because none of handlers has sent a response
-        end(ctx)
+        end(ctx) // if any of all handlers do not returned any value
     }
 }
 
-// create app whit middlewares
-export const createApp = (handler: RequestListener | RequestListener[], ...handlers: RequestListener[]) => (errHandler?: RequestListener) => {
+export const createApp = (handler: Handler | Handler[], ...handlers: Handler[]) => (errHandler?: Handler) => {
     const mergedHandlers = mergeHandlers(handler, handlers)
     return (req: IncomingMessage, res: ServerResponse) => {
         const runLoop = createHandlersLoop(mergedHandlers, errHandler)
