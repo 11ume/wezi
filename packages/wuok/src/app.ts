@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { mergeHandlers } from './utils'
 import { ErrorObj } from './error'
-import { send, end } from 'wuok-senders'
+import { send } from 'wuok-senders'
 
 export interface Context {
     readonly req: IncomingMessage
@@ -74,7 +74,7 @@ const createNextFn = (ctx: Context, loop: Loop) => {
 // default error handler
 const errorHandler = (ctx: Context) => {
     ctx.res.statusCode = ctx.error.statusCode || 500
-    end(ctx)
+    ctx.res.end(ctx)
 }
 
 // creates a loop handler stack controller, used for execute each handler secuencially
@@ -93,7 +93,8 @@ const createHandlersLoop = (handlers: Handler[], handleErrors: Handler = errorHa
             return
         }
 
-        end(ctx)
+        // if none handler has end the response
+        ctx.res.end(ctx)
     }
 }
 
