@@ -12,12 +12,17 @@ export interface Context {
 export type NextFunction = (err?: ErrorObj) => void
 export type RequestListener = (ctx: Context, next?: NextFunction) => any
 type Loop = (ctx: Context, next: NextFunction) => void
+type HandlerResponse = {
+    context?: Context
+    , handlers?: RequestListener[]
+    , $handlers?: Symbol
+}
 
+// symbol used for detect an stack of handlers
 export const $handlers = Symbol('handler_stack')
 
 // sandbox of asnyc handlers execution
 function handleAsyncReturn(ctx: Context, next: NextFunction, val: unknown) {
-    if (ctx.error) return
     if (val === null) {
         send(ctx, 204)
         return
@@ -34,11 +39,13 @@ function handleAsyncReturn(ctx: Context, next: NextFunction, val: unknown) {
 // controll the async flow of all handlers
 async function asyncHandlerWrapper(ctx: Context
     , next: NextFunction
-    , handler: RequestListener) {
+    , handler: RequestListener
+    , errorHandler: RequestListener) {
         try {
-            const ret = await handler(ctx, next)
+            const ret: HandlerResponse = await handler(ctx, next)
+            // any handler can return a stack of handlers
             if (ret?.$handlers) {
-                const loop = createHandlersLoop(ret.handlers)
+                const loop = createHandlersLoop(ret.handlers, errorHandler)
                 loop(ret.context)
                 return
             }
@@ -49,7 +56,7 @@ async function asyncHandlerWrapper(ctx: Context
         }
 }
 
-// is used for pass to next function in each handler of the loop
+// an "next function" is used for increase a one position in the stack of handlers
 function createNextFn(ctx: Context, loop: Loop) {
     return function next(err?: ErrorObj) {
         if (err) ctx.error = err
@@ -63,7 +70,7 @@ function handlerErrors(ctx: Context) {
     end(ctx)
 }
 
-// control the handler loop pile
+// creates a loop handler stack controller, used for execute each handler secuencially  
 function createHandlersLoop(handlers: RequestListener[], errorHandler: RequestListener = handlerErrors) {
     let i = 0
     return function loop(ctx: Context, next: NextFunction = null) {
@@ -75,7 +82,7 @@ function createHandlersLoop(handlers: RequestListener[], errorHandler: RequestLi
         if (i < handlers.length) {
             const handler = handlers[i++]
             const nx = next ?? createNextFn(ctx, loop)
-            asyncHandlerWrapper(ctx, nx, handler)
+            asyncHandlerWrapper(ctx, nx, handler, errorHandler)
             return
         }
 
