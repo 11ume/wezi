@@ -14,8 +14,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "content-type": "^1.0.4",
-    "raw-body": "^2.4.1"
+    "wuok-senders": "0.1.1-alpha.0"
   },
   "devDependencies": {
     "@ava/babel": "^1.0.1",

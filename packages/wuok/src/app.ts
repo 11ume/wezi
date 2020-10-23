@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { mergeHandlers } from './utils'
 import { ErrorObj } from './error'
-import { send, end } from './senders'
+import { send, end } from 'wuok-senders'
 
 export interface Context {
     readonly req: IncomingMessage
@@ -11,15 +11,24 @@ export interface Context {
 
 export type NextFunction = (err?: ErrorObj) => void
 export type Handler = (ctx: Context, next?: NextFunction) => any
+
 type Loop = (ctx: Context, next: NextFunction) => void
 type HandlerResponse = {
-    context?: Context
-    , handlers?: Handler[]
-    , $handlers?: Symbol
+    $id: Symbol
+    , context: Context
+    , handlers: Handler[]
 }
 
 // handler stack identifier
-export const $handlers = Symbol('handler_stack')
+const $stackId = Symbol('s_id')
+
+export const createHandlersStack = (context: Context, handlers: Handler[]): HandlerResponse => {
+    return {
+        $id: $stackId
+        , context
+        , handlers
+    }
+}
 
 // automatic handler response resolver 
 const execReturnHandler = (ctx: Context, next: NextFunction, val: unknown) => {
@@ -37,7 +46,7 @@ const execReturnHandler = (ctx: Context, next: NextFunction, val: unknown) => {
 
 // evaluate heandler execution result
 const execEvaluator = (ctx: Context, next: NextFunction, errorHandler: Handler) => (value: HandlerResponse) => {
-    if (value?.$handlers) {
+    if (value?.$id == $stackId) {
         const loop = createHandlersLoop(value.handlers, errorHandler)
         loop(value.context)
         return
@@ -63,17 +72,17 @@ const createNextFn = (ctx: Context, loop: Loop) => {
 }
 
 // default error handler
-const handlerErrors = (ctx: Context) => {
+const errorHandler = (ctx: Context) => {
     ctx.res.statusCode = ctx.error.statusCode || 500
     end(ctx)
 }
 
 // creates a loop handler stack controller, used for execute each handler secuencially
-const createHandlersLoop = (handlers: Handler[], errorHandler: Handler = handlerErrors) => {
+const createHandlersLoop = (handlers: Handler[], handleErrors: Handler = errorHandler) => {
     let i = 0
     return function loop(ctx: Context, next: NextFunction = null) {
         if (ctx.error) {
-            errorHandler(ctx, next)
+            handleErrors(ctx, next)
             return
         }
         if (ctx.res.writableEnded) return
@@ -84,7 +93,7 @@ const createHandlersLoop = (handlers: Handler[], errorHandler: Handler = handler
             return
         }
 
-        end(ctx) // if any of all handlers do not returned any value
+        end(ctx)
     }
 }
 
