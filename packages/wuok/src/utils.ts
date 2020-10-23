@@ -1,8 +1,9 @@
 import { Stream, Readable } from 'stream'
 import { createError } from './error'
-import { Handler } from './app'
+import { Context, Handler } from './app'
 
 export const isDev = () => process.env.NODE_ENV === 'development'
+export const status = (ctx: Context, statusCode: number) => ctx.res.statusCode = statusCode
 
 export const isStream = (stream: Stream) => {
     return stream !== null &&

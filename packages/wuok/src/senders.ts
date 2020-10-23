@@ -2,7 +2,9 @@ import { Stream, Readable } from 'stream'
 import { isReadable } from './utils'
 import { Context } from './app'
 
-export const noContentType = (ctx: Context) => !ctx.res.getHeader('Content-Type')
+const noContentType = (ctx: Context) => !ctx.res.getHeader('Content-Type')
+
+export const end = (ctx: Context) => ctx.res.end()
 
 export const sendBuffer = (ctx: Context, statusCode = 200, obj: Buffer) => {
     ctx.res.statusCode = statusCode
@@ -16,7 +18,7 @@ export const sendBuffer = (ctx: Context, statusCode = 200, obj: Buffer) => {
         return
     }
 
-    ctx.res.end()
+    end(ctx)
 }
 
 export const sendStream = (ctx: Context, statusCode = 200, obj: Readable) => {
@@ -30,13 +32,13 @@ export const sendStream = (ctx: Context, statusCode = 200, obj: Readable) => {
         return
     }
 
-    ctx.res.end()
+    end(ctx)
 }
 
 export const send = (ctx: Context, statusCode = 200, obj = null) => {
     ctx.res.statusCode = statusCode
     if (obj === null) {
-        ctx.res.end()
+        end(ctx)
         return
     }
 
@@ -52,6 +54,4 @@ export const send = (ctx: Context, statusCode = 200, obj = null) => {
 
     ctx.res.end(payload)
 }
-
-export const end = (ctx: Context) => ctx.res.end()
 

@@ -22,7 +22,7 @@ type HandlerResponse = {
 export const $handlers = Symbol('handler_stack')
 
 // automatic handler response resolver 
-const handleAsyncReturn = (ctx: Context, next: NextFunction, val: unknown) => {
+const execReturnHandler = (ctx: Context, next: NextFunction, val: unknown) => {
     if (val === null) {
         send(ctx, 204)
         return
@@ -35,14 +35,15 @@ const handleAsyncReturn = (ctx: Context, next: NextFunction, val: unknown) => {
     next()
 }
 
-const isHandlerStack = (ctx: Context, next: NextFunction, errorHandler: Handler) => (value: HandlerResponse) => {
+// evaluate heandler execution result
+const execEvaluator = (ctx: Context, next: NextFunction, errorHandler: Handler) => (value: HandlerResponse) => {
     if (value?.$handlers) {
         const loop = createHandlersLoop(value.handlers, errorHandler)
         loop(value.context)
         return
     }
 
-    handleAsyncReturn(ctx, next, value)
+    execReturnHandler(ctx, next, value)
 }
 
 // used for controll the async execution of each handler in the stack
@@ -50,7 +51,7 @@ const asyncHandlerWrapper = async (ctx: Context
     , next: NextFunction
     , handler: Handler
     , errorHandler: Handler) => new Promise((resolve: (value: HandlerResponse) => void) => resolve(handler(ctx, next)))
-        .then(isHandlerStack(ctx, next, errorHandler))
+        .then(execEvaluator(ctx, next, errorHandler))
         .catch(next)
 
 // create a "next function" used for increase by one position in the stack of handlers
