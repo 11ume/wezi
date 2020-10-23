@@ -98,7 +98,6 @@ test('routes with params and query', async (t) => {
 
 test('routes with multi params', async (t) => {
     const hello = (ctx: ContextRoute<{ foo: string, bar: string }>) => `${ctx.params.foo} ${ctx.params.bar}`
-
     const routes = router(get('/hello/:foo/:bar', hello))
     const url = await server(routes)
     const res = await fetch(`${url}/hello/foo/bar`)
@@ -122,8 +121,7 @@ test('routes with matching optional param', async t => {
 
 test('routes with matching double optional params', async t => {
     const hello = (ctx: ContextRoute<{ foo?: string, bar?: string }>) => {
-        if (ctx.params.foo && ctx.params.bar)
-            return `Hello ${ctx.params.foo} ${ctx.params.bar}`
+        if (ctx.params.foo && ctx.params.bar) return `Hello ${ctx.params.foo} ${ctx.params.bar}`
         else if (ctx.params.foo) return `Hello ${ctx.params.foo}`
         else return 'Hello'
     }

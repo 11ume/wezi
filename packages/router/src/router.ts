@@ -40,6 +40,23 @@ const createNewContext = (ctx: ContextRoute, query: ParsedUrlQuery, params: {}) 
     , params
 })
 
+const isRouteMatch = (ctx: ContextRoute, item: RouteStackItem, match: RegExpExecArray, query: ParsedUrlQuery) => {
+    // send empty request for head requests
+    if (isHead(ctx)) {
+        end(ctx)
+        return undefined
+    }
+
+    const params = getUrlParams(item, match)
+    const context = createNewContext(ctx, query, params)
+
+    return {
+        $handlers
+        , context
+        , handlers: item.handlers
+    }
+}
+
 // runs every time a request is made, and try match any route
 const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStackItem[]) => {
     for (const item of stack) {
@@ -47,26 +64,10 @@ const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStack
         const qp = getUrlQuery(ctx.req.url)
         const path = qp.pathname ?? ctx.req.url
         const match = exetPatternMatch(path, item)
-
-        if (match) {
-            const params = getUrlParams(item, match)
-            const context = createNewContext(ctx, qp.query, params)
-            return {
-                $handlers
-                , context
-                , handlers: item.handlers
-            }
-        }
-
-        // send empty request for head requests
-        if (isHead(ctx)) {
-            end(ctx)
-            return undefined
-        }
+        if (match) return isRouteMatch(ctx, item, match, qp.query)
     }
 
-    // no path matches
-    next()
+    next() // no path matches
     return undefined
 }
 
