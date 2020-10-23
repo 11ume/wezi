@@ -1,5 +1,5 @@
 import { ParsedUrlQuery } from 'querystring'
-import { Context, Handler, NextFunction, $handlers } from 'wuok'
+import { Context, NextFunction, Handler, $handlers, end } from 'wuok'
 import { getUrlQuery, getUrlParams } from './extractors'
 import regexparam from './regexparam'
 
@@ -60,7 +60,7 @@ const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStack
 
         // send empty request for head requests
         if (isHead(ctx)) {
-            ctx.res.end()
+            end(ctx)
             return undefined
         }
     }
