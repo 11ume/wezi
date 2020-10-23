@@ -1,5 +1,5 @@
 import { ParsedUrlQuery } from 'querystring'
-import { Context, RequestListener, NextFunction, $handlers } from 'wuok'
+import { Context, Handler, NextFunction, $handlers } from 'wuok'
 import { getUrlQuery, getUrlParams } from './extractors'
 import regexparam from './regexparam'
 
@@ -23,7 +23,7 @@ export type RouteStackItem = {
     path: string
     method: string
     route: Route
-    handlers: RequestListener[]
+    handlers: Handler[]
     namespace: string
 }
 
@@ -93,7 +93,7 @@ const prepareRoutesWhitNamespace = (handlerStackItems: RouteStackItem[], namespa
     return prepareRouteStack(handlerStackItems, namespace)
 }
 
-const createStackItem = (giveMethod: string) => (path: string, ...handlers: RequestListener[]): RouteStackItem => {
+const createStackItem = (giveMethod: string) => (path: string, ...handlers: Handler[]): RouteStackItem => {
     const method = giveMethod.toUpperCase()
     return {
         path

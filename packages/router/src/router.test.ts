@@ -2,7 +2,7 @@ import test from 'ava'
 import http from 'http'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
-import wuok, { RequestListener } from 'wuok'
+import wuok, { Handler } from 'wuok'
 import router, {
     ContextRoute
     , ContextRouteWild
@@ -14,9 +14,9 @@ import router, {
     , del
 } from '..'
 
-const server = (fn: RequestListener) => {
+const server = (fn: Handler) => {
     const app = wuok(fn)
-    listen(http.createServer(app()))
+    return listen(http.createServer(app()))
 }
 
 test('test base path', async t => {
@@ -145,8 +145,7 @@ test('routes with matching double optional params', async t => {
 
 test('routes with matching params last optional only', async t => {
     const hello = (ctx: ContextRoute<{ foo: string, bar?: string }>) => {
-        if (ctx.params.bar)
-            return `Hello ${ctx.params.foo} ${ctx.params.bar}`
+        if (ctx.params.bar) return `Hello ${ctx.params.foo} ${ctx.params.bar}`
         else return `Hello ${ctx.params.foo}`
     }
 
@@ -164,8 +163,7 @@ test('routes with matching params last optional only', async t => {
 
 test('routes with matching params first optional only', async t => {
     const hello = (ctx: ContextRoute<{ foo?: string, bar: string }>) => {
-        if (ctx.params.foo)
-            return `Hello ${ctx.params.foo} ${ctx.params.bar}`
+        if (ctx.params.foo) return `Hello ${ctx.params.foo} ${ctx.params.bar}`
         else return `Hello ${ctx.params.bar}`
     }
 
