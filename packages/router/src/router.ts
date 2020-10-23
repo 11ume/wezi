@@ -41,7 +41,6 @@ const createNewContext = (ctx: ContextRoute, query: ParsedUrlQuery, params: {}) 
 })
 
 const isRouteMatch = (ctx: ContextRoute, item: RouteStackItem, match: RegExpExecArray, query: ParsedUrlQuery) => {
-    // send empty request for head requests
     if (isHead(ctx)) {
         end(ctx)
         return undefined
@@ -67,7 +66,7 @@ const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStack
         if (match) return isRouteMatch(ctx, item, match, qp.query)
     }
 
-    next() // no path matches
+    next()
     return undefined
 }
 
