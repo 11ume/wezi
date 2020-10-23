@@ -52,3 +52,6 @@ export const send = (ctx: Context, statusCode = 200, obj = null) => {
     
     ctx.res.end(payload)
 }
+
+export const end = (ctx: Context) => ctx.res.end()
+

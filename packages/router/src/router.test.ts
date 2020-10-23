@@ -14,7 +14,10 @@ import router, {
     , del
 } from '..'
 
-const server = (fn: RequestListener) => listen(http.createServer(wuok(fn)))
+const server = (fn: RequestListener) => {
+    const app = wuok(fn)
+    listen(http.createServer(app()))
+}
 
 test('test base path', async t => {
     const hello = () => 'hello'

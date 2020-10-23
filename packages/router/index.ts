@@ -1,4 +1,4 @@
-import { createRouter } from './src/route'
-export * from './src/route'
-export * from './src/route'
+import { createRouter } from './src/router'
+export * from './src/router'
+export * from './src/router'
 export default createRouter
