@@ -1,5 +1,5 @@
 import { ParsedUrlQuery } from 'querystring'
-import { Context, NextFunction, Handler, createHandlersStack, end } from 'wuok'
+import { Context, NextFunction, Handler, createHandlersStack } from 'wuok'
 import { getUrlQuery, getUrlParams } from './extractors'
 import regexparam from './regexparam'
 
@@ -46,10 +46,9 @@ const isRouteMatch = (
     , match: RegExpExecArray
     , query: ParsedUrlQuery) => {
     if (isHead(ctx)) {
-        end(ctx)
+        ctx.res.end()
         return undefined
     }
-
     const params = getUrlParams(item, match)
     const context = createNewContext(ctx, query, params)
     return createHandlersStack(context, item.handlers)
@@ -62,7 +61,7 @@ const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStack
         const qp = getUrlQuery(ctx.req.url)
         const path = qp.pathname ?? ctx.req.url
         const match = exetPatternMatch(path, item)
-        if (match) return isRouteMatch(ctx, item, match, qp.query)
+        if (match) return isRouteMatch(ctx, item, match, qp.query) 
     }
 
     next()

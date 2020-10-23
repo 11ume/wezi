@@ -16,7 +16,7 @@ export const buffer = (ctx: Context, statusCode = 200, obj: Buffer) => {
         return
     }
 
-    ctx.res.end(ctx)
+    ctx.res.end()
 }
 
 export const stream = (ctx: Context, statusCode = 200, obj: Readable) => {
@@ -30,13 +30,13 @@ export const stream = (ctx: Context, statusCode = 200, obj: Readable) => {
         return
     }
 
-    ctx.res.end(ctx)
+    ctx.res.end()
 }
 
 export const send = (ctx: Context, statusCode = 200, obj = null) => {
     ctx.res.statusCode = statusCode
     if (obj === null) {
-        ctx.res.end(ctx)
+        ctx.res.end()
         return
     }
 

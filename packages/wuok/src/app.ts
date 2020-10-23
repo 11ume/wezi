@@ -74,7 +74,7 @@ const createNextFn = (ctx: Context, loop: Loop) => {
 // default error handler
 const errorHandler = (ctx: Context) => {
     ctx.res.statusCode = ctx.error.statusCode || 500
-    ctx.res.end(ctx)
+    ctx.res.end()
 }
 
 // creates a loop handler stack controller, used for execute each handler secuencially
@@ -94,7 +94,7 @@ const createHandlersLoop = (handlers: Handler[], handleErrors: Handler = errorHa
         }
 
         // if none handler has end the response
-        ctx.res.end(ctx)
+        ctx.res.end()
     }
 }
 
