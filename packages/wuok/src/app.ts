@@ -66,7 +66,7 @@ const asyncHandlerWrapper = async (ctx: Context
 // create a "next function" used for increase by one position in the stack of handlers
 const createNextFn = (ctx: Context, loop: Loop) => {
     return function next(err?: ErrorObj) {
-        if (err) ctx.error = err
+        if (err instanceof Error) ctx.error = err
         loop(ctx, next)
     }
 }
