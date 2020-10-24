@@ -1,5 +1,5 @@
 {
-  "name": "wuok-recibers",
+  "name": "wuok-send",
   "version": "0.1.1-alpha.0",
   "description": "",
   "main": "index.ts",
@@ -14,8 +14,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "content-type": "^1.0.4",
-    "raw-body": "^2.4.1",
     "wuok": "0.1.1-alpha.0"
   },
   "devDependencies": {

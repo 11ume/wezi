@@ -2,7 +2,8 @@ import test from 'ava'
 import http from 'http'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
-import wuok, { Handler } from 'wuok'
+import wuok, { Handler, NextFunction, createError } from 'wuok'
+import * as recibe from 'wuok-recibe'
 import router, {
     ContextRoute
     , ContextRouteWild
@@ -223,11 +224,61 @@ test('match head, match route and return empty body', async t => {
 })
 
 test('multiple matching routes match whit wildcards', async t => {
-    const hello = (ctx: ContextRouteWild) => ctx.params.wild
-    const routes = router(get('/character/*', hello))
+    const getChar = (ctx: ContextRouteWild) => ctx.params.wild
+    const routes = router(get('/character/*', getChar))
     const url = await server(routes)
     const res = await fetch(`${url}/character/john/connor`)
     const r = await res.text()
 
     t.is(r, 'john/connor')
+})
+
+test('multiple routes handlers', async t => {
+    const checkChar = (ctx: ContextRoute<{ name: string }>, next: NextFunction) => {
+        if (ctx.params.name !== 'john') {
+            next(createError(400, 'Bad request'))
+        }
+    }
+    const getChar = (ctx: ContextRoute<{ name: string }>) => ctx.params.name
+    const routes = router(get('/character/:name', checkChar, getChar))
+    const url = await server(routes)
+    const res = await fetch(`${url}/character/john`)
+    const r = await res.text()
+
+    t.is(r, 'john')
+})
+
+test('multiple routes handlers fail next', async t => {
+    const checkChar = async (ctx: ContextRoute, next: NextFunction) => {
+        const char = await recibe.json<{ name?: string, power?: string }>(ctx)
+        if (char.name && char.power) next()
+        else next(createError(400, 'Bad request'))
+    }
+    const getChar = (ctx: ContextRoute<{ name: string }>) => ctx.params.name
+    const routes = router(post('/character', checkChar, getChar))
+    const url = await server(routes)
+    const res = await fetch(`${url}/character`, {
+        method: 'post'
+        , body: JSON.stringify({ name: 't800' })
+    })
+    t.is(res.status, 400)
+})
+
+test('multiple routes handlers throw error', async t => {
+    const checkChar = async (ctx: ContextRoute, next: NextFunction) => {
+        const char = await recibe.json<{ name?: string, power?: string }>(ctx)
+        if (char.name && char.power) next()
+        else next(createError(400, 'Bad request'))
+    }
+    const getChar = (ctx: ContextRoute<{ name: string }>) => ctx.params.name
+    const checkPower = (ctx: ContextRoute<{ name: string }>) => {
+
+    }
+    const routes = router(post('/character', checkChar, getChar))
+    const url = await server(routes)
+    const res = await fetch(`${url}/character`, {
+        method: 'post'
+        , body: JSON.stringify({ name: 't800' })
+    })
+    t.is(res.status, 400)
 })

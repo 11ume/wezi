@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { mergeHandlers } from './utils'
 import { ErrorObj } from './error'
-import { send } from 'wuok-senders'
+import { send } from 'wuok-send'
 
 export interface Context {
     readonly req: IncomingMessage
