@@ -1,4 +1,4 @@
 export * from './src'
 export * from './src/error'
-import { createApp } from './src'
-export default createApp
+import { serve } from './src'
+export default serve
