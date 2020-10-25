@@ -15,10 +15,10 @@ export type Handler = (ctx: Context, next?: NextFunction) => any
 type Loop = (ctx: Context, next?: NextFunction) => void
 
 // used for controll the async execution of each handler in the stack
-const exec =  (ctx: Context, next: NextFunction, handler: Handler) => {
+const exec = (ctx: Context, next: NextFunction, handler: Handler) => {
         // automatic handler response resolver 
         try {
-            const val =  handler(ctx, next)
+            const val = handler(ctx, next)
             if (val) {
                 send(ctx, ctx.res.statusCode, val)
                 return
@@ -42,6 +42,10 @@ const createNextFn = (ctx: Context, loop: Loop) => {
         if (err instanceof Error) ctx.error = err
         loop(ctx, next)
     }
+}
+
+function *run() {
+    yield exec(ctx, nx, handler)
 }
 
 // creates a loop handler stack controller, used for execute each handler secuencially
