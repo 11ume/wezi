@@ -263,22 +263,3 @@ test('multiple routes handlers fail next', async t => {
     })
     t.is(res.status, 400)
 })
-
-test('multiple routes handlers throw error', async t => {
-    const checkChar = async (ctx: ContextRoute, next: NextFunction) => {
-        const char = await recibe.json<{ name?: string, power?: string }>(ctx)
-        if (char.name && char.power) next()
-        else next(createError(400, 'Bad request'))
-    }
-    const getChar = (ctx: ContextRoute<{ name: string }>) => ctx.params.name
-    const checkPower = (ctx: ContextRoute<{ name: string }>) => {
-
-    }
-    const routes = router(post('/character', checkChar, getChar))
-    const url = await server(routes)
-    const res = await fetch(`${url}/character`, {
-        method: 'post'
-        , body: JSON.stringify({ name: 't800' })
-    })
-    t.is(res.status, 400)
-})

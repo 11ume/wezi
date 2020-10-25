@@ -1,5 +1,5 @@
 import { ParsedUrlQuery } from 'querystring'
-import { Context, NextFunction, Handler, createHandlersStack } from 'wuok'
+import { Context, NextFunction, Handler, createHandlersLoop } from 'wuok'
 import { getUrlQuery, getUrlParams } from './extractors'
 import regexparam from './regexparam'
 
@@ -47,11 +47,13 @@ const isRouteMatch = (
     , query: ParsedUrlQuery) => {
     if (isHead(ctx)) {
         ctx.res.end()
-        return undefined
+        return
     }
+
     const params = getUrlParams(item, match)
     const context = createNewContext(ctx, query, params)
-    return createHandlersStack(context, item.handlers)
+    const loop = createHandlersLoop(item.handlers)
+    loop(context)
 }
 
 // runs every time a request is made, and try match any route
@@ -61,11 +63,13 @@ const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStack
         const qp = getUrlQuery(ctx.req.url)
         const path = qp.pathname ?? ctx.req.url
         const match = exetPatternMatch(path, item)
-        if (match) return isRouteMatch(ctx, item, match, qp.query) 
+        if (match) {
+            isRouteMatch(ctx, item, match, qp.query) 
+            return
+        }
     }
 
     next()
-    return undefined
 }
 
 const creteRouteStackItem = (item: RouteStackItem, namespace: string) => {
@@ -84,7 +88,9 @@ const prepareRouteStack = (handlerStackItems: RouteStackItem[], namespace = ''):
 // it make pre built of all router handlers
 const prepareRoutes = (handlerStackItems: RouteStackItem[]) => {
     const stack = prepareRouteStack(handlerStackItems)
-    return (ctx: ContextRoute, next: NextFunction) => findRouteMatch(ctx, next, stack)
+    return function router(ctx: ContextRoute, next: NextFunction) {
+        return findRouteMatch(ctx, next, stack)
+    }
 }
 
 const prepareRoutesWhitNamespace = (handlerStackItems: RouteStackItem[], namespace?: string) => {
