@@ -40,10 +40,7 @@ const createNewContext = (ctx: ContextRoute, query: ParsedUrlQuery, params: {}) 
     , params
 })
 
-const isRouteMatch = (
-    ctx: ContextRoute
-    , item: RouteStackItem
-    , match: RegExpExecArray
+const isRouteMatch = (ctx: ContextRoute, item: RouteStackItem, match: RegExpExecArray
     , query: ParsedUrlQuery) => {
     if (isHead(ctx)) {
         ctx.res.end()
