@@ -1,4 +1,4 @@
-export * from './src/app'
+export * from './src'
 export * from './src/error'
-import { createApp } from './src/app'
+import { createApp } from './src'
 export default createApp

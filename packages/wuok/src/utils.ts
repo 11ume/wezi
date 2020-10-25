@@ -1,4 +1,4 @@
-import { Context, Handler } from './app'
+import { Context, Handler } from '.'
 
 export const isDev = () => process.env.NODE_ENV === 'development'
 export const status = (ctx: Context, statusCode: number) => ctx.res.statusCode = statusCode
