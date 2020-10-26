@@ -13,10 +13,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "got": "^11.8.0",
-    "wuok": "^0.1.1-alpha.0",
-    "wuok-send": "^0.1.1-alpha.0",
-    "wuok-recibe": "^0.1.1-alpha.0"
+    "wuok-types": "^0.1.1-alpha.0",
+    "wuok-composer": "^0.1.1-alpha.0"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.5.7",

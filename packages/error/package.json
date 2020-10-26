@@ -1,0 +1,12 @@
+{
+  "name": "wuok-error",
+  "version": "0.1.1-alpha.0",
+  "description": "",
+  "main": "index.ts",
+  "types": "index.ts",
+  "author": {
+    "name": "Horacio Rivero",
+    "email": "horacioriverods@gmail.com"
+  },
+  "license": "MIT"
+}

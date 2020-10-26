@@ -1,6 +1,6 @@
 import { Stream, Readable } from 'stream'
 import { isReadable } from './utils'
-import { Context } from 'wuok'
+import { Context } from 'wuok-types'
 
 const noContentType = (ctx: Context) => !ctx.res.getHeader('Content-Type')
 

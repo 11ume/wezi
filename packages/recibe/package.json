@@ -16,7 +16,8 @@
   "dependencies": {
     "content-type": "^1.0.4",
     "raw-body": "^2.4.1",
-    "wuok": "0.1.1-alpha.0"
+    "wuok-types": "0.1.1-alpha.0",
+    "wuok-error": "0.1.1-alpha.0"
   },
   "devDependencies": {
     "@ava/babel": "^1.0.1",

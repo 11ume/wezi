@@ -1,5 +1,5 @@
 {
-  "name": "wuok-cors",
+  "name": "wuok-composer",
   "version": "0.1.1-alpha.0",
   "description": "",
   "main": "index.ts",
@@ -8,16 +8,18 @@
     "name": "Horacio Rivero",
     "email": "horacioriverods@gmail.com"
   },
+  "scripts": {
+  },
   "license": "MIT",
   "dependencies": {
-    "wuok-types": "^0.1.1-alpha.0"
+    "wuok-send": "^0.1.1-alpha.0",
+    "wuok-types": "^0.1.1-alpha.0",
+    "wuok-error": "^0.1.1-alpha.0"
   },
   "devDependencies": {
-    "@ava/babel": "^1.0.1",
     "@types/node": "^14.14.0",
-    "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
-    "ava": "^3.13.0",
+    "@typescript-eslint/eslint-plugin": "^4.5.0",
     "eslint": "^7.11.0",
     "standard": "^14.3.4",
     "ts-node": "^9.0.0",
