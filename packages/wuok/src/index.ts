@@ -15,19 +15,19 @@ export type Handler = (ctx: Context, next?: NextFunction) => any
 type Loop = (ctx: Context, next?: NextFunction) => void
 
 // used for controll the async execution of each handler in the stack
-const exec = (ctx: Context, next: NextFunction, handler: Handler) => {
-        // automatic handler response resolver 
-        try {
-            const val = handler(ctx, next)
-            if (val) {
-                send(ctx, ctx.res.statusCode, val)
-                return
-            }
-            next()
+const exec = async (ctx: Context, next: NextFunction, handler: Handler) => {
+    // automatic handler response resolver 
+    try {
+        const val = await handler(ctx, next)
+        if (val) {
+            send(ctx, ctx.res.statusCode, val)
+            return
         }
-        catch(err) {
-            next(err)
-        }
+        next()
+    }
+    catch (err) {
+        next(err)
+    }
 }
 
 // default error handler
@@ -69,13 +69,14 @@ export const createHandlersLoop = (handlers: Handler[], handleErrors: Handler = 
     }
 }
 
-export const createApp = (handler: Handler | Handler[], ...handlers: Handler[]) => (errHandler?: Handler) => {
+export const serve = (handler: Handler | Handler[], ...handlers: Handler[]) => (errHandler?: Handler) => {
     const mergedHandlers = mergeHandlers(handler, handlers)
     return (req: IncomingMessage, res: ServerResponse) => {
         const loop = createHandlersLoop(mergedHandlers, errHandler)
         const context = {
             req
             , res
+            , error: null
         }
 
         loop(context)
