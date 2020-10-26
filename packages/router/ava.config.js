@@ -1,13 +1,12 @@
 export default {
-    cache: true,
-    timeout: '2m',
+    cache: false,
+    timeout: '1m',
     concurrency: 6,
     babel: {
         compileEnhancements: false
     },
     files: [
-        '!dist'
-        , '!dev'
+        '!dev'
     ],
     require: ['ts-node/register'],
     extensions: ['ts']

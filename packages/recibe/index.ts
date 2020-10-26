@@ -1,18 +1,17 @@
-import { IncomingMessage } from 'http'
-import contentType from 'content-type'
+import { Context } from 'wuok-types'
+import { createError } from 'wuok-error'
 import { parseJSON } from './utils'
-import { createError } from './error'
-import { Context } from './app'
+import contentType from 'content-type'
 import getRawBody, { Options as GetRawBodyOptions, RawBodyError } from 'raw-body'
 
 // Maps requests to buffered raw bodies so that
 // multiple calls to `json` work as expected
 const rawBodyMap = new WeakMap()
 
-export const buffer = (req: IncomingMessage, { limit = '1mb', encoding }: GetRawBodyOptions = {}) => {
-    const body = rawBodyMap.get(req)
-    const type = req.headers['content-type'] || 'text/plain'
-    const length = req.headers['content-length']
+export const buffer = (ctx: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}) => {
+    const body = rawBodyMap.get(ctx.req)
+    const type = ctx.req.headers['content-type'] || 'text/plain'
+    const length = ctx.req.headers['content-length']
     let encode = encoding
 
     if (encoding === undefined) {
@@ -23,13 +22,13 @@ export const buffer = (req: IncomingMessage, { limit = '1mb', encoding }: GetRaw
         return body
     }
 
-    return getRawBody(req, {
+    return getRawBody(ctx.req, {
         limit
         , length
         , encoding: encode
     })
         .then((buf) => {
-            rawBodyMap.set(req, buf)
+            rawBodyMap.set(ctx.req, buf)
             return buf
         })
         .catch((err: RawBodyError) => {
@@ -41,7 +40,7 @@ export const buffer = (req: IncomingMessage, { limit = '1mb', encoding }: GetRaw
         })
 }
 
-export const text = (ctx: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}) => buffer(ctx.req, {
+export const text = (ctx: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}) => buffer(ctx, {
     limit
     , encoding
 })

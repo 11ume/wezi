@@ -1,13 +1,18 @@
 import { ParsedUrlQuery } from 'querystring'
-import { Context, RequestListener, NextFunction } from 'wuok'
 import { getUrlQuery, getUrlParams } from './extractors'
+import { Context, NextFunction, Handler } from 'wuok-types'
+import composer from 'wuok-composer'
 import regexparam from './regexparam'
-
-type HandlerFunction = (ctx: ContextRoute, next: NextFunction, namespace?: string) => void
 
 export interface ContextRoute<P = void, Q = void> extends Context {
     params?: P
     , query?: Q
+}
+
+export interface ContextRouteWild extends Context {
+    params?: {
+        wild: string
+    }
 }
 
 export type Route = {
@@ -18,8 +23,8 @@ export type Route = {
 export type RouteStackItem = {
     path: string
     method: string
-    handler: HandlerFunction
     route: Route
+    handlers: Handler[]
     namespace: string
 }
 
@@ -36,6 +41,21 @@ const createNewContext = (ctx: ContextRoute, query: ParsedUrlQuery, params: {}) 
     , params
 })
 
+const isRouteMatch = (ctx: ContextRoute
+    , item: RouteStackItem
+    , match: RegExpExecArray
+    , query: ParsedUrlQuery) => {
+    if (isHead(ctx)) {
+        ctx.res.end()
+        return
+    }
+
+    const params = getUrlParams(item, match)
+    const context = createNewContext(ctx, query, params)
+    const loop = composer(item.handlers)
+    loop(context)
+}
+
 // runs every time a request is made, and try match any route
 const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStackItem[]) => {
     for (const item of stack) {
@@ -43,21 +63,12 @@ const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStack
         const qp = getUrlQuery(ctx.req.url)
         const path = qp.pathname ?? ctx.req.url
         const match = exetPatternMatch(path, item)
-
         if (match) {
-            const params = getUrlParams(item, match)
-            const context = createNewContext(ctx, qp.query, params)
-            return item.handler(context, next)
-        }
-
-        // send empty request for head requests
-        if (isHead(ctx)) {
-            ctx.res.end()
+            isRouteMatch(ctx, item, match, qp.query)
             return
         }
     }
 
-    // no path matches
     next()
 }
 
@@ -77,19 +88,21 @@ const prepareRouteStack = (handlerStackItems: RouteStackItem[], namespace = ''):
 // it make pre built of all router handlers
 const prepareRoutes = (handlerStackItems: RouteStackItem[]) => {
     const stack = prepareRouteStack(handlerStackItems)
-    return (ctx: ContextRoute, next: NextFunction) => findRouteMatch(ctx, next, stack)
+    return function routeMatch(ctx: ContextRoute, next: NextFunction) {
+        return findRouteMatch(ctx, next, stack)
+    }
 }
 
 const prepareRoutesWhitNamespace = (handlerStackItems: RouteStackItem[], namespace?: string) => {
     return prepareRouteStack(handlerStackItems, namespace)
 }
 
-const createStackItem = (giveMethod: string) => (path: string, handler: RequestListener): RouteStackItem => {
+const createStackItem = (giveMethod: string) => (path: string, ...handlers: Handler[]): RouteStackItem => {
     const method = giveMethod.toUpperCase()
     return {
         path
         , method
-        , handler
+        , handlers
         , route: null
         , namespace: ''
     }
@@ -105,11 +118,9 @@ export const withNamespace = (namespace: string) => (...handlerStackItems: Route
 }
 
 export const get = createStackItem('get')
-export const del = createStackItem('del')
 export const put = createStackItem('put')
 export const path = createStackItem('path')
 export const post = createStackItem('post')
-export const head = createStackItem('heat')
+export const head = createStackItem('head')
+export const del = createStackItem('delete')
 export const options = createStackItem('options')
-
-

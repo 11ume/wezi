@@ -1,10 +1,10 @@
 import { Stream, Readable } from 'stream'
 import { isReadable } from './utils'
-import { Context } from './app'
+import { Context } from 'wuok-types'
 
-export const noContentType = (ctx: Context) => !ctx.res.getHeader('Content-Type')
+const noContentType = (ctx: Context) => !ctx.res.getHeader('Content-Type')
 
-export const sendBuffer = (ctx: Context, statusCode = 200, obj: Buffer) => {
+export const buffer = (ctx: Context, statusCode = 200, obj: Buffer) => {
     ctx.res.statusCode = statusCode
     if (Buffer.isBuffer(obj)) {
         if (noContentType(ctx)) {
@@ -19,7 +19,7 @@ export const sendBuffer = (ctx: Context, statusCode = 200, obj: Buffer) => {
     ctx.res.end()
 }
 
-export const sendStream = (ctx: Context, statusCode = 200, obj: Readable) => {
+export const stream = (ctx: Context, statusCode = 200, obj: Readable) => {
     ctx.res.statusCode = statusCode
     if (obj instanceof Stream || isReadable(obj)) {
         if (noContentType(ctx)) {
@@ -46,9 +46,10 @@ export const send = (ctx: Context, statusCode = 200, obj = null) => {
         if (noContentType(ctx)) {
             ctx.res.setHeader('Content-Type', 'application/json charset=utf-8')
         }
-    
+
         ctx.res.setHeader('Content-Length', Buffer.byteLength(payload))
     }
-    
+
     ctx.res.end(payload)
 }
+
