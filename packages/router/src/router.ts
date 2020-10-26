@@ -52,8 +52,8 @@ const isRouteMatch = (ctx: ContextRoute
 
     const params = getUrlParams(item, match)
     const context = createNewContext(ctx, query, params)
-    const loop = composer(item.handlers)
-    loop(context)
+    const dispatch = composer(item.handlers)
+    dispatch(context)
 }
 
 // runs every time a request is made, and try match any route
