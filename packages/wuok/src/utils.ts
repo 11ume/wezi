@@ -1,4 +1,4 @@
-import { Context, Handler } from '.'
+import { Context, Handler } from 'wuok-types'
 
 export const isDev = () => process.env.NODE_ENV === 'development'
 export const status = (ctx: Context, statusCode: number) => ctx.res.statusCode = statusCode

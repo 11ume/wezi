@@ -4,17 +4,9 @@ import { send } from 'wuok-send'
 
 type Loop = (ctx: Context, next?: NextFunction) => void
 
-// create a "next function" used for increase by one position in the stack of handlers
-const createNextFn = (ctx: Context, loop: Loop) => {
-    return function next(err?: ErrorObj) {
-        if (err instanceof Error) ctx.error = err
-        loop(ctx, next)
-    }
-}
-
 // used for controll the async execution of each handler in the stack
-export const exec = async (ctx: Context, next: NextFunction, handler: Handler) => {
-    // automatic handler response resolver 
+const exec = async (ctx: Context, next: NextFunction, handler: Handler) => {
+    // automatic response resolver 
     try {
         const val = await handler(ctx, next)
         if (val) {
@@ -28,12 +20,20 @@ export const exec = async (ctx: Context, next: NextFunction, handler: Handler) =
     }
 }
 
+// create a "next function" used for increase by one position in the stack of handlers
+const createNextFn = (ctx: Context, loop: Loop) => {
+    return function next(err?: ErrorObj) {
+        if (err instanceof Error) ctx.error = err
+        loop(ctx, next)
+    }
+}
+
 // creates a loop handler stack controller, used for execute each handler secuencially
-export const composer = (handlers: Handler[], handleErrors: Handler): Loop => {
+const composer = (handlers: Handler[]): Loop => {
     let i = 0
     return function loop(ctx: Context, next: NextFunction = null) {
         if (ctx.error) {
-            handleErrors(ctx, next)
+            ctx.errorHandler(ctx, next)
             return
         }
         if (ctx.res.writableEnded) return

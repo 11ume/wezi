@@ -64,7 +64,7 @@ const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStack
         const path = qp.pathname ?? ctx.req.url
         const match = exetPatternMatch(path, item)
         if (match) {
-            isRouteMatch(ctx, item, match, qp.query) 
+            isRouteMatch(ctx, item, match, qp.query)
             return
         }
     }
@@ -118,9 +118,9 @@ export const withNamespace = (namespace: string) => (...handlerStackItems: Route
 }
 
 export const get = createStackItem('get')
-export const del = createStackItem('delete')
 export const put = createStackItem('put')
 export const path = createStackItem('path')
 export const post = createStackItem('post')
 export const head = createStackItem('head')
+export const del = createStackItem('delete')
 export const options = createStackItem('options')

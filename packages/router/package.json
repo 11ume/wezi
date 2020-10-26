@@ -13,6 +13,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "wuok": "^0.1.1-alpha.0",
     "wuok-types": "^0.1.1-alpha.0",
     "wuok-composer": "^0.1.1-alpha.0"
   },
