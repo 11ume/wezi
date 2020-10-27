@@ -18,7 +18,7 @@ const execute = async (ctx: Context, next: NextFunction, handler: Handler) => {
     }
 }
 
-const createNextFn = (ctx: Context, dispatch: Dispatch) => {
+const createNext = (ctx: Context, dispatch: Dispatch) => {
     return function next(err?: ErrorObj) {
         if (err instanceof Error) ctx.error = err
         dispatch(ctx, next)
@@ -35,13 +35,14 @@ const composer = (handlers: Handler[]) => {
         if (ctx.res.writableEnded) return
         if (i < handlers.length) {
             const handler = handlers[i++]
-            const nx = next ?? createNextFn(ctx, dispatch)
+            const nx = next ?? createNext(ctx, dispatch)
             execute(ctx, nx, handler)
             return
         }
 
-        // if none handler has end the response
-        ctx.res.end()
+        i = 0
+        // in case of none handler has ended the response
+        // ctx.res.end()
     }
 }
 
