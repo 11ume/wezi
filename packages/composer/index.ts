@@ -28,11 +28,11 @@ const createNext = (ctx: Context, dispatch: Dispatch) => {
 const composer = (handlers: Handler[]) => {
     let i = 0
     return function dispatch(ctx: Context, next: NextFunction = null) {
+        if (ctx.res.writableEnded) return
         if (ctx.error) {
             ctx.errorHandler(ctx, next)
             return
         }
-        if (ctx.res.writableEnded) return
         if (i < handlers.length) {
             const handler = handlers[i++]
             const nx = next ?? createNext(ctx, dispatch)
