@@ -240,6 +240,7 @@ test('multiple routes handlers', async t => {
         if (ctx.params.name !== 'john') {
             next(createError(400, 'Bad request'))
         }
+        next()
     }
     const getChar = (ctx: ContextRoute<{ name: string }>) => ctx.params.name
     const routes = router(get('/character/:name', checkChar, getChar))

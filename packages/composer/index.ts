@@ -11,7 +11,6 @@ const execute = async (ctx: Context, next: NextFunction, handler: Handler) => {
             send(ctx, ctx.res.statusCode, val)
             return
         }
-        next()
     }
     catch (err) {
         next(err)
@@ -25,7 +24,8 @@ const createNext = (ctx: Context, dispatch: Dispatch) => {
     }
 }
 
-const composer = (handlers: Handler[]) => {
+// sr ejecuta por cada request no es neceasio llevarlo a cero
+const composer = (handlers: Handler[], main = false) => {
     let i = 0
     return function dispatch(ctx: Context, next: NextFunction = null) {
         if (ctx.res.writableEnded) return
@@ -36,13 +36,13 @@ const composer = (handlers: Handler[]) => {
         if (i < handlers.length) {
             const handler = handlers[i++]
             const nx = next ?? createNext(ctx, dispatch)
-            execute(ctx, nx, handler)
+            process.nextTick(() => execute(ctx, nx, handler))
             return
         }
 
-        i = 0
-        // in case of none handler has ended the response
-        // ctx.res.end()
+        if (main) {
+            process.nextTick(() => ctx.res.end())
+        }
     }
 }
 
