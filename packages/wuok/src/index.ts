@@ -12,7 +12,7 @@ export const errorHandler = (ctx: Context) => {
 const run = (handler: Handler | Handler[], ...handlers: Handler[]) => (errHandler: Handler = errorHandler) => {
     const mergedHandlers = mergeHandlers(handler, handlers)
     return (req: IncomingMessage, res: ServerResponse) => {
-        const dispatch = composer(mergedHandlers, true)
+        const dispatch = composer(true, ...mergedHandlers)
         const context = {
             req
             , res

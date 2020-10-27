@@ -52,7 +52,7 @@ const isRouteMatch = (ctx: ContextRoute
 
     const params = getUrlParams(item, match)
     const context = createNewContext(ctx, query, params)
-    const dispatch = composer(item.handlers)
+    const dispatch = composer(false, ...item.handlers)
     dispatch(context)
 }
 

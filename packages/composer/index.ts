@@ -24,7 +24,7 @@ const createNext = (ctx: Context, dispatch: Dispatch) => {
     }
 }
 
-const composer = (main = false, ...handlers: Handler[]) => {
+const composer = (main: boolean, ...handlers: Handler[]) => {
     let i = 0
     return function dispatch(ctx: Context, next: NextFunction = null) {
         if (ctx.res.writableEnded) return
