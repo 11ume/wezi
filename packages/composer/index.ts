@@ -24,8 +24,7 @@ const createNext = (ctx: Context, dispatch: Dispatch) => {
     }
 }
 
-// sr ejecuta por cada request no es neceasio llevarlo a cero
-const composer = (handlers: Handler[], main = false) => {
+const composer = (main = false, ...handlers: Handler[]) => {
     let i = 0
     return function dispatch(ctx: Context, next: NextFunction = null) {
         if (ctx.res.writableEnded) return
