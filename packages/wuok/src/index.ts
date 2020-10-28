@@ -12,7 +12,7 @@ export const errorHandler = (ctx: Context) => {
 const run = (handler: Handler | Handler[], ...handlers: Handler[]) => (errHandler: Handler = errorHandler) => {
     const mergedHandlers = mergeHandlers(handler, handlers)
     return (req: IncomingMessage, res: ServerResponse) => {
-        const loop = composer(mergedHandlers)
+        const dispatch = composer(true, ...mergedHandlers)
         const context = {
             req
             , res
@@ -20,7 +20,7 @@ const run = (handler: Handler | Handler[], ...handlers: Handler[]) => (errHandle
             , errorHandler: errHandler
         }
 
-        loop(context)
+        dispatch(context)
     }
 }
 
