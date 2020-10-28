@@ -29,7 +29,7 @@ const createNext = (ctx: Context, dispatch: Dispatch) => {
 // end response if all higher-order handlers are executed, and none of them have ended the response
 const end = (main: boolean, ctx: Context) => main && ctx.res.end()
 
-// used for create a multi handler flow controllers 
+// used for create a multi handler flow controller
 const composer = (main: boolean, ...handlers: Handler[]) => {
     let i = 0
     return function dispatch(ctx: Context, next: NextFunction = null) {
