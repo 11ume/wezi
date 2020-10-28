@@ -4,6 +4,7 @@ import { send } from 'wuok-send'
 
 type Dispatch = (ctx: Context, next?: NextFunction) => void
 
+// execute and manage the return of a handler
 const execute = async (ctx: Context, next: NextFunction, handler: Handler) => {
     try {
         const val = await handler(ctx, next)
@@ -17,6 +18,7 @@ const execute = async (ctx: Context, next: NextFunction, handler: Handler) => {
     }
 }
 
+// create a function "next" used fo pass to next handler in the handler stack
 const createNext = (ctx: Context, dispatch: Dispatch) => {
     return function next(err?: ErrorObj) {
         if (err instanceof Error) ctx.error = err
@@ -24,6 +26,10 @@ const createNext = (ctx: Context, dispatch: Dispatch) => {
     }
 }
 
+// end response if all higher-order handlers are executed, and none of them have ended the response
+const end = (main: boolean, ctx: Context) => main && ctx.res.end()
+
+// used for create a multi handler flow controllers 
 const composer = (main: boolean, ...handlers: Handler[]) => {
     let i = 0
     return function dispatch(ctx: Context, next: NextFunction = null) {
@@ -35,13 +41,11 @@ const composer = (main: boolean, ...handlers: Handler[]) => {
         if (i < handlers.length) {
             const handler = handlers[i++]
             const nx = next ?? createNext(ctx, dispatch)
-            process.nextTick(() => execute(ctx, nx, handler))
+            process.nextTick(execute, ctx, nx, handler)
             return
         }
 
-        if (main) {
-            process.nextTick(() => ctx.res.end())
-        }
+        end(main, ctx)
     }
 }
 
