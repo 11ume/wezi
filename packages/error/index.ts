@@ -4,19 +4,20 @@ export class HttpError extends Error {
     constructor(
         public message: string
         , public statusCode: number
-        , public error?: Error) {
+        , public originalError?: Error) {
         super(message)
-        this.message = this.message ? message : codes[statusCode]
     }
 }
 
-const createError = (statusCode: number
-    , message?: string
-    , error?: Error) => {
-    const err = new HttpError(message, statusCode, error)
-    err.statusCode = statusCode
-    err.error = error
-    return err
+const createError = (status: number, message?: string, error?: Error) => {
+    let msg = message ? message : codes[status]
+    msg = error ? error.message : msg
+    if (status > 511 || status < 100) {
+        throw Error(`Invalid status code ${status}`)
+    }
+    return new HttpError(msg, status, error)
 }
+
+export const error = (error: Error, message?: string) => createError(500, message, error)
 
 export default createError
