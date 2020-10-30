@@ -40,7 +40,7 @@ const composer = (main: boolean, ...handlers: Handler[]) => {
         }
         if (i < handlers.length) {
             const handler = handlers[i++]
-            const nx = next ?? createNext(ctx, dispatch)
+            const nx = createNext(ctx, dispatch)
             setImmediate(execute, ctx, nx, handler)
             return
         }
