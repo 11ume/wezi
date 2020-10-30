@@ -1,3 +1,4 @@
+// source code is part of lukeed https://github.com/lukeed/regexparam
 const regexparam = (path: string, loose?: string) => {
     let c = ''
     let optional = 0

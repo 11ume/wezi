@@ -4,7 +4,7 @@ import listen from 'test-listen'
 import wuok from 'wuok'
 import fetch from 'node-fetch'
 import { Handler, NextFunction } from 'wuok-types'
-import { createError } from 'wuok-error'
+import createError from 'wuok-error'
 import * as recibe from 'wuok-recibe'
 import router, {
     ContextRoute

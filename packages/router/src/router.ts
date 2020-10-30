@@ -20,29 +20,27 @@ export type Route = {
     , pattern: RegExp
 }
 
-export type RouteStackItem = {
+export type RouteEntity = {
     path: string
-    method: string
     route: Route
+    method: string
     handlers: Handler[]
     namespace: string
 }
 
 const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
 
-const notMethodMatch = (method: string, itemMethod: string) => method !== itemMethod
+const notMethodMatch = (method: string, entityMethod: string) => method !== entityMethod
 
-const exetPatternMatch = (path: string, item: RouteStackItem) => {
-    return item.route.pattern.exec(path)
-}
+const exetPatternMatch = (path: string, entity: RouteEntity) => entity.route.pattern.exec(path)
 
-const createNewContext = (ctx: ContextRoute, query: ParsedUrlQuery, params: {}) => Object.assign(ctx, {
+const createRouteContext = (ctx: ContextRoute, query: ParsedUrlQuery, params: {}) => Object.assign(ctx, {
     query
     , params
 })
 
-const isRouteMatch = (ctx: ContextRoute
-    , item: RouteStackItem
+const dispatchRoute = (ctx: ContextRoute
+    , entity: RouteEntity
     , match: RegExpExecArray
     , query: ParsedUrlQuery) => {
     if (isHead(ctx)) {
@@ -50,77 +48,66 @@ const isRouteMatch = (ctx: ContextRoute
         return
     }
 
-    const params = getUrlParams(item, match)
-    const context = createNewContext(ctx, query, params)
-    const dispatch = composer(false, ...item.handlers)
+    const params = getUrlParams(entity, match)
+    const context = createRouteContext(ctx, query, params)
+    const dispatch = composer(false, ...entity.handlers)
     dispatch(context)
 }
 
-// runs every time a request is made, and try match any route
-const findRouteMatch = (ctx: ContextRoute, next: NextFunction, stack: RouteStackItem[]) => {
-    for (const item of stack) {
-        if (notMethodMatch(ctx.req.method, item.method)) continue
-        const qp = getUrlQuery(ctx.req.url)
-        const path = qp.pathname ?? ctx.req.url
-        const match = exetPatternMatch(path, item)
+const findRouteMatch = (stack: RouteEntity[]) => (ctx: ContextRoute, next: NextFunction) => {
+    for (const entity of stack) {
+        if (notMethodMatch(ctx.req.method, entity.method)) continue
+        const { query, pathname } = getUrlQuery(ctx.req.url)
+        const path = pathname ?? ctx.req.url
+        const match = exetPatternMatch(path, entity)
         if (match) {
-            isRouteMatch(ctx, item, match, qp.query)
+            dispatchRoute(ctx, entity, match, query)
             return
         }
     }
 
+    // no route has matched
     next()
 }
 
-const creteRouteStackItem = (item: RouteStackItem, namespace: string) => {
-    const route = item.route ?? regexparam(`${namespace}${item.path}`)
+const creteRouteEntity = (entity: RouteEntity, namespace: string) => {
+    const route = entity.route ?? regexparam(`${namespace}${entity.path}`)
     return {
-        ...item
+        ...entity
         , route
         , namespace
     }
 }
 
-const prepareRouteStack = (handlerStackItems: RouteStackItem[], namespace = ''): RouteStackItem[] => {
-    return handlerStackItems.map((item) => creteRouteStackItem(item, namespace))
+const prepareRouteStack = (entities: RouteEntity[], namespace = ''): RouteEntity[] => entities.map((entity) => creteRouteEntity(entity, namespace))
+
+// make pre built of all route handlers
+const prepareRoutes = (entities: RouteEntity[]) => {
+    const stack = prepareRouteStack(entities)
+    return findRouteMatch(stack)
 }
 
-// it make pre built of all router handlers
-const prepareRoutes = (handlerStackItems: RouteStackItem[]) => {
-    const stack = prepareRouteStack(handlerStackItems)
-    return function routeMatch(ctx: ContextRoute, next: NextFunction) {
-        return findRouteMatch(ctx, next, stack)
-    }
+const prepareRoutesWhitNamespace = (entities: RouteEntity[], namespace?: string) => {
+    return prepareRouteStack(entities, namespace)
 }
 
-const prepareRoutesWhitNamespace = (handlerStackItems: RouteStackItem[], namespace?: string) => {
-    return prepareRouteStack(handlerStackItems, namespace)
-}
-
-const createStackItem = (giveMethod: string) => (path: string, ...handlers: Handler[]): RouteStackItem => {
-    const method = giveMethod.toUpperCase()
+const createRouteEntity = (method: string) => (path: string, ...handlers: Handler[]): RouteEntity => {
     return {
         path
+        , route: null
         , method
         , handlers
-        , route: null
         , namespace: ''
     }
 }
 
-export const createRouter = (...handlerStackItems: RouteStackItem[] | RouteStackItem[][]) => {
-    return prepareRoutes(handlerStackItems.flat())
-}
+export const createRouter = (...entities: RouteEntity[] | RouteEntity[][]) => prepareRoutes(entities.flat())
+export const withNamespace = (namespace: string) => (...entities: RouteEntity[]) => prepareRoutesWhitNamespace(entities, namespace)
 
-// create router whit namespace
-export const withNamespace = (namespace: string) => (...handlerStackItems: RouteStackItem[]) => {
-    return prepareRoutesWhitNamespace(handlerStackItems, namespace)
-}
-
-export const get = createStackItem('get')
-export const put = createStackItem('put')
-export const path = createStackItem('path')
-export const post = createStackItem('post')
-export const head = createStackItem('head')
-export const del = createStackItem('delete')
-export const options = createStackItem('options')
+export const post = createRouteEntity('POST')
+export const get = createRouteEntity('GET')
+export const put = createRouteEntity('PUT')
+export const path = createRouteEntity('PATH')
+export const del = createRouteEntity('DELETE')
+export const head = createRouteEntity('HEAD')
+export const options = createRouteEntity('OPTIONS')

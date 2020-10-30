@@ -1,5 +1,5 @@
 import queryString from 'querystring'
-import { Route, RouteStackItem } from './router'
+import { Route, RouteEntity } from './router'
 
 // extracts all params of an matched url pattern as key/value
 const regExpExtractParams = (route: Route, match: RegExpExecArray) => {
@@ -36,7 +36,7 @@ const getQueryString = (url: string, idx: number) => {
 }
 
 // parse and extract all url params as key/values
-export const getUrlParams = (item: RouteStackItem, match: RegExpExecArray) => match
+export const getUrlParams = (item: RouteEntity, match: RegExpExecArray) => match
     ? regExpExtractParams(item.route, match)
     : {}
 
