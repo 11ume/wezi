@@ -3,8 +3,8 @@ import composer from '..'
 import http, { IncomingMessage, ServerResponse } from 'http'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
-import { Context, NextFunction } from 'wuok-types'
-import createError from 'wuok-error'
+import { Context, NextFunction } from 'wezi-types'
+import createError from 'wezi-error'
 
 const server = (fn: (req: IncomingMessage, res: ServerResponse) => void) => {
     return listen(http.createServer((req, res) => fn(req, res)))

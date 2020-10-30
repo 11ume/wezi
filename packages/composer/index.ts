@@ -1,6 +1,6 @@
-import { Context, Handler, NextFunction } from 'wuok-types'
-import { HttpError } from 'wuok-error'
-import { send } from 'wuok-send'
+import { Context, Handler, NextFunction } from 'wezi-types'
+import { HttpError } from 'wezi-error'
+import { send } from 'wezi-send'
 
 type Dispatch = (ctx: Context, next?: NextFunction) => void
 

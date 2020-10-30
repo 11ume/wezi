@@ -1,7 +1,7 @@
 import { ParsedUrlQuery } from 'querystring'
 import { getUrlQuery, getUrlParams } from './extractors'
-import { Context, NextFunction, Handler } from 'wuok-types'
-import composer from 'wuok-composer'
+import { Context, NextFunction, Handler } from 'wezi-types'
+import composer from 'wezi-composer'
 import regexparam from './regexparam'
 
 export interface ContextRoute<P = void, Q = void> extends Context {

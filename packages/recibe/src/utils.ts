@@ -1,4 +1,4 @@
-import createError from 'wuok-error'
+import createError from 'wezi-error'
 
 export const parseJSON = (str: string) => {
     try {

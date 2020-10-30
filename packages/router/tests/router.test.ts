@@ -1,11 +1,11 @@
 import test from 'ava'
 import http from 'http'
 import listen from 'test-listen'
-import wuok from 'wuok'
+import wezi from 'wezi'
 import fetch from 'node-fetch'
-import { Handler, NextFunction } from 'wuok-types'
-import createError from 'wuok-error'
-import * as recibe from 'wuok-recibe'
+import { Handler, NextFunction } from 'wezi-types'
+import createError from 'wezi-error'
+import * as recibe from 'wezi-recibe'
 import router, {
     ContextRoute
     , ContextRouteWild
@@ -18,7 +18,7 @@ import router, {
 } from '..'
 
 const server = (fn: Handler) => {
-    const app = wuok(fn)
+    const app = wezi(fn)
     return listen(http.createServer(app()))
 }
 
