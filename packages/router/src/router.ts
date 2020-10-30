@@ -101,13 +101,8 @@ const createStackItem = (method: string) => (path: string, ...handlers: Handler[
     }
 }
 
-export const createRouter = (...entities: RouteEntity[] | RouteEntity[][]) => {
-    return prepareRoutes(entities.flat())
-}
-
-export const withNamespace = (namespace: string) => (...entities: RouteEntity[]) => {
-    return prepareRoutesWhitNamespace(entities, namespace)
-}
+export const createRouter = (...entities: RouteEntity[] | RouteEntity[][]) => prepareRoutes(entities.flat())
+export const withNamespace = (namespace: string) => (...entities: RouteEntity[]) => prepareRoutesWhitNamespace(entities, namespace)
 
 export const post = createStackItem('POST')
 export const get = createStackItem('GET')
