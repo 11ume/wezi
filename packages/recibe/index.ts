@@ -1,5 +1,5 @@
 import { Context } from 'wuok-types'
-import { parseJSON } from './utils'
+import { parseJSON } from './src/utils'
 import createError from 'wuok-error'
 import contentType from 'content-type'
 import getRawBody, { Options as GetRawBodyOptions, RawBodyError } from 'raw-body'
