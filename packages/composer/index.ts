@@ -1,5 +1,5 @@
 import { Context, Handler, NextFunction } from 'wuok-types'
-import { ErrorObj } from 'wuok-error'
+import { HttpError } from 'wuok-error'
 import { send } from 'wuok-send'
 
 type Dispatch = (ctx: Context, next?: NextFunction) => void
@@ -20,7 +20,7 @@ const execute = async (ctx: Context, next: NextFunction, handler: Handler) => {
 
 // create a function "next" used fo pass to next handler in the handler stack
 const createNext = (ctx: Context, dispatch: Dispatch) => {
-    return function next(err?: ErrorObj) {
+    return function next(err?: HttpError) {
         if (err instanceof Error) ctx.error = err
         dispatch(ctx, next)
     }
