@@ -41,7 +41,7 @@ const composer = (main: boolean, ...handlers: Handler[]) => {
         if (i < handlers.length) {
             const handler = handlers[i++]
             const nx = next ?? createNext(ctx, dispatch)
-            process.nextTick(execute, ctx, nx, handler)
+            setImmediate(execute, ctx, nx, handler)
             return
         }
 
