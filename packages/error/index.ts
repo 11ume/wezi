@@ -5,16 +5,18 @@ export class HttpError extends Error {
         public message: string
         , public statusCode: number
         , public error?: Error) {
-        super()
-        this.message = this.message ?? codes[statusCode]
+        super(message)
+        this.message = this.message ? message : codes[statusCode]
     }
 }
 
-export const createError = (statusCode: number
-    , message = ''
+const createError = (statusCode: number
+    , message?: string
     , error?: Error) => {
     const err = new HttpError(message, statusCode, error)
     err.statusCode = statusCode
     err.error = error
     return err
 }
+
+export default createError
