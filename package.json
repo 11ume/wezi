@@ -1,6 +1,6 @@
 {
   "private": true,
-  "repository": "11ume/wuok",
+  "repository": "11ume/wezi",
   "author": {
     "name": "Horacio Rivero",
     "email": "horacioriverods@gmail.com"
@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "pretest": "lerna bootstrap",
-    "prepublish": "cp readme.md packages/wuok/."
+    "prepublish": "cp readme.md packages/wezi/."
   },
   "devDependencies": {
     "lerna": "^3.22.1"

@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { Context, Handler } from 'wuok-types'
+import { Context, Handler } from 'wezi-types'
 import { mergeHandlers } from './utils'
-import composer from 'wuok-composer'
+import composer from 'wezi-composer'
 
 // default error handler
 export const errorHandler = (ctx: Context) => {

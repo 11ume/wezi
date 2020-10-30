@@ -1,4 +1,4 @@
-import { Context } from 'wuok-types'
+import { Context } from 'wezi-types'
 
 const DEFAULT_ALLOW_METHODS: string[] = [
     'POST'

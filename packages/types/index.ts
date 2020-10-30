@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { HttpError } from 'wuok-error'
+import { HttpError } from 'wezi-error'
 
 export type ErrorHandler = (ctx: Context, next?: NextFunction) => void
 export interface Context {

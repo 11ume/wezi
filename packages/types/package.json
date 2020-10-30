@@ -1,5 +1,5 @@
 {
-  "name": "wuok-types",
+  "name": "wezi-types",
   "version": "0.1.1-alpha.0",
   "description": "",
   "main": "index.ts",
@@ -10,6 +10,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "wuok-error": "0.1.1-alpha.0"
+    "wezi-error": "0.1.1-alpha.0"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "wuok-send",
+  "name": "wezi-send",
   "version": "0.1.1-alpha.0",
   "description": "",
   "main": "index.ts",
@@ -14,7 +14,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "wuok-types": "0.1.1-alpha.0"
+    "wezi-types": "0.1.1-alpha.0"
   },
   "devDependencies": {
     "@ava/babel": "^1.0.1",
