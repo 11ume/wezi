@@ -14,7 +14,7 @@
 <br>
 
 
-> **why?** Wizi is small but powerful, the idea behind it is to create robust http servers like polar bear, is expressive and easy to use. 
+> **why?** Wizi is small but powerful, you can create robust http servers like a polar bear, is really impressive and easy to learn. 
 
 <br>
 
