@@ -17,7 +17,7 @@
 
 <br>
 
-Do you like create a robust e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶ microservice like a polar bear!, **Wizi** is small because has only what do u probably will need, focused on laws of simplicity, each part of his source code is useful, modular, simple, easy to understand and maintain. 
+Do you like create a robust e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶ microservice like a polar bear!, **Wizi** is small because has only what do u probably will need. Is focused on laws of simplicity each part of his source code is useful, modular, simple, easy to understand and maintain. 
 
 <br>
 
