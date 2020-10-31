@@ -6,7 +6,7 @@
 <br>
 
 <p align="center">
-    **Wizi** is a simply, small and expressive library
+    Wizi is a simply, small and expressive library
     <br>
     to create a robust e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶  http service like a polar bear!. 
 <p>
