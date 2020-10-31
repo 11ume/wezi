@@ -5,15 +5,21 @@
 
 <br>
 
-<p align="center">
-    Wizi is a small, simply and expressive library
+<p align="center">Async    a small, simply and expressive library
     <br>
     to create a e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶s  robust web services like polar bear!. 
 <p>
     
 <br>
 
+> Features
 
+* **Fast** high performance
+* **Small** only contains the essential
+* **Async** fully asynchronous
+* **Easy** it's really easy to learn  
+* **Clean** thinked for implement the best practices
+* **Familiar** implements enhanced middlewares 
 
 <br>
 
