@@ -30,7 +30,7 @@
 ```ts
 import wezi, { listen } from 'wezi'
 
-const hello = () => 'Hi!'
+const hello = () => 'Hi, i'm small polar bear!'
 const w = wezi(hello)
 listen(w(), 3000)
 ```
