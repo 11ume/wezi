@@ -2,10 +2,12 @@
     <img src="https://github.com/11ume/wezi-assets/blob/main/logo.png?raw=true" width="300" height="auto"/>
 </div>
 
+<br>
 
 <br>
 
-<p align="center"> wezi is a small, simply and expressive library
+<p align="center"> 
+    wezi is a small, simply and expressive library
     <br>
     to create a e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶s  robust web services like polar bear!. 
 <p>
@@ -13,6 +15,8 @@
 <br>
 
 > Features
+
+<br>
 
 * **Fast** high performance
 * **Small** only contains the essential
