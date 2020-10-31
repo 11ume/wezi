@@ -18,11 +18,11 @@
 
 <br>
 
+* **Easy** easy to learn  
 * **Fast** high performance
 * **Small** only contains what you will need
-* **Easy** easy to learn  
-* **Async** fully asynchronous, implements enhanced middlewares
 * **Clean** thinked for implement the best practices
+* **Async** fully asynchronous, implements enhanced middlewares
 * **Intuitive** his appearance is similar to others popular libraries
 
 <br>
