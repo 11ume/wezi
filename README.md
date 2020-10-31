@@ -6,14 +6,14 @@
 <br>
 
 <p align="center">
-    small and expressive 
+    **Wizi** is a simply, small and expressive library
     <br>
-    web library
+    to create a robust e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶  http service like a polar bear!. 
 <p>
     
 <br>
 
-**Wizi** is a simply and small library to create a robust e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶  http service like a polar bear!. 
+
 
 <br>
 
