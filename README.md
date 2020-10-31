@@ -24,7 +24,7 @@
 <br>
 
 <div align="right">
-    <img src="https://github.com/11ume/wezi-assets/blob/main/hi.png?raw=true" width="120" height="auto"/>
+    <img src="https://github.com/11ume/wezi-assets/blob/main/hi2.png?raw=true" width="200" height="auto"/>
 </div>
 
 ```ts
