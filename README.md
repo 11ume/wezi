@@ -17,7 +17,7 @@
 
 <br>
 
-**Wizi** is small but powerful, focused on the **KISS** principle, each part of his code is modular, useful, simple and easy to understand, you can create robust http servers like a polar bear. 
+**Wizi** is small because his features are reduced only to the essentials, focused on the **KISS** principle, each part of his source code is useful, modular, simple, easy to understand and maintain. Other similar libraries have a lot of redundant [**LOC**](https://en.wikipedia.org/wiki/Source_lines_of_code), you can create robust http servers like a polar bear. 
 
 <br>
 
