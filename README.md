@@ -13,8 +13,7 @@
     
 <br>
 
-
-> **why?** Wizi is small but powerful, you can create robust http servers like a polar bear, is really impressive and easy to learn. 
+> **why?** Wizi is small but powerful, focused on the YAGNI principle **You aren't gonna need it**, each part of his code is modular and useful, simple and easy to understand, you can create robust http servers like a polar bear. 
 
 <br>
 
