@@ -14,8 +14,10 @@
 <br>
 
 > **why?** 
+
 <br>
-Wizi is small but powerful, focused on the *YAGNI* principle "You aren't gonna need it", each part of his code is modular, useful, simple and easy to understand, you can create robust http servers like a polar bear. 
+
+**Wizi** is small but powerful, focused on the **YAGNI** principle "You aren't gonna need it", each part of his code is modular, useful, simple and easy to understand, you can create robust http servers like a polar bear. 
 
 <br>
 
