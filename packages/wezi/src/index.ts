@@ -1,11 +1,12 @@
 import http, { RequestListener, IncomingMessage, ServerResponse } from 'http'
 import { Context, Handler } from 'wezi-types'
 import { mergeHandlers } from './utils'
+import { send } from 'wezi-send'
 import composer from 'wezi-composer'
 
 export const errorHandler = (ctx: Context) => {
-    ctx.res.statusCode = ctx.error.statusCode || 500
-    ctx.res.end()
+    const status = ctx.error.statusCode || 500
+    send(ctx, status, ctx.error.message)
 }
 
 export const listen = (run: RequestListener, port: number) => new Promise((resolve, reject) => {
