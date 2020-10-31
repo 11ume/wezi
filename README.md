@@ -18,8 +18,8 @@
 
 <br>
 
-* **Easy** easy to learn  
 * **Fast** high performance
+* **Easy** small lerning curve  
 * **Small** only contains what you will need
 * **Clean** thinked for implement the best practices
 * **Async** fully asynchronous, implements enhanced middlewares
