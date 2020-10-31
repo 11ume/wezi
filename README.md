@@ -13,10 +13,6 @@
     
 <br>
 
-> **why?** 
-
-<br>
-
 **Wizi** is a simply and small library to create a robust e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶  http service like a polar bear!. 
 
 <br>
