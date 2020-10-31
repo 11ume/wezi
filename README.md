@@ -21,6 +21,13 @@ Small and expressive http server
 
 <br>
 
+<div align="right">
+    <img src="https://github.com/11ume/wezi-assets/blob/main/hi.png?raw=true" width="120" height="auto"/>
+</div>
+
+
+<br>
+
 ```ts
 import wezi, { listen } from 'wezi'
 
