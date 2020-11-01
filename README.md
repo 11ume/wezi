@@ -36,10 +36,39 @@
     <img src="https://github.com/11ume/wezi-assets/blob/main/hi2.png?raw=true" width="200" height="auto"/>
 </div>
 
+> Say hello
+
 ```ts
 import wezi, { listen } from 'wezi'
 
 const hello = () => 'Hi, i'm small polar bear!'
 const w = wezi(hello)
+listen(w(), 3000)
+```
+
+> Recibe
+
+```ts
+import { Context } from 'wezi'
+import { json } from 'wezi-recibe'
+
+type Bear = {
+    name: string
+    type: string 
+}
+
+const locate = (type: string) => ({
+    'polar': 'North pole',
+    'grezzly': 'Yellowstone National Park'
+})[type]
+
+const find = async (ctx: Context) => {
+    const bear = await json<Bear>(ctx)
+    const location = locate(bear.type)
+    if (location) return `The ${bear.name} lives in ${location}`
+    return null
+}
+
+const w = wezi(find)
 listen(w(), 3000)
 ```
