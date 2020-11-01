@@ -62,8 +62,8 @@ const locate = (type: string) => ({
     'grezzly': 'Yellowstone National Park'
 })[type]
 
-const find = async (ctx: Context) => {
-    const bear = await json<Bear>(ctx)
+const find = async (c: Context) => {
+    const bear = await json<Bear>(c)
     const location = locate(bear.type)
     if (location) return `The ${bear.name} lives in ${location}`
     return null
