@@ -3,7 +3,7 @@ import composer from '..'
 import http, { IncomingMessage, ServerResponse } from 'http'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
-import { Context, NextFunction } from 'wezi-types'
+import { Context } from 'wezi-types'
 import createError from 'wezi-error'
 
 const server = (fn: (req: IncomingMessage, res: ServerResponse) => void) => {
@@ -17,6 +17,7 @@ test('main composer handler flow', async (t) => {
         const context = {
             req
             , res
+            , next: null
             , error: null
             , errorHandler: null
         }
@@ -31,14 +32,15 @@ test('main composer handler flow', async (t) => {
 
 test('main composer multi handlers', async (t) => {
     const url = await server((req, res) => {
-        const check = (_, next: NextFunction) => {
-            next()
+        const check = (c: Context) => {
+            c.next()
         }
         const hello = () => 'hello'
         const dispatch = composer(true, check, hello)
         const context = {
             req
             , res
+            , next: null
             , error: null
             , errorHandler: null
         }
@@ -53,14 +55,15 @@ test('main composer multi handlers', async (t) => {
 
 test('main composer multi handlers async', async (t) => {
     const url = await server((req, res) => {
-        const check = (_, next: NextFunction) => {
-            next()
+        const check = (c: Context) => {
+            c.next()
         }
         const hello = () => Promise.resolve('hello')
         const dispatch = composer(true, check, hello)
         const context = {
             req
             , res
+            , next: null
             , error: null
             , errorHandler: null
         }
@@ -75,18 +78,19 @@ test('main composer multi handlers async', async (t) => {
 
 test('main composer multi handlers next error', async (t) => {
     const url = await server((req, res) => {
-        const check = (_, next: NextFunction) => {
-            next(createError(400))
+        const check = (c: Context) => {
+            c.next(createError(400))
         }
         const hello = () => Promise.resolve('hello')
-        const errorHandler = (ctx: Context) => {
-            ctx.res.statusCode = ctx.error.statusCode || 500
-            ctx.res.end()
+        const errorHandler = (context: Context) => {
+            context.res.statusCode = context.error.statusCode || 500
+            context.res.end()
         }
         const dispatch = composer(true, check, hello)
         const context = {
             req
             , res
+            , next: null
             , error: null
             , errorHandler
         }
@@ -101,18 +105,19 @@ test('main composer multi handlers next error', async (t) => {
 
 test('main composer multi handlers throw error', async (t) => {
     const url = await server((req, res) => {
-        const check = (_, next: NextFunction) => next()
-        const hello = () => Promise.reject(new Error('youp'))
-        const errorHandler = (ctx: Context) => {
-            ctx.res.statusCode = 500
-            ctx.res.end(JSON.stringify({
-                message: ctx.error.message
+        const check = (c: Context) => c.next()
+        const hello = () => Promise.reject(new Error('yay'))
+        const errorHandler = (context: Context) => {
+            context.res.statusCode = 500
+            context.res.end(JSON.stringify({
+                message: context.error.message
             }))
         }
         const dispatch = composer(true, check, hello)
         const context = {
             req
             , res
+            , next: null
             , error: null
             , errorHandler
         }
@@ -122,6 +127,6 @@ test('main composer multi handlers throw error', async (t) => {
 
     const res = await fetch(`${url}/`)
     const r = await res.json()
-    t.is(r.message, 'youp')
+    t.is(r.message, 'yay')
     t.is(res.status, 500)
 })
