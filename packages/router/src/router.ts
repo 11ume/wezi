@@ -1,6 +1,6 @@
 import { ParsedUrlQuery } from 'querystring'
 import { getUrlQuery, getUrlParams } from './extractors'
-import { Context, NextFunction, Handler } from 'wezi-types'
+import { Context, Handler } from 'wezi-types'
 import composer from 'wezi-composer'
 import regexparam from './regexparam'
 
@@ -28,46 +28,46 @@ export type RouteEntity = {
     namespace: string
 }
 
-const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
+const isHead = (c: Context) => c.req.method === 'HEAD'
 
 const notMethodMatch = (method: string, entityMethod: string) => method !== entityMethod
 
 const exetPatternMatch = (path: string, entity: RouteEntity) => entity.route.pattern.exec(path)
 
-const createRouteContext = (ctx: ContextRoute, query: ParsedUrlQuery, params: {}) => Object.assign(ctx, {
+const createRouteContext = (c: ContextRoute, query: ParsedUrlQuery, params: {}) => Object.assign(c, {
     query
     , params
 })
 
-const dispatchRoute = (ctx: ContextRoute
+const dispatchRoute = (c: ContextRoute
     , entity: RouteEntity
     , match: RegExpExecArray
     , query: ParsedUrlQuery) => {
-    if (isHead(ctx)) {
-        ctx.res.end()
+    if (isHead(c)) {
+        c.res.end()
         return
     }
 
     const params = getUrlParams(entity, match)
-    const context = createRouteContext(ctx, query, params)
+    const context = createRouteContext(c, query, params)
     const dispatch = composer(false, ...entity.handlers)
     dispatch(context)
 }
 
-const findRouteMatch = (stack: RouteEntity[]) => (ctx: ContextRoute, next: NextFunction) => {
+const findRouteMatch = (stack: RouteEntity[]) => (c: ContextRoute) => {
     for (const entity of stack) {
-        if (notMethodMatch(ctx.req.method, entity.method)) continue
-        const { query, pathname } = getUrlQuery(ctx.req.url)
-        const path = pathname ?? ctx.req.url
+        if (notMethodMatch(c.req.method, entity.method)) continue
+        const { query, pathname } = getUrlQuery(c.req.url)
+        const path = pathname ?? c.req.url
         const match = exetPatternMatch(path, entity)
         if (match) {
-            dispatchRoute(ctx, entity, match, query)
+            dispatchRoute(c, entity, match, query)
             return
         }
     }
 
     // no route has matched
-    next()
+    c.next()
 }
 
 const creteRouteEntity = (entity: RouteEntity, namespace: string) => {

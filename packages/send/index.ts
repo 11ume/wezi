@@ -2,54 +2,54 @@ import { Stream, Readable } from 'stream'
 import { isReadable } from './utils'
 import { Context } from 'wezi-types'
 
-const noContentType = (ctx: Context) => !ctx.res.getHeader('Content-Type')
+const noContentType = (c: Context) => !c.res.getHeader('Content-Type')
 
-export const buffer = (ctx: Context, statusCode = 200, obj: Buffer) => {
-    ctx.res.statusCode = statusCode
+export const buffer = (c: Context, statusCode = 200, obj: Buffer) => {
+    c.res.statusCode = statusCode
     if (Buffer.isBuffer(obj)) {
-        if (noContentType(ctx)) {
-            ctx.res.setHeader('Content-Type', 'application/octet-stream')
+        if (noContentType(c)) {
+            c.res.setHeader('Content-Type', 'application/octet-stream')
         }
 
-        ctx.res.setHeader('Content-Length', obj.length)
-        ctx.res.end(obj)
+        c.res.setHeader('Content-Length', obj.length)
+        c.res.end(obj)
         return
     }
 
-    ctx.res.end()
+    c.res.end()
 }
 
-export const stream = (ctx: Context, statusCode = 200, obj: Readable) => {
-    ctx.res.statusCode = statusCode
+export const stream = (c: Context, statusCode = 200, obj: Readable) => {
+    c.res.statusCode = statusCode
     if (obj instanceof Stream || isReadable(obj)) {
-        if (noContentType(ctx)) {
-            ctx.res.setHeader('Content-Type', 'application/octet-stream')
+        if (noContentType(c)) {
+            c.res.setHeader('Content-Type', 'application/octet-stream')
         }
 
-        obj.pipe(ctx.res)
+        obj.pipe(c.res)
         return
     }
 
-    ctx.res.end()
+    c.res.end()
 }
 
-export const send = (ctx: Context, statusCode = 200, obj = null) => {
-    ctx.res.statusCode = statusCode
+export const send = (c: Context, statusCode = 200, obj = null) => {
+    c.res.statusCode = statusCode
     if (obj === null) {
-        ctx.res.end()
+        c.res.end()
         return
     }
 
     let payload = obj
     if (typeof obj === 'object' || typeof obj === 'number') {
         payload = JSON.stringify(obj)
-        if (noContentType(ctx)) {
-            ctx.res.setHeader('Content-Type', 'application/json charset=utf-8')
+        if (noContentType(c)) {
+            c.res.setHeader('Content-Type', 'application/json charset=utf-8')
         }
 
-        ctx.res.setHeader('Content-Length', Buffer.byteLength(payload))
+        c.res.setHeader('Content-Length', Buffer.byteLength(payload))
     }
 
-    ctx.res.end(payload)
+    c.res.end(payload)
 }
 

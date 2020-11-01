@@ -29,7 +29,7 @@ export type CorsOptions = {
     , exposeHeaders?: string[]
 }
 
-const cors = (options: CorsOptions = {}) => (ctx: Context) => {
+const cors = (options: CorsOptions = {}) => (c: Context) => {
     const {
         origin = '*'
         , maxAge = DEFAULT_MAX_AGE_SECONDS
@@ -39,19 +39,19 @@ const cors = (options: CorsOptions = {}) => (ctx: Context) => {
         , exposeHeaders = []
     } = options
 
-    ctx.res.setHeader('Access-Control-Allow-Origin', origin)
+    c.res.setHeader('Access-Control-Allow-Origin', origin)
     if (allowCredentials) {
-        ctx.res.setHeader('Access-Control-Allow-Credentials', 'true')
+        c.res.setHeader('Access-Control-Allow-Credentials', 'true')
     }
     if (exposeHeaders.length) {
-        ctx.res.setHeader('Access-Control-Expose-Headers', exposeHeaders.join(','))
+        c.res.setHeader('Access-Control-Expose-Headers', exposeHeaders.join(','))
     }
 
-    const preFlight = ctx.req.method === 'OPTIONS'
+    const preFlight = c.req.method === 'OPTIONS'
     if (preFlight) {
-        ctx.res.setHeader('Access-Control-Allow-Methods', allowMethods.join(','))
-        ctx.res.setHeader('Access-Control-Allow-Headers', allowHeaders.join(','))
-        ctx.res.setHeader('Access-Control-Max-Age', String(maxAge))
+        c.res.setHeader('Access-Control-Allow-Methods', allowMethods.join(','))
+        c.res.setHeader('Access-Control-Allow-Headers', allowHeaders.join(','))
+        c.res.setHeader('Access-Control-Max-Age', String(maxAge))
     }
 }
 
