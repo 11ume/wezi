@@ -28,46 +28,46 @@ export type RouteEntity = {
     namespace: string
 }
 
-const isHead = (c: Context) => c.req.method === 'HEAD'
+const isHead = (context: Context) => context.req.method === 'HEAD'
 
 const notMethodMatch = (method: string, entityMethod: string) => method !== entityMethod
 
 const exetPatternMatch = (path: string, entity: RouteEntity) => entity.route.pattern.exec(path)
 
-const createRouteContext = (c: ContextRoute, query: ParsedUrlQuery, params: {}) => Object.assign(c, {
+const createRouteContext = (context: ContextRoute, query: ParsedUrlQuery, params: {}) => Object.assign(context, {
     query
     , params
 })
 
-const dispatchRoute = (c: ContextRoute
+const dispatchRoute = (context: ContextRoute
     , entity: RouteEntity
     , match: RegExpExecArray
     , query: ParsedUrlQuery) => {
-    if (isHead(c)) {
-        c.res.end()
+    if (isHead(context)) {
+        context.res.end()
         return
     }
 
     const params = getUrlParams(entity, match)
-    const context = createRouteContext(c, query, params)
+    const ctx = createRouteContext(context, query, params)
     const dispatch = composer(false, ...entity.handlers)
-    dispatch(context)
+    dispatch(ctx)
 }
 
-const findRouteMatch = (stack: RouteEntity[]) => (c: ContextRoute) => {
+const findRouteMatch = (stack: RouteEntity[]) => (context: ContextRoute) => {
     for (const entity of stack) {
-        if (notMethodMatch(c.req.method, entity.method)) continue
-        const { query, pathname } = getUrlQuery(c.req.url)
-        const path = pathname ?? c.req.url
+        if (notMethodMatch(context.req.method, entity.method)) continue
+        const { query, pathname } = getUrlQuery(context.req.url)
+        const path = pathname ?? context.req.url
         const match = exetPatternMatch(path, entity)
         if (match) {
-            dispatchRoute(c, entity, match, query)
+            dispatchRoute(context, entity, match, query)
             return
         }
     }
 
     // no route has matched
-    c.next()
+    context.next()
 }
 
 const creteRouteEntity = (entity: RouteEntity, namespace: string) => {

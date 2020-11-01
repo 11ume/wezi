@@ -79,9 +79,9 @@ test('main composer multi handlers next error', async (t) => {
             next(createError(400))
         }
         const hello = () => Promise.resolve('hello')
-        const errorHandler = (c: Context) => {
-            c.res.statusCode = c.error.statusCode || 500
-            c.res.end()
+        const errorHandler = (context: Context) => {
+            context.res.statusCode = context.error.statusCode || 500
+            context.res.end()
         }
         const dispatch = composer(true, check, hello)
         const context = {
@@ -103,10 +103,10 @@ test('main composer multi handlers throw error', async (t) => {
     const url = await server((req, res) => {
         const check = (_, next: NextFunction) => next()
         const hello = () => Promise.reject(new Error('youp'))
-        const errorHandler = (c: Context) => {
-            c.res.statusCode = 500
-            c.res.end(JSON.stringify({
-                message: c.error.message
+        const errorHandler = (context: Context) => {
+            context.res.statusCode = 500
+            context.res.end(JSON.stringify({
+                message: context.error.message
             }))
         }
         const dispatch = composer(true, check, hello)

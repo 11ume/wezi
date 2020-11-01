@@ -3,9 +3,9 @@ import { Context, Handler } from 'wezi-types'
 import { mergeHandlers } from './utils'
 import composer from 'wezi-composer'
 
-export const errorHandler = (c: Context) => {
-    c.res.statusCode = c.error.statusCode || 500
-    c.res.end()
+export const errorHandler = (context: Context) => {
+    context.res.statusCode = context.error.statusCode || 500
+    context.res.end()
 }
 
 export const listen = (run: RequestListener, port: number) => new Promise((resolve, reject) => {

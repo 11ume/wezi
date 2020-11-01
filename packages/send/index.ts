@@ -2,54 +2,54 @@ import { Stream, Readable } from 'stream'
 import { isReadable } from './utils'
 import { Context } from 'wezi-types'
 
-const noContentType = (c: Context) => !c.res.getHeader('Content-Type')
+const noContentType = (context: Context) => !context.res.getHeader('Content-Type')
 
-export const buffer = (c: Context, statusCode = 200, obj: Buffer) => {
-    c.res.statusCode = statusCode
+export const buffer = (context: Context, statusCode = 200, obj: Buffer) => {
+    context.res.statusCode = statusCode
     if (Buffer.isBuffer(obj)) {
-        if (noContentType(c)) {
-            c.res.setHeader('Content-Type', 'application/octet-stream')
+        if (noContentType(context)) {
+            context.res.setHeader('Content-Type', 'application/octet-stream')
         }
 
-        c.res.setHeader('Content-Length', obj.length)
-        c.res.end(obj)
+        context.res.setHeader('Content-Length', obj.length)
+        context.res.end(obj)
         return
     }
 
-    c.res.end()
+    context.res.end()
 }
 
-export const stream = (c: Context, statusCode = 200, obj: Readable) => {
-    c.res.statusCode = statusCode
+export const stream = (context: Context, statusCode = 200, obj: Readable) => {
+    context.res.statusCode = statusCode
     if (obj instanceof Stream || isReadable(obj)) {
-        if (noContentType(c)) {
-            c.res.setHeader('Content-Type', 'application/octet-stream')
+        if (noContentType(context)) {
+            context.res.setHeader('Content-Type', 'application/octet-stream')
         }
 
-        obj.pipe(c.res)
+        obj.pipe(context.res)
         return
     }
 
-    c.res.end()
+    context.res.end()
 }
 
-export const send = (c: Context, statusCode = 200, obj = null) => {
-    c.res.statusCode = statusCode
+export const send = (context: Context, statusCode = 200, obj = null) => {
+    context.res.statusCode = statusCode
     if (obj === null) {
-        c.res.end()
+        context.res.end()
         return
     }
 
     let payload = obj
     if (typeof obj === 'object' || typeof obj === 'number') {
         payload = JSON.stringify(obj)
-        if (noContentType(c)) {
-            c.res.setHeader('Content-Type', 'application/json charset=utf-8')
+        if (noContentType(context)) {
+            context.res.setHeader('Content-Type', 'application/json charset=utf-8')
         }
 
-        c.res.setHeader('Content-Length', Buffer.byteLength(payload))
+        context.res.setHeader('Content-Length', Buffer.byteLength(payload))
     }
 
-    c.res.end(payload)
+    context.res.end(payload)
 }
 

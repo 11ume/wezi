@@ -8,10 +8,10 @@ import getRawBody, { Options as GetRawBodyOptions, RawBodyError } from 'raw-body
 // multiple calls to `json` work as expected
 const rawBodyMap = new WeakMap()
 
-export const buffer = (c: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}) => {
-    const body = rawBodyMap.get(c.req)
-    const type = c.req.headers['content-type'] || 'text/plain'
-    const length = c.req.headers['content-length']
+export const buffer = (context: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}) => {
+    const body = rawBodyMap.get(context.req)
+    const type = context.req.headers['content-type'] || 'text/plain'
+    const length = context.req.headers['content-length']
     let encode = encoding
 
     if (encoding === undefined) {
@@ -22,13 +22,13 @@ export const buffer = (c: Context, { limit = '1mb', encoding }: GetRawBodyOption
         return body
     }
 
-    return getRawBody(c.req, {
+    return getRawBody(context.req, {
         limit
         , length
         , encoding: encode
     })
         .then((buf) => {
-            rawBodyMap.set(c.req, buf)
+            rawBodyMap.set(context.req, buf)
             return buf
         })
         .catch((err: RawBodyError) => {
@@ -40,11 +40,11 @@ export const buffer = (c: Context, { limit = '1mb', encoding }: GetRawBodyOption
         })
 }
 
-export const text = (c: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}) => buffer(c, {
+export const text = (context: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}) => buffer(context, {
     limit
     , encoding
 })
     .then((body) => body.toString(encoding))
 
-export const json = <T>(c: Context, opts?: GetRawBodyOptions): Promise<T> => text(c, opts)
+export const json = <T>(context: Context, opts?: GetRawBodyOptions): Promise<T> => text(context, opts)
     .then((body: string) => parseJSON(body))

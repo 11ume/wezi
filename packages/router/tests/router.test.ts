@@ -45,7 +45,7 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
 
     const routes = router(
         get('/users', () => responses.getAll)
-        , get('/users/:id', (c: ContextRoute<User>) => c.params.id)
+        , get('/users/:id', (context: ContextRoute<User>) => context.params.id)
         , post('/users', () => responses.create)
         , put('/users', () => responses.update)
         , del('/users', () => responses.delete)
@@ -102,7 +102,7 @@ test('different routes whit return null', async (t) => {
 })
 
 test('routes with params and query', async (t) => {
-    const hello = (c: ContextRoute<{ msg: string }, { time: number }>) => `Hello ${c.params.msg} ${c.query.time}`
+    const hello = (context: ContextRoute<{ msg: string }, { time: number }>) => `Hello ${context.params.msg} ${context.query.time}`
     const routes = router(get('/hello/:msg', hello))
     const url = await server(routes)
 
@@ -113,7 +113,7 @@ test('routes with params and query', async (t) => {
 })
 
 test('routes with multi params', async (t) => {
-    const hello = (c: ContextRoute<{ foo: string, bar: string }>) => `${c.params.foo} ${c.params.bar}`
+    const hello = (context: ContextRoute<{ foo: string, bar: string }>) => `${context.params.foo} ${context.params.bar}`
     const routes = router(get('/hello/:foo/:bar', hello))
     const url = await server(routes)
     const res = await fetch(`${url}/hello/foo/bar`)
@@ -123,7 +123,7 @@ test('routes with multi params', async (t) => {
 })
 
 test('routes with matching optional param', async t => {
-    const hello = (c: ContextRoute<{ msg: string }>) => `Hello ${c.params.msg ?? ''}`
+    const hello = (context: ContextRoute<{ msg: string }>) => `Hello ${context.params.msg ?? ''}`
     const routes = router(get('/path/:msg?', hello))
     const url = await server(routes)
     const res = await fetch(`${url}/path`)
@@ -136,9 +136,9 @@ test('routes with matching optional param', async t => {
 })
 
 test('routes with matching double optional params', async t => {
-    const hello = (c: ContextRoute<{ foo?: string, bar?: string }>) => {
-        if (c.params.foo && c.params.bar) return `Hello ${c.params.foo} ${c.params.bar}`
-        else if (c.params.foo) return `Hello ${c.params.foo}`
+    const hello = (context: ContextRoute<{ foo?: string, bar?: string }>) => {
+        if (context.params.foo && context.params.bar) return `Hello ${context.params.foo} ${context.params.bar}`
+        else if (context.params.foo) return `Hello ${context.params.foo}`
         else return 'Hello'
     }
 
@@ -158,9 +158,9 @@ test('routes with matching double optional params', async t => {
 })
 
 test('routes with matching params last optional only', async t => {
-    const hello = (c: ContextRoute<{ foo: string, bar?: string }>) => {
-        if (c.params.bar) return `Hello ${c.params.foo} ${c.params.bar}`
-        else return `Hello ${c.params.foo}`
+    const hello = (context: ContextRoute<{ foo: string, bar?: string }>) => {
+        if (context.params.bar) return `Hello ${context.params.foo} ${context.params.bar}`
+        else return `Hello ${context.params.foo}`
     }
 
     const routes = router(get('/path/:foo/:bar?', hello))
@@ -176,9 +176,9 @@ test('routes with matching params last optional only', async t => {
 })
 
 test('routes with matching params first optional only', async t => {
-    const hello = (c: ContextRoute<{ foo?: string, bar: string }>) => {
-        if (c.params.foo) return `Hello ${c.params.foo} ${c.params.bar}`
-        else return `Hello ${c.params.bar}`
+    const hello = (context: ContextRoute<{ foo?: string, bar: string }>) => {
+        if (context.params.foo) return `Hello ${context.params.foo} ${context.params.bar}`
+        else return `Hello ${context.params.bar}`
     }
 
     const routes = router(get('/path/:foo?/:bar', hello))
@@ -239,7 +239,7 @@ test('match head, match route and return empty body', async t => {
 })
 
 test('multiple matching routes match whit wildcards', async t => {
-    const getChar = (c: ContextRouteWild) => c.params.wild
+    const getChar = (context: ContextRouteWild) => context.params.wild
     const routes = router(get('/character/*', getChar))
     const url = await server(routes)
     const res = await fetch(`${url}/character/john/connor`)
@@ -249,13 +249,13 @@ test('multiple matching routes match whit wildcards', async t => {
 })
 
 test('multiple routes handlers', async t => {
-    const checkChar = (c: ContextRoute<{ name: string }>) => {
-        if (c.params.name !== 'john') {
-            c.next(createError(400, 'Bad request'))
+    const checkChar = (context: ContextRoute<{ name: string }>) => {
+        if (context.params.name !== 'john') {
+            context.next(createError(400, 'Bad request'))
         }
-        c.next()
+        context.next()
     }
-    const getChar = (c: ContextRoute<{ name: string }>) => c.params.name
+    const getChar = (context: ContextRoute<{ name: string }>) => context.params.name
     const routes = router(get('/character/:name', checkChar, getChar))
     const url = await server(routes)
     const res = await fetch(`${url}/character/john`)
@@ -265,10 +265,10 @@ test('multiple routes handlers', async t => {
 })
 
 test('multiple routes handlers fail next', async t => {
-    const checkChar = async (c: ContextRoute) => {
-        const char = await recibe.json<{ name?: string, power?: string }>(c)
-        if (char.name && char.power) c.next()
-        else c.next(createError(400, 'Bad request'))
+    const checkChar = async (context: ContextRoute) => {
+        const char = await recibe.json<{ name?: string, power?: string }>(context)
+        if (char.name && char.power) context.next()
+        else context.next(createError(400, 'Bad request'))
     }
     const getChar = () => null
     const routes = router(post('/character', checkChar, getChar))
