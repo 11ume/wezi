@@ -46,7 +46,8 @@ const w = wezi(hello)
 listen(w(), 3000)
 ```
 
-> receive
+> Send and receive messages
+
 
 ```ts
 import { Context } from 'wezi'
