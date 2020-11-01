@@ -1,11 +1,10 @@
 import http, { RequestListener, IncomingMessage, ServerResponse } from 'http'
 import { Context, Handler } from 'wezi-types'
-import { mergeHandlers } from './utils'
 import composer from 'wezi-composer'
 
-export const errorHandler = (ctx: Context) => {
-    ctx.res.statusCode = ctx.error.statusCode || 500
-    ctx.res.end()
+export const errorHandler = (context: Context) => {
+    context.res.statusCode = context.error.statusCode || 500
+    context.res.end()
 }
 
 export const listen = (run: RequestListener, port: number) => new Promise((resolve, reject) => {
@@ -15,13 +14,13 @@ export const listen = (run: RequestListener, port: number) => new Promise((resol
     return server.listen(port)
 })
 
-const run = (handler: Handler | Handler[], ...handlers: Handler[]) => (errHandler: Handler = errorHandler) => {
-    const mergedHandlers = mergeHandlers(handler, handlers)
+const run = (...handlers: Handler[]) => (errHandler: Handler = errorHandler) => {
     return (req: IncomingMessage, res: ServerResponse) => {
-        const dispatch = composer(true, ...mergedHandlers)
-        const context = {
+        const dispatch = composer(true, handlers)
+        const context: Context = {
             req
             , res
+            , next: null
             , error: null
             , errorHandler: errHandler
         }
@@ -29,6 +28,5 @@ const run = (handler: Handler | Handler[], ...handlers: Handler[]) => (errHandle
         dispatch(context)
     }
 }
-
 
 export default run

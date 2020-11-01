@@ -1,6 +1,6 @@
 import { ParsedUrlQuery } from 'querystring'
 import { getUrlQuery, getUrlParams } from './extractors'
-import { Context, NextFunction, Handler } from 'wezi-types'
+import { Context, Handler } from 'wezi-types'
 import composer from 'wezi-composer'
 import regexparam from './regexparam'
 
@@ -28,46 +28,46 @@ export type RouteEntity = {
     namespace: string
 }
 
-const isHead = (ctx: Context) => ctx.req.method === 'HEAD'
+const isHead = (context: Context) => context.req.method === 'HEAD'
 
 const notMethodMatch = (method: string, entityMethod: string) => method !== entityMethod
 
 const exetPatternMatch = (path: string, entity: RouteEntity) => entity.route.pattern.exec(path)
 
-const createRouteContext = (ctx: ContextRoute, query: ParsedUrlQuery, params: {}) => Object.assign(ctx, {
+const createRouteContext = (context: ContextRoute, query: ParsedUrlQuery, params: {}) => Object.assign(context, {
     query
     , params
 })
 
-const dispatchRoute = (ctx: ContextRoute
+const dispatchRoute = (context: ContextRoute
     , entity: RouteEntity
     , match: RegExpExecArray
     , query: ParsedUrlQuery) => {
-    if (isHead(ctx)) {
-        ctx.res.end()
+    if (isHead(context)) {
+        context.res.end()
         return
     }
 
     const params = getUrlParams(entity, match)
-    const context = createRouteContext(ctx, query, params)
-    const dispatch = composer(false, ...entity.handlers)
-    dispatch(context)
+    const newContext = createRouteContext(context, query, params)
+    const dispatch = composer(false, entity.handlers)
+    dispatch(newContext)
 }
 
-const findRouteMatch = (stack: RouteEntity[]) => (ctx: ContextRoute, next: NextFunction) => {
+const findRouteMatch = (stack: RouteEntity[]) => (context: ContextRoute) => {
     for (const entity of stack) {
-        if (notMethodMatch(ctx.req.method, entity.method)) continue
-        const { query, pathname } = getUrlQuery(ctx.req.url)
-        const path = pathname ?? ctx.req.url
+        if (notMethodMatch(context.req.method, entity.method)) continue
+        const { query, pathname } = getUrlQuery(context.req.url)
+        const path = pathname ?? context.req.url
         const match = exetPatternMatch(path, entity)
         if (match) {
-            dispatchRoute(ctx, entity, match, query)
+            dispatchRoute(context, entity, match, query)
             return
         }
     }
 
     // no route has matched
-    next()
+    context.next()
 }
 
 const creteRouteEntity = (entity: RouteEntity, namespace: string) => {

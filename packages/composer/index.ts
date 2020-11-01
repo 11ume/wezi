@@ -1,51 +1,64 @@
-import { Context, Handler, NextFunction } from 'wezi-types'
-import { HttpError } from 'wezi-error'
+import { Context, Handler } from 'wezi-types'
 import { send } from 'wezi-send'
 
-type Dispatch = (ctx: Context, next?: NextFunction) => void
+type Dispatch = (context: Context, payload: unknown) => void
 
 // execute and manage the return of a handler
-const execute = async (ctx: Context, next: NextFunction, handler: Handler) => {
+const execute = async (context: Context, handler: Handler, payload: unknown) => {
     try {
-        const val = await handler(ctx, next)
-        if (val) {
-            send(ctx, ctx.res.statusCode, val)
+        const val = await handler(context, payload)
+        if (val === null) {
+            send(context, 204, val)
+            return
+        }
+        if (val !== undefined) {
+            send(context, context.res.statusCode, val)
             return
         }
     }
     catch (err) {
-        next(err)
+        context.next(err)
     }
 }
 
 // create a function "next" used fo pass to next handler in the handler stack
-const createNext = (ctx: Context, dispatch: Dispatch) => {
-    return function next(err?: HttpError) {
-        if (err instanceof Error) ctx.error = err
-        dispatch(ctx, next)
+const createNext = (context: Context, dispatch: Dispatch) => {
+    return function next(payload: unknown) {
+        let ctx = context
+        if (payload instanceof Error) {
+            ctx = Object.assign(context, {
+                error: payload
+            })
+        }
+
+        dispatch(ctx, payload)
     }
 }
 
 // end response if all higher-order handlers are executed, and none of them have ended the response
-const end = (main: boolean, ctx: Context) => main && ctx.res.end()
+const end = (main: boolean, context: Context) => main && context.res.end()
 
 // used for create a multi handler flow execution controller
-const composer = (main: boolean, ...handlers: Handler[]) => {
+const composer = (main: boolean, handlers: Handler[]) => {
     let i = 0
-    return function dispatch(ctx: Context, next: NextFunction = null) {
-        if (ctx.res.writableEnded) return
-        if (ctx.error) {
-            ctx.errorHandler(ctx, next)
+    return function dispatch(context: Context, payload?: unknown) {
+        if (context.res.writableEnded) return
+        if (context.error) {
+            context.errorHandler(context)
             return
         }
         if (i < handlers.length) {
             const handler = handlers[i++]
-            const nx = createNext(ctx, dispatch)
-            setImmediate(execute, ctx, nx, handler)
+            const next = createNext(context, dispatch)
+            const newContext = Object.assign(context, {
+                next
+            })
+
+            setImmediate(execute, newContext, handler, payload)
             return
         }
 
-        end(main, ctx)
+        end(main, context)
     }
 }
 
