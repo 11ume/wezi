@@ -3,6 +3,7 @@ node_modules
 .vscode
 .nyc_output
 coverage
-*.lock
+*.lock.json
 *.log
+*.lerna_backup
 dev

@@ -6,9 +6,11 @@ export interface Context {
     readonly req: IncomingMessage
     readonly res: ServerResponse
     readonly next: NextFunction
-    readonly errorHandler: ErrorHandler
+    readonly nextError: NextErrorFunction
     readonly error: HttpError
+    readonly errorHandler: ErrorHandler
 }
 
-export type NextFunction = (err?: HttpError) => void
+export type NextErrorFunction = (err?: HttpError) => void
+export type NextFunction = <T>(val: T) => void
 export type Handler = (c: Context) => any
