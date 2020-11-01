@@ -8,7 +8,11 @@ type Dispatch = (c: Context, next?: NextFunction) => void
 const execute = async (c: Context, handler: Handler) => {
     try {
         const val = await handler(c)
-        if (val) {
+        if (val === null) {
+            send(c, 204, val)
+            return
+        }
+        if (val !== undefined) {
             send(c, c.res.statusCode, val)
             return
         }

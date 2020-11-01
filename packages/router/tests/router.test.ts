@@ -88,6 +88,19 @@ test('different routes whit static paths, method get', async (t) => {
     t.is(resBar.name, 'bar')
 })
 
+test('different routes whit return null', async (t) => {
+    const routes = router(
+        get('/foo', () => null)
+    )
+
+    const url = await server(routes)
+    const res = await fetch(`${url}/foo`)
+    const r = await res.text()
+
+    t.is(res.status, 204)
+    t.falsy(r)
+})
+
 test('routes with params and query', async (t) => {
     const hello = (c: ContextRoute<{ msg: string }, { time: number }>) => `Hello ${c.params.msg} ${c.query.time}`
     const routes = router(get('/hello/:msg', hello))
