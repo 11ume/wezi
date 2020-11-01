@@ -49,11 +49,12 @@ const composer = (main: boolean, ...handlers: Handler[]) => {
         }
         if (i < handlers.length) {
             const handler = handlers[i++]
-            const nx = createNext(context, dispatch)
-            const nc = Object.assign(context, {
-                next: nx
+            const next = createNext(context, dispatch)
+            const newContext = Object.assign(context, {
+                next
             })
-            setImmediate(execute, nc, handler)
+
+            setImmediate(execute, newContext, handler)
             return
         }
 

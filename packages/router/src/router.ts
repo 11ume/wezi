@@ -49,9 +49,9 @@ const dispatchRoute = (context: ContextRoute
     }
 
     const params = getUrlParams(entity, match)
-    const ctx = createRouteContext(context, query, params)
+    const newContext = createRouteContext(context, query, params)
     const dispatch = composer(false, ...entity.handlers)
-    dispatch(ctx)
+    dispatch(newContext)
 }
 
 const findRouteMatch = (stack: RouteEntity[]) => (context: ContextRoute) => {
