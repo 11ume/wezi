@@ -19,7 +19,7 @@ const run = (handler: Handler | Handler[], ...handlers: Handler[]) => (errHandle
     const mergedHandlers = mergeHandlers(handler, handlers)
     return (req: IncomingMessage, res: ServerResponse) => {
         const dispatch = composer(true, ...mergedHandlers)
-        const context = {
+        const context: Context = {
             req
             , res
             , next: null

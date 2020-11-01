@@ -1,8 +1,7 @@
-import { Context, Handler, NextFunction } from 'wezi-types'
-import { HttpError } from 'wezi-error'
+import { Context, Handler } from 'wezi-types'
 import { send } from 'wezi-send'
 
-type Dispatch = (c: Context, next?: NextFunction) => void
+type Dispatch = (c: Context, payload: any) => void
 
 // execute and manage the return of a handler
 const execute = async (c: Context, handler: Handler) => {
@@ -24,14 +23,15 @@ const execute = async (c: Context, handler: Handler) => {
 
 // create a function "next" used fo pass to next handler in the handler stack
 const createNext = (c: Context, dispatch: Dispatch) => {
-    return function next(error?: HttpError) {
-        let nc = c
-        if (error instanceof Error) {
-            nc = Object.assign(c, {
-                error
+    return function next(payload: unknown) {
+        let context = c
+        if (payload instanceof Error) {
+            context = Object.assign(c, {
+                error: payload
             })
         }
-        dispatch(nc, next)
+
+        dispatch(context, payload)
     }
 }
 
@@ -44,7 +44,7 @@ const composer = (main: boolean, ...handlers: Handler[]) => {
     return function dispatch(c: Context) {
         if (c.res.writableEnded) return
         if (c.error) {
-            c.errorHandler(c)
+            c.errorHandler(c) // circlular dep
             return
         }
         if (i < handlers.length) {

@@ -270,7 +270,7 @@ test('multiple routes handlers fail next', async t => {
         if (char.name && char.power) c.next()
         else c.next(createError(400, 'Bad request'))
     }
-    const getChar = (c: ContextRoute<{ name: string }>) => c.params.name
+    const getChar = () => null
     const routes = router(post('/character', checkChar, getChar))
     const url = await server(routes)
     const res = await fetch(`${url}/character`, {
