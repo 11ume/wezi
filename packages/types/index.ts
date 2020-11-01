@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { HttpError } from 'wezi-error'
 
-export type ErrorHandler = <T>(context: Context, ...values: T[]) => void
+export type ErrorHandler = (context: Context, payload?: any) => void
 export interface Context {
     readonly req: IncomingMessage
     readonly res: ServerResponse
@@ -10,5 +10,5 @@ export interface Context {
     readonly errorHandler: ErrorHandler
 }
 
-export type NextFunction = (...values: any[]) => void
-export type Handler = <T>(context: Context, ...values: T[]) => any
+export type NextFunction = <T>(payload?: T) => void
+export type Handler = (context: Context, payload?: any) => any

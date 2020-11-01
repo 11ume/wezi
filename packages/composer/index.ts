@@ -4,9 +4,9 @@ import { send } from 'wezi-send'
 type Dispatch = (context: Context, payload: unknown) => void
 
 // execute and manage the return of a handler
-const execute = async (context: Context, handler: Handler) => {
+const execute = async (context: Context, handler: Handler, payload: unknown) => {
     try {
-        const val = await handler(context)
+        const val = await handler(context, payload)
         if (val === null) {
             send(context, 204, val)
             return
@@ -41,7 +41,7 @@ const end = (main: boolean, context: Context) => main && context.res.end()
 // used for create a multi handler flow execution controller
 const composer = (main: boolean, handlers: Handler[]) => {
     let i = 0
-    return function dispatch(context: Context) {
+    return function dispatch(context: Context, payload?: unknown) {
         if (context.res.writableEnded) return
         if (context.error) {
             context.errorHandler(context)
@@ -54,7 +54,7 @@ const composer = (main: boolean, handlers: Handler[]) => {
                 next
             })
 
-            setImmediate(execute, newContext, handler)
+            setImmediate(execute, newContext, handler, payload)
             return
         }
 
