@@ -5,7 +5,7 @@ import wezi from 'wezi'
 import fetch from 'node-fetch'
 import { Handler } from 'wezi-types'
 import createError from 'wezi-error'
-import * as recibe from 'wezi-recibe'
+import * as receive from 'wezi-receive'
 import router, {
     ContextRoute
     , ContextRouteWild
@@ -266,7 +266,7 @@ test('multiple routes handlers', async t => {
 
 test('multiple routes handlers fail next', async t => {
     const checkChar = async (context: ContextRoute) => {
-        const char = await recibe.json<{ name?: string, power?: string }>(context)
+        const char = await receive.json<{ name?: string, power?: string }>(context)
         if (char.name && char.power) context.next()
         else context.next(createError(400, 'Bad request'))
     }

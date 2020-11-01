@@ -46,11 +46,11 @@ const w = wezi(hello)
 listen(w(), 3000)
 ```
 
-> Recibe
+> receive
 
 ```ts
 import { Context } from 'wezi'
-import { json } from 'wezi-recibe'
+import { json } from 'wezi-receive'
 
 type Bear = {
     name: string
