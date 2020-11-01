@@ -18,12 +18,12 @@
 
 <br>
 
-* **Fast** high performance
-* **Easy** small lerning curve  
+* **Fast** high performance (even JSON parsing is opt-in)  
 * **Small** only contains what you will need
 * **Clean** thinked for implement the best practices
 * **Async** fully asynchronous, implements enhanced middlewares
-* **Intuitive** his appearance is similar to others popular libraries
+* **Intuitive** is designed to look like other popular libraries
+* **Functional** functional programing friendly
 
 <br>
 
