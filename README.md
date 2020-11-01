@@ -18,12 +18,12 @@
 
 <br>
 
-* **Fast** high performance (even JSON parsing is opt-in)  
 * **Small** only contains what you will need
+* **Fast** high performance (even JSON parsing is opt-in)  
 * **Clean** thinked for implement the best practices
-* **Async** fully asynchronous, implements enhanced middlewares
-* **Intuitive** is designed to look like other popular libraries
+* **Async** fully asynchronous, implements enhanced flow handlers
 * **Functional** functional programing friendly
+* **Intuitive** has features similar to other popular projects
 
 <br>
 
