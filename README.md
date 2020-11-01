@@ -53,7 +53,7 @@ listen(w(), 3000)
 
 
 ```ts
-import { Context } from 'wezi'
+import wezi, { Context, listen } from 'wezi'
 import { json } from 'wezi-receive'
 
 type Bear = {
