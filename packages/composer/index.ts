@@ -39,12 +39,12 @@ const createNext = (context: Context, dispatch: Dispatch) => {
 const end = (main: boolean, context: Context) => main && context.res.end()
 
 // used for create a multi handler flow execution controller
-const composer = (main: boolean, ...handlers: Handler[]) => {
+const composer = (main: boolean, handlers: Handler[]) => {
     let i = 0
     return function dispatch(context: Context) {
         if (context.res.writableEnded) return
         if (context.error) {
-            context.errorHandler(context) // circlular dep
+            context.errorHandler(context)
             return
         }
         if (i < handlers.length) {

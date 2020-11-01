@@ -50,7 +50,7 @@ const dispatchRoute = (context: ContextRoute
 
     const params = getUrlParams(entity, match)
     const newContext = createRouteContext(context, query, params)
-    const dispatch = composer(false, ...entity.handlers)
+    const dispatch = composer(false, entity.handlers)
     dispatch(newContext)
 }
 
