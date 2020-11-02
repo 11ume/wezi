@@ -24,6 +24,7 @@
 * **Async** fully asynchronous, implements enhanced flow handlers
 * **Functional** functional programing friendly
 * **Intuitive** has features similar to other popular projects
+* **Solid** desing for work whit Typescript
 
 <br>
 
