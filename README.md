@@ -106,7 +106,7 @@ const bears = [
 
 const getAll = (): Bear[] => bears
 const getById = ({ params }: ContextRoute<Pick<Bear,'type'>>) => params.type 
-    ? bears.find((bear) => bear.type = params.type) 
+    ? bears.find((bear) => bear.type === params.type) 
     : null 
 
 const r = router(
