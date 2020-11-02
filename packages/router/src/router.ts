@@ -5,8 +5,8 @@ import composer from 'wezi-composer'
 import regexparam from './regexparam'
 
 export interface ContextRoute<P = void, Q = void> extends Context {
-    params?: P
-    , query?: Q
+    readonly params?: P
+    readonly query?: Q
 }
 
 export interface ContextRouteWild extends Context {
@@ -17,7 +17,7 @@ export interface ContextRouteWild extends Context {
 
 export type Route = {
     keys: Array<string>
-    , pattern: RegExp
+    pattern: RegExp
 }
 
 export type RouteEntity = {
