@@ -77,3 +77,44 @@ const find = async (c: Context) => {
 const w = wezi(find)
 listen(w(), 3000)
 ```
+
+<br>
+
+
+> Using the router
+
+
+```ts
+import wezi, { listen } from 'wezi'
+import router, { ContextRoute, get } from 'wezi-router'
+
+type Bear = {
+    type: string
+    location: string
+}
+
+const bears = [
+    {
+        type: 'polar',
+        location: 'North pole'
+    },
+    {
+        type: 'grezzly', 
+        location: 'Yellowstone National Park'
+    }
+]
+
+const getAll = (): Bear[] => bears
+const getById = ({ params }: ContextRoute<Pick<Bear,'type'>>) => params.type 
+    ? bears.find((bear) => bear.type = params.type) 
+    : null 
+
+const r = router(
+    get('/bears', getAll)
+    , get('/bears/:type', getById)
+)
+
+const w = wezi(r)
+listen(w(), 3000)
+
+```
