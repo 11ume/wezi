@@ -6,60 +6,60 @@ import listen from 'test-listen'
 import fetch from 'node-fetch'
 import { json, buffer } from '..'
 
+type ErrorPayload = {
+    message: string
+}
+
 const server = (fn: Handler) => {
     const app = wezi(fn)
     return listen(http.createServer(app()))
 }
 
-test('json from rawBodyMap works', async (t) => {
-    type Body = {
-        message: string
+test('json', async t => {
+    type Characters = {
+        name: string
     }
 
-	const fn =  async (c: Context)  => {
-		const bodyOne = await json<Body>(c)
-		const bodyTwo = await json<Body>(c)
-
-		t.deepEqual(bodyOne, bodyTwo)
-
-        return {
-			response: bodyOne.message
-		}
-	}
-
+    const fn = async (c: Context) => {
+        const characters = await json<Characters[]>(c)
+        return characters.map((char) => char.name)
+    }
     const url = await server(fn)
-	const res = await fetch(url, {
-		method: 'POST',
-		body: JSON.stringify({
-			message: 'foo'
-		})
-    })
-    
-	const body = await res.json()
-	t.deepEqual(body.response, 'json')
-})
-
-test('json should throw 400 on empty body with no headers', async (t) => {
-    const fn = async (c: Context) => json(c)
-    const url = await server(fn)
-
-    const res = await fetch(url)
-    const body = await res.text()
-    t.is(body, 'Invalid JSON')
-    t.is(res.status, 400)
-})
-
-test('buffer should throw 400 on invalid encoding', async t => {
-    const fn = async (c: Context) => buffer(c, { encoding: 'lol' })
-    const url = await server(fn)
-
     const res = await fetch(url, {
         method: 'POST',
-        body: 'foo'
+        body: JSON.stringify([
+            {
+                name: 't800'
+            },
+            {
+                name: 'John Connor'
+            }
+        ])
     })
-    const body = await res.text()
-    t.is(body, 'Invalid body')
-    t.is(res.status, 400)
+
+    const body: string[] = await res.json()
+    t.deepEqual(body[0], 't800')
+    t.deepEqual(body[1], 'John Connor')
+})
+
+test('json parse error', async t => {
+    const fn = async (c: Context) => {
+        const body = await json(c)
+        return {
+            body
+        }
+    }
+
+    const url = await server(fn)
+    const { status } = await fetch(url, {
+        method: 'POST',
+        body: '{ "bad json" }',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+
+    t.is(status, 400)
 })
 
 test('buffer works', async t => {
@@ -71,19 +71,62 @@ test('buffer works', async t => {
     t.is(body, '🐻')
 })
 
-test('Content-Type header for JSON is set', async t => {
-    const url = await server(() => ({}))
-    const res = await fetch(url)
+test('json from rawBodyMap works', async (t) => {
+    type Body = {
+        message: string
+    }
 
-    t.is(res.headers.get('content-type'), 'application/json charset=utf-8')
+    const fn = async (c: Context) => {
+        const bodyOne = await json<Body>(c)
+        const bodyTwo = await json<Body>(c)
+
+        t.deepEqual(bodyOne, bodyTwo)
+
+        return {
+            message: bodyOne.message
+        }
+    }
+
+    const url = await server(fn)
+    const res = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+            message: 'foo'
+        })
+    })
+
+    const body: { message: string } = await res.json()
+    t.deepEqual(body.message, 'foo')
+})
+
+test('json should throw 400 on empty body with no headers', async (t) => {
+    const fn = async (c: Context) => json(c)
+    const url = await server(fn)
+
+    const res = await fetch(url)
+    const body: ErrorPayload = await res.json()
+
+    t.is(body.message, 'Invalid JSON')
+    t.is(res.status, 400)
+})
+
+test('buffer should throw 400 on invalid encoding', async t => {
+    const fn = async (c: Context) => buffer(c, { encoding: 'lol' })
+    const url = await server(fn)
+
+    const res = await fetch(url, {
+        method: 'POST',
+        body: 'foo'
+    })
+
+    const body: ErrorPayload = await res.json()
+    t.is(body.message, 'Invalid body')
+    t.is(res.status, 400)
 })
 
 test('json limit (below)', async (t) => {
-    type Payload = {
-        message: string
-    }
     const fn = async (c: Context) => {
-        const body = await json<Payload>(c, {
+        const body = await json(c, {
             limit: 100
         })
 
@@ -98,8 +141,9 @@ test('json limit (below)', async (t) => {
         })
     })
 
-    const body: Payload = await res.json()
-    t.deepEqual(body.message, 'foo')
+    const body: ErrorPayload = await res.json()
+    t.is(res.status, 200)
+    t.is(body.message, 'foo')
 })
 
 test('json limit (over)', async t => {
@@ -122,46 +166,25 @@ test('json limit (over)', async t => {
         })
     })
 
-    t.deepEqual(res.status, 200)
+    t.is(res.status, 200)
 })
 
 test('json limit (over) unhandled', async t => {
     const fn = (c: Context) => {
         return json(c, {
-            limit: 3
+            limit: 2
         })
     }
 
     const url = await server(fn)
-    try {
-        const res = await fetch(url, {
-            method: 'POST',
-            body: JSON.stringify({
-                message: 'fooas'
-            })
+    const res = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+            message: 'foo'
         })
+    })
 
-        const body: { message:  } = await res.text()
-        t.is(res.status, 413)
-        t.is(body.message, 'Body exceeded 2 limit')
-
-    } catch (err) {
-        t.is(err.message, 'Body exceeded as${limit} limit')
-    }
+    const body: ErrorPayload = await res.json()
+    t.is(res.status, 413)
+    t.is(body.message, 'Body exceeded 2 limit')
 })
-
-// test('json circular', async t => {
-// 	const fn = async (req, res) => {
-// 		const obj = {
-// 			circular: true
-// 		}
-
-// 		obj.obj = obj
-// 		send(res, 200, obj)
-// 	}
-
-// 	const url = await getUrl(fn)
-
-// 	const {status} = await fetch(url)
-// 	t.deepEqual(status, 500)
-// })
