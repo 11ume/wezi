@@ -1,6 +1,6 @@
 import http, { RequestListener, IncomingMessage, ServerResponse } from 'http'
-import { Context, Handler } from 'wezi-types'
 import { send } from 'wezi-send'
+import { Context, Handler } from 'wezi-types'
 import composer from 'wezi-composer'
 
 export const errorHandler = (ctx: Context) => {

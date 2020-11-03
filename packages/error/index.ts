@@ -11,7 +11,6 @@ export class HttpError extends Error {
 
 const createError = (status: number, message?: string, error?: Error) => {
     let msg = message ? message : codes[status]
-    msg = error ? error.message : msg
     if (status > 511 || status < 100) {
         throw Error(`Invalid status code ${status}`)
     }

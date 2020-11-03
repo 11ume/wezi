@@ -14,10 +14,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "wezi": "^0.1.1-alpha.0",
     "wezi-types": "^0.1.1-alpha.0",
-    "wezi-error": "^0.1.1-alpha.0",
-    "wezi-receive": "^0.1.1-alpha.0",
     "wezi-composer": "^0.1.1-alpha.0"
   },
   "devDependencies": {
@@ -27,6 +24,9 @@
     "@ava/babel": "^1.0.1",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
+    "wezi": "^0.1.1-alpha.0",
+    "wezi-error": "^0.1.1-alpha.0",
+    "wezi-receive": "^0.1.1-alpha.0",
     "ava": "^3.13.0",
     "eslint": "^7.11.0",
     "standard": "^14.3.4",
