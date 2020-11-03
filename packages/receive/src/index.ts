@@ -1,6 +1,6 @@
 import { Context } from 'wezi-types'
 import { parseJSON } from './utils'
-import { rawBodyMap, parseBody } from './stream'
+import { rawBodyMap, parseBody } from './buffer'
 import { Options as GetRawBodyOptions } from 'raw-body'
 import contentType from 'content-type'
 
