@@ -14,8 +14,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - name: lerna actions
+      - name: build
         run: |
-          npm install -g lerna
-          lerna bootstrap
-          lerna run test
+          npm install
+          npm run test

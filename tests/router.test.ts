@@ -2,20 +2,18 @@ import test from 'ava'
 import http from 'http'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
-import wezi from 'wezi'
-import { Handler } from 'wezi-types'
-import createError from 'wezi-error'
-import * as receive from 'wezi-receive'
-import router, {
-    ContextRoute
+import wezi from '../packages/wezi'
+import { Handler } from '../packages/types'
+import createError from '../packages/error'
+import * as receive from '../packages/receive'
+import router, { ContextRoute
     , ContextRouteWild
     , withNamespace
     , get
     , head
     , post
     , put
-    , del
-} from '..'
+    , del } from '../packages/router'
 
 const server = (fn: Handler) => {
     const app = wezi(fn)
@@ -51,9 +49,15 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
 
     const responses = {
         getAll: [1, 2, 3]
-        , create: { action: 'create' }
-        , update: { action: 'update' }
-        , delete: { action: 'delete' }
+        , create: {
+            action: 'create'
+        }
+        , update: {
+            action: 'update'
+        }
+        , delete: {
+            action: 'delete'
+        }
     }
 
     const routes = router(
@@ -67,9 +71,15 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
     const url = await server(routes)
     const getAll = await fetch(`${url}/users`)
     const getById = await fetch(`${url}/users/1`)
-    const create = await fetch(`${url}/users`, { method: 'post' })
-    const update = await fetch(`${url}/users`, { method: 'put' })
-    const daleteOne = await fetch(`${url}/users`, { method: 'delete' })
+    const create = await fetch(`${url}/users`, {
+        method: 'post'
+    })
+    const update = await fetch(`${url}/users`, {
+        method: 'put'
+    })
+    const daleteOne = await fetch(`${url}/users`, {
+        method: 'delete'
+    })
 
     const bAll = await getAll.json()
     const bById = await getById.text()
@@ -86,8 +96,12 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
 
 test('different routes whit static paths, method get', async (t) => {
     const routes = router(
-        get('/foo', () => ({ name: 'foo' }))
-        , get('/bar', () => ({ name: 'bar' }))
+        get('/foo', () => ({
+            name: 'foo'
+        }))
+        , get('/bar', () => ({
+            name: 'bar'
+        }))
     )
 
     const url = await server(routes)
@@ -244,7 +258,9 @@ test('match head, match route and return empty body', async t => {
     const ping = () => 'hello'
     const routes = router(head('/hello', ping))
     const url = await server(routes)
-    const res = await fetch(`${url}/hello`, { method: 'head' })
+    const res = await fetch(`${url}/hello`, {
+        method: 'head'
+    })
     const body = await res.blob()
 
     t.is(body.size, 0)
@@ -288,7 +304,9 @@ test('multiple routes handlers fail next', async t => {
     const url = await server(routes)
     const res = await fetch(`${url}/character`, {
         method: 'post'
-        , body: JSON.stringify({ name: 't800' })
+        , body: JSON.stringify({
+            name: 't800'
+        })
     })
     t.is(res.status, 400)
 })

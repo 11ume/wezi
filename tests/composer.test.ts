@@ -1,10 +1,10 @@
 import test from 'ava'
-import composer from '..'
 import http, { IncomingMessage, ServerResponse } from 'http'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
-import { Context } from 'wezi-types'
-import createError from 'wezi-error'
+import { Context } from '../packages/types'
+import createError from '../packages/error'
+import composer from '../packages/composer'
 
 const server = (fn: (req: IncomingMessage, res: ServerResponse) => void) => {
     return listen(http.createServer((req, res) => fn(req, res)))
@@ -101,7 +101,6 @@ test('main composer multi handlers next error', async (t) => {
     const res = await fetch(`${url}/`)
     t.is(res.status, 400)
 })
-
 
 test('main composer multi handlers throw error', async (t) => {
     const url = await server((req, res) => {

@@ -1,5 +1,5 @@
 import test from 'ava'
-import createError, { error } from '..'
+import createError, { error } from '../packages/error'
 
 test('create http status simple error', (t) => {
     const err = createError(200)

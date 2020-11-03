@@ -1,11 +1,10 @@
 import test from 'ava'
 import http from 'http'
-import wezi from 'wezi'
-import { Handler, Context } from 'wezi-types'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
-import { json, buffer } from '..'
-import { text } from '../src'
+import wezi from '../packages/wezi'
+import { Handler, Context } from '../packages/types'
+import { text, json, buffer } from '../packages/receive'
 
 type ErrorPayload = {
     message: string
@@ -27,12 +26,12 @@ test('receive json', async (t) => {
     }
     const url = await server(fn)
     const res = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify([
+        method: 'POST'
+        , body: JSON.stringify([
             {
                 name: 't800'
-            },
-            {
+            }
+            , {
                 name: 'John Connor'
             }
         ])
@@ -55,9 +54,9 @@ test('json parse error', async (t) => {
 
     const url = await server(fn)
     const { status } = await fetch(url, {
-        method: 'POST',
-        body: '{ "bad json" }',
-        headers: {
+        method: 'POST'
+        , body: '{ "bad json" }'
+        , headers: {
             'Content-Type': 'application/json'
         }
     })
@@ -69,7 +68,9 @@ test('receive buffer', async (t) => {
     const fn = async (c: Context) => buffer(c)
     const url = await server(fn)
 
-    const res = await fetch(url, { method: 'POST', body: '🐻' })
+    const res = await fetch(url, {
+        method: 'POST', body: '🐻'
+    })
     const body = await res.text()
 
     t.is(body, '🐻')
@@ -79,7 +80,9 @@ test('receive text', async (t) => {
     const fn = async (c: Context) => text(c)
     const url = await server(fn)
 
-    const res = await fetch(url, { method: 'POST', body: '🐻 im a small polar bear' })
+    const res = await fetch(url, {
+        method: 'POST', body: '🐻 im a small polar bear'
+    })
     const body = await res.text()
 
     t.is(body, '🐻 im a small polar bear')
@@ -103,8 +106,8 @@ test('json from rawBodyMap works', async (t) => {
 
     const url = await server(fn)
     const res = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify({
+        method: 'POST'
+        , body: JSON.stringify({
             message: 'foo'
         })
     })
@@ -125,12 +128,14 @@ test('json should throw 400 on empty body with no headers', async (t) => {
 })
 
 test('buffer should throw 400 on invalid encoding', async (t) => {
-    const fn = async (c: Context) => buffer(c, { encoding: 'lol' })
+    const fn = async (c: Context) => buffer(c, {
+        encoding: 'lol'
+    })
     const url = await server(fn)
 
     const res = await fetch(url, {
-        method: 'POST',
-        body: 'foo'
+        method: 'POST'
+        , body: 'foo'
     })
 
     const body: ErrorPayload = await res.json()
@@ -176,8 +181,8 @@ test('json limit (over)', async (t) => {
 
     const url = await server(fn)
     const res = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify({
+        method: 'POST'
+        , body: JSON.stringify({
             message: 'foo'
         })
     })
@@ -194,8 +199,8 @@ test('json limit (over) unhandled', async (t) => {
 
     const url = await server(fn)
     const res = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify({
+        method: 'POST'
+        , body: JSON.stringify({
             message: 'foo'
         })
     })
