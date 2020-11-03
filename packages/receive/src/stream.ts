@@ -37,8 +37,8 @@ export const buffer = (context: Context, { limit = '1mb', encoding }: GetRawBody
     const length = context.req.headers['content-length']
     if (body) return Promise.resolve(body)
     if (encoding === undefined) {
-        const { parameters } = contentType.parse(type)
-        return parseBody({ context, length, limit, encoding: parameters.charset })
+        const parameters = contentType.parse(type)?.parameters
+        return parseBody({ context, length, limit, encoding: parameters?.charset })
     }
 
     return parseBody({ context, length, limit, encoding })
