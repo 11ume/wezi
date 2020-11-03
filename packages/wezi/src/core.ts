@@ -5,7 +5,9 @@ import composer from 'wezi-composer'
 
 export const errorHandler = (ctx: Context) => {
     const status = ctx.error.statusCode || 500
-    send(ctx, status, ctx.error.message)
+    send(ctx, status, {
+        message: ctx.error.message
+    })
 }
 
 export const listen = (run: RequestListener, port: number) => new Promise((resolve, reject) => {
@@ -17,7 +19,7 @@ export const listen = (run: RequestListener, port: number) => new Promise((resol
 
 const run = (...handlers: Handler[]) => (errHandler: Handler = errorHandler) => {
     return (req: IncomingMessage, res: ServerResponse) => {
-        const dispatch = composer(true, handlers)
+        const dispatch = composer(true, ...handlers)
         const context: Context = {
             req
             , res
