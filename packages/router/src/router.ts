@@ -1,8 +1,9 @@
 import { ParsedUrlQuery } from 'querystring'
 import { getUrlQuery, getUrlParams } from './extractors'
 import { Context, Handler } from 'wezi-types'
-import composer from 'wezi-composer'
 import regexparam from './regexparam'
+import composer from 'wezi-composer'
+import createError from 'wezi-error'
 
 export interface ContextRoute<P = void, Q = void> extends Context {
     params?: P
@@ -67,7 +68,7 @@ const findRouteMatch = (stack: RouteEntity[]) => (context: ContextRoute) => {
     }
 
     // no route has matched
-    context.next()
+    context.next(createError(404))
 }
 
 const creteRouteEntity = (entity: RouteEntity, namespace: string) => {
