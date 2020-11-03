@@ -11,6 +11,34 @@ const server = (fn: Handler) => {
     return listen(http.createServer(app()))
 }
 
+test('json from rawBodyMap works', async (t) => {
+    type Body = {
+        message: string
+    }
+
+	const fn =  async (c: Context)  => {
+		const bodyOne = await json<Body>(c)
+		const bodyTwo = await json<Body>(c)
+
+		t.deepEqual(bodyOne, bodyTwo)
+
+        return {
+			response: bodyOne.message
+		}
+	}
+
+    const url = await server(fn)
+	const res = await fetch(url, {
+		method: 'POST',
+		body: JSON.stringify({
+			message: 'foo'
+		})
+    })
+    
+	const body = await res.json()
+	t.deepEqual(body.response, 'json')
+})
+
 test('json should throw 400 on empty body with no headers', async (t) => {
     const fn = async (c: Context) => json(c)
     const url = await server(fn)

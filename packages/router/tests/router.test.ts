@@ -26,9 +26,22 @@ test('test base path', async t => {
     const hello = () => 'hello'
     const url = await server(router(get('/', hello)))
     const res = await fetch(`${url}/`)
-    const r = await res.text()
+    const body = await res.text()
 
-    t.is(r, 'hello')
+    t.is(body, 'hello')
+})
+
+test('test not found', async t => {
+    const foo = () => 'foo'
+    const bar = () => 'bar'
+    const url = await server(router(get('/foo', foo), get('/bar', bar)))
+    const res = await fetch(`${url}/`)
+    const body = await res.json()
+
+    t.deepEqual(body, {
+        message: 'Not Found'
+    })
+    t.is(res.status, 404)
 })
 
 test('different routes whit static paths diferent methods (CRUD)', async (t) => {
@@ -58,17 +71,17 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
     const update = await fetch(`${url}/users`, { method: 'put' })
     const daleteOne = await fetch(`${url}/users`, { method: 'delete' })
 
-    const rAll = await getAll.json()
-    const rById = await getById.text()
-    const rCreaste = await create.json()
-    const rUpdate = await update.json()
-    const rDelete = await daleteOne.json()
+    const bAll = await getAll.json()
+    const bById = await getById.text()
+    const bCreaste = await create.json()
+    const bUpdate = await update.json()
+    const bDelete = await daleteOne.json()
 
-    t.deepEqual(rAll, responses.getAll)
-    t.is(rById, '1')
-    t.deepEqual(rCreaste, responses.create)
-    t.deepEqual(rUpdate, responses.update)
-    t.deepEqual(rDelete, responses.delete)
+    t.deepEqual(bAll, responses.getAll)
+    t.is(bById, '1')
+    t.deepEqual(bCreaste, responses.create)
+    t.deepEqual(bUpdate, responses.update)
+    t.deepEqual(bDelete, responses.delete)
 })
 
 test('different routes whit static paths, method get', async (t) => {
@@ -81,11 +94,11 @@ test('different routes whit static paths, method get', async (t) => {
     const fooGet = await fetch(`${url}/foo`)
     const barGet = await fetch(`${url}/bar`)
 
-    const resFoo = await fooGet.json()
-    const resBar = await barGet.json()
+    const bodyFoo = await fooGet.json()
+    const bodyBar = await barGet.json()
 
-    t.is(resFoo.name, 'foo')
-    t.is(resBar.name, 'bar')
+    t.is(bodyFoo.name, 'foo')
+    t.is(bodyBar.name, 'bar')
 })
 
 test('different routes whit return null', async (t) => {
@@ -95,10 +108,10 @@ test('different routes whit return null', async (t) => {
 
     const url = await server(routes)
     const res = await fetch(`${url}/foo`)
-    const r = await res.text()
+    const body = await res.text()
 
     t.is(res.status, 204)
-    t.falsy(r)
+    t.falsy(body)
 })
 
 test('routes with params and query', async (t) => {
@@ -107,9 +120,9 @@ test('routes with params and query', async (t) => {
     const url = await server(routes)
 
     const res = await fetch(`${url}/hello/world?time=now`)
-    const r = await res.text()
+    const body = await res.text()
 
-    t.is(r, 'Hello world now')
+    t.is(body, 'Hello world now')
 })
 
 test('routes with multi params', async (t) => {
@@ -117,9 +130,9 @@ test('routes with multi params', async (t) => {
     const routes = router(get('/hello/:foo/:bar', hello))
     const url = await server(routes)
     const res = await fetch(`${url}/hello/foo/bar`)
-    const r = await res.text()
+    const body = await res.text()
 
-    t.is(r, 'foo bar')
+    t.is(body, 'foo bar')
 })
 
 test('routes with matching optional param', async t => {
@@ -128,11 +141,11 @@ test('routes with matching optional param', async t => {
     const url = await server(routes)
     const res = await fetch(`${url}/path`)
     const resOptional = await fetch(`${url}/path/world`)
-    const r = await res.text()
-    const rOptional = await resOptional.text()
+    const body = await res.text()
+    const bodyOptional = await resOptional.text()
 
-    t.is(r, 'Hello ')
-    t.is(rOptional, 'Hello world')
+    t.is(body, 'Hello ')
+    t.is(bodyOptional, 'Hello world')
 })
 
 test('routes with matching double optional params', async t => {
@@ -148,13 +161,13 @@ test('routes with matching double optional params', async t => {
     const resOptional = await fetch(`${url}/path/john`)
     const resOptionalWhitTwo = await fetch(`${url}/path/john/connor`)
 
-    const r = await res.text()
-    const rOptional = await resOptional.text()
-    const rOptionalWhitTwo = await resOptionalWhitTwo.text()
+    const body = await res.text()
+    const bodyOptional = await resOptional.text()
+    const bodyOptionalWhitTwo = await resOptionalWhitTwo.text()
 
-    t.is(r, 'Hello')
-    t.is(rOptional, 'Hello john')
-    t.is(rOptionalWhitTwo, 'Hello john connor')
+    t.is(body, 'Hello')
+    t.is(bodyOptional, 'Hello john')
+    t.is(bodyOptionalWhitTwo, 'Hello john connor')
 })
 
 test('routes with matching params last optional only', async t => {
@@ -168,11 +181,11 @@ test('routes with matching params last optional only', async t => {
     const resOptional = await fetch(`${url}/path/john`)
     const resOptionalWhitLast = await fetch(`${url}/path/john/connor`)
 
-    const rOptional = await resOptional.text()
-    const rOptionalWhitLast = await resOptionalWhitLast.text()
+    const bodyOptional = await resOptional.text()
+    const bodyOptionalWhitLast = await resOptionalWhitLast.text()
 
-    t.is(rOptional, 'Hello john')
-    t.is(rOptionalWhitLast, 'Hello john connor')
+    t.is(bodyOptional, 'Hello john')
+    t.is(bodyOptionalWhitLast, 'Hello john connor')
 })
 
 test('routes with matching params first optional only', async t => {
@@ -187,13 +200,13 @@ test('routes with matching params first optional only', async t => {
     const resOptionalFirst = await fetch(`${url}/path/connor`)
     const resOptionalAll = await fetch(`${url}/path/john/connor`)
 
-    const rOptional = await resOptional.text()
-    const rOptionalAll = await resOptionalAll.text()
-    const rOptionalFirst = await resOptionalFirst.text()
+    const bodyOptional = await resOptional.text()
+    const bodyOptionalAll = await resOptionalAll.text()
+    const bodyOptionalFirst = await resOptionalFirst.text()
 
-    t.is(rOptional, 'Hello john')
-    t.is(rOptionalAll, 'Hello john connor')
-    t.is(rOptionalFirst, 'Hello connor')
+    t.is(bodyOptional, 'Hello john')
+    t.is(bodyOptionalAll, 'Hello john connor')
+    t.is(bodyOptionalFirst, 'Hello connor')
 })
 
 test('multiple matching routes', async t => {
@@ -203,9 +216,9 @@ test('multiple matching routes', async t => {
     const routes = router(get('/path', withPath), get('/:param', withParam))
     const url = await server(routes)
     const res = await fetch(`${url}/path`)
-    const r = await res.text()
+    const body = await res.text()
 
-    t.is(r, 'Hello world')
+    t.is(body, 'Hello world')
 })
 
 test('routes with namespace', async t => {
@@ -220,11 +233,11 @@ test('routes with namespace', async t => {
     const url = await server(routes)
     const fooGet = await fetch(`${url}/v1/test`)
     const barGet = await fetch(`${url}/v2/test`)
-    const fooRes = await fooGet.text()
-    const barRes = await barGet.text()
+    const bodyFoo = await fooGet.text()
+    const bodyBar = await barGet.text()
 
-    t.is(fooRes, 'foo')
-    t.is(barRes, 'bar')
+    t.is(bodyFoo, 'foo')
+    t.is(bodyBar, 'bar')
 })
 
 test('match head, match route and return empty body', async t => {
@@ -232,9 +245,9 @@ test('match head, match route and return empty body', async t => {
     const routes = router(head('/hello', ping))
     const url = await server(routes)
     const res = await fetch(`${url}/hello`, { method: 'head' })
-    const r = await res.blob()
+    const body = await res.blob()
 
-    t.is(r.size, 0)
+    t.is(body.size, 0)
     t.is(res.status, 200)
 })
 
@@ -243,9 +256,9 @@ test('multiple matching routes match whit wildcards', async t => {
     const routes = router(get('/character/*', getChar))
     const url = await server(routes)
     const res = await fetch(`${url}/character/john/connor`)
-    const r = await res.text()
+    const body = await res.text()
 
-    t.is(r, 'john/connor')
+    t.is(body, 'john/connor')
 })
 
 test('multiple routes handlers', async t => {
@@ -259,9 +272,9 @@ test('multiple routes handlers', async t => {
     const routes = router(get('/character/:name', checkChar, getChar))
     const url = await server(routes)
     const res = await fetch(`${url}/character/john`)
-    const r = await res.text()
+    const body = await res.text()
 
-    t.is(r, 'john')
+    t.is(body, 'john')
 })
 
 test('multiple routes handlers fail next', async t => {
