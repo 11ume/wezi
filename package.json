@@ -9,7 +9,8 @@
     "*.ts"
   ],
   "scripts": {
-    "pretest": "lerna bootstrap",
+    "test": "node node_modules/.bin/ava",
+    "pretest": "node node_modules/.bin/lerna bootstrap",
     "prepublish": "cp readme.md packages/wezi/."
   },
   "devDependencies": {
@@ -26,5 +27,8 @@
     "test-listen": "^1.1.0",
     "node-fetch": "^2.6.1",
     "typescript": "^4.0.3"
+  },
+  "dependencies": {
+    "lerna": "^3.22.1"
   }
 }
