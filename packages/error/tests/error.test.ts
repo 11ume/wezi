@@ -19,10 +19,10 @@ test('create http error whit message', (t) => {
 
 test('create http error from error', (t) => {
     const err = createError(500, null, new Error('Im a error'))
-    t.is(err.message, 'Im a error')
+    t.is(err.originalError.message, 'Im a error')
 })
 
 test('create simple error', (t) => {
     const err = error(new Error('Im a error'))
-    t.is(err.message, 'Im a error')
+    t.is(err.originalError.message, 'Im a error')
 })
