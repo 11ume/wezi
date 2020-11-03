@@ -9,7 +9,6 @@ export const text = (context: Context, { limit = '1mb', encoding }: GetRawBodyOp
     , encoding
 })
     .then((body) => body.toString())
-    .catch(context.next)
 
 export const json = <T>(context: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}): Promise<T> => buffer(context, {
     limit
@@ -19,7 +18,6 @@ export const json = <T>(context: Context, { limit = '1mb', encoding }: GetRawBod
         const str = body.toString()
         return parseJSON(str)
     })
-    .catch(context.next)
 
 
 export const buffer = (context: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}) => {
@@ -34,4 +32,3 @@ export const buffer = (context: Context, { limit = '1mb', encoding }: GetRawBody
 
     return parseBody({ context, length, limit, encoding })
 }
-    
