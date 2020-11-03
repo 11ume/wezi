@@ -5,6 +5,7 @@ import { Handler, Context } from 'wezi-types'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
 import { json, buffer } from '..'
+import { text } from '../src'
 
 type ErrorPayload = {
     message: string
@@ -15,7 +16,7 @@ const server = (fn: Handler) => {
     return listen(http.createServer(app()))
 }
 
-test('json', async t => {
+test('recibe json', async t => {
     type Characters = {
         name: string
     }
@@ -38,8 +39,9 @@ test('json', async t => {
     })
 
     const body: string[] = await res.json()
-    t.deepEqual(body[0], 't800')
-    t.deepEqual(body[1], 'John Connor')
+    t.is(res.headers.get('content-type'), 'application/json charset=utf-8')
+    t.is(body[0], 't800')
+    t.is(body[1], 'John Connor')
 })
 
 test('json parse error', async t => {
@@ -68,7 +70,18 @@ test('buffer works', async t => {
 
     const res = await fetch(url, { method: 'POST', body: '🐻' })
     const body = await res.text()
+
     t.is(body, '🐻')
+})
+
+test('text works', async t => {
+    const fn = async (c: Context) => text(c)
+    const url = await server(fn)
+
+    const res = await fetch(url, { method: 'POST', body: '🐻 im a small polar bear' })
+    const body = await res.text()
+
+    t.is(body, '🐻 im a small polar bear')
 })
 
 test('json from rawBodyMap works', async (t) => {
@@ -120,6 +133,7 @@ test('buffer should throw 400 on invalid encoding', async t => {
     })
 
     const body: ErrorPayload = await res.json()
+
     t.is(body.message, 'Invalid body')
     t.is(res.status, 400)
 })
@@ -142,6 +156,7 @@ test('json limit (below)', async (t) => {
     })
 
     const body: ErrorPayload = await res.json()
+
     t.is(res.status, 200)
     t.is(body.message, 'foo')
 })
