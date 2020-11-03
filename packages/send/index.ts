@@ -33,23 +33,26 @@ export const stream = (context: Context, statusCode = 200, obj: Readable) => {
     context.res.end()
 }
 
-export const send = (context: Context, statusCode = 200, obj = null) => {
-    context.res.statusCode = statusCode
+export const send = (context: Context, statusCode?: number, obj?: any) => {
     if (obj === null) {
+        context.res.statusCode = 204
         context.res.end()
         return
     }
-
-    let payload = obj
+    
+    context.res.statusCode = statusCode ?? 200
+    let payload = obj ?? ''
     if (typeof obj === 'object' || typeof obj === 'number') {
         payload = JSON.stringify(obj)
         if (noContentType(context)) {
             context.res.setHeader('Content-Type', 'application/json charset=utf-8')
         }
-
-        context.res.setHeader('Content-Length', Buffer.byteLength(payload))
     }
 
+    if (noContentType(context)) {
+        context.res.setHeader('Content-Type', 'text/plain')
+    }
+    context.res.setHeader('Content-Length', Buffer.byteLength(payload))
     context.res.end(payload)
 }
 
