@@ -15,8 +15,10 @@
 <br>
 
 <div align="center"> 
+    
+    
+[![Build Status](https://img.shields.io/github/workflow/status/11ume/wezi/Build?event=push?style=flat&colorA=000000&colorB=000000)](https://github.com/11ume/wezi/workflows/Build/badge.svg?event=push)
 
-![Build](https://github.com/11ume/wezi/workflows/Build/badge.svg?branch=main)
 
 </div>
     
