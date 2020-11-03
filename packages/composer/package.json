@@ -13,8 +13,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@ava/babel": "^1.0.1",
-    "ava": "^3.13.0",
     "wezi-error": "^0.1.1-alpha.0",
     "wezi-send": "^0.1.1-alpha.0",
     "wezi-types": "^0.1.1-alpha.0"
@@ -25,6 +23,8 @@
     "@types/test-listen": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
+    "@ava/babel": "^1.0.1",
+    "ava": "^3.13.0",
     "eslint": "^7.11.0",
     "standard": "^14.3.4",
     "ts-node": "^9.0.0",
