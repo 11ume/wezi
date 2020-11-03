@@ -1,10 +1,10 @@
 import test from 'ava'
 import http from 'http'
-import wezi from 'wezi'
-import { Handler, Context } from 'wezi-types'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
-import { send } from '..'
+import wezi from '../packages/wezi'
+import { Handler, Context } from '../packages/types'
+import { send } from '../packages/send'
 
 const server = (fn: Handler) => {
     const app = wezi(fn)
@@ -70,7 +70,7 @@ test('send direct json', async (t) => {
     const url = await server(fn)
     const res = await fetch(url)
     const body: { message: string } = await res.json()
-    
+
     t.is(res.status, 200)
     t.is(body.message, 'hello')
     t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
