@@ -16,7 +16,7 @@ const server = (fn: Handler) => {
     return listen(http.createServer(app()))
 }
 
-test('recibe json', async t => {
+test('recibe json', async (t) => {
     type Characters = {
         name: string
     }
@@ -39,12 +39,13 @@ test('recibe json', async t => {
     })
 
     const body: string[] = await res.json()
+
     t.is(res.headers.get('content-type'), 'application/json charset=utf-8')
     t.is(body[0], 't800')
     t.is(body[1], 'John Connor')
 })
 
-test('json parse error', async t => {
+test('json parse error', async (t) => {
     const fn = async (c: Context) => {
         const body = await json(c)
         return {
@@ -64,7 +65,7 @@ test('json parse error', async t => {
     t.is(status, 400)
 })
 
-test('buffer works', async t => {
+test('recibe buffer', async (t) => {
     const fn = async (c: Context) => buffer(c)
     const url = await server(fn)
 
@@ -74,7 +75,7 @@ test('buffer works', async t => {
     t.is(body, '🐻')
 })
 
-test('text works', async t => {
+test('recibe text', async (t) => {
     const fn = async (c: Context) => text(c)
     const url = await server(fn)
 
@@ -109,7 +110,7 @@ test('json from rawBodyMap works', async (t) => {
     })
 
     const body: { message: string } = await res.json()
-    t.deepEqual(body.message, 'foo')
+    t.is(body.message, 'foo')
 })
 
 test('json should throw 400 on empty body with no headers', async (t) => {
@@ -123,7 +124,7 @@ test('json should throw 400 on empty body with no headers', async (t) => {
     t.is(res.status, 400)
 })
 
-test('buffer should throw 400 on invalid encoding', async t => {
+test('buffer should throw 400 on invalid encoding', async (t) => {
     const fn = async (c: Context) => buffer(c, { encoding: 'lol' })
     const url = await server(fn)
 
@@ -161,7 +162,7 @@ test('json limit (below)', async (t) => {
     t.is(body.message, 'foo')
 })
 
-test('json limit (over)', async t => {
+test('json limit (over)', async (t) => {
     const fn = async (c: Context) => {
         try {
             return await json(c, {
@@ -184,7 +185,7 @@ test('json limit (over)', async t => {
     t.is(res.status, 200)
 })
 
-test('json limit (over) unhandled', async t => {
+test('json limit (over) unhandled', async (t) => {
     const fn = (c: Context) => {
         return json(c, {
             limit: 2
@@ -200,6 +201,7 @@ test('json limit (over) unhandled', async t => {
     })
 
     const body: ErrorPayload = await res.json()
+
     t.is(res.status, 413)
     t.is(body.message, 'Body exceeded 2 limit')
 })
