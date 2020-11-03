@@ -16,7 +16,7 @@ const server = (fn: Handler) => {
     return listen(http.createServer(app()))
 }
 
-test('recibe json', async (t) => {
+test('receive json', async (t) => {
     type Characters = {
         name: string
     }
@@ -65,7 +65,7 @@ test('json parse error', async (t) => {
     t.is(status, 400)
 })
 
-test('recibe buffer', async (t) => {
+test('receive buffer', async (t) => {
     const fn = async (c: Context) => buffer(c)
     const url = await server(fn)
 
@@ -75,7 +75,7 @@ test('recibe buffer', async (t) => {
     t.is(body, '🐻')
 })
 
-test('recibe text', async (t) => {
+test('receive text', async (t) => {
     const fn = async (c: Context) => text(c)
     const url = await server(fn)
 

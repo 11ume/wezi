@@ -9,7 +9,8 @@
     "email": "horacioriverods@gmail.com"
   },
   "scripts": {
-    "test": "ava -v"
+    "test": "ava -v",
+    "test:watch": "ava -w -v"
   },
   "license": "MIT",
   "dependencies": {
