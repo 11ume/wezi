@@ -5,10 +5,8 @@
     "name": "Horacio Rivero",
     "email": "horacioriverods@gmail.com"
   },
-  "files": [
-    "*.ts"
-  ],
   "scripts": {
+    "build": "tsc",
     "test": "node node_modules/.bin/ava",
     "lint": "node node_modules/.bin/eslint .",
     "pretest": "node node_modules/.bin/lerna bootstrap",
