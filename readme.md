@@ -93,15 +93,12 @@ listen(w(), 3000)
 
 
 ```ts
-import wezi, { listen } from 'wezi'
-import router, { ContextRoute, get } from 'wezi-router'
-
 type Bear = {
     type: string
     location: string
 }
 
-const bears = [
+const bears: Bear[] = [
     {
         type: 'polar',
         location: 'North pole'
@@ -111,6 +108,11 @@ const bears = [
         location: 'Yellowstone National Park'
     }
 ]
+```
+
+```ts
+import wezi, { listen } from 'wezi'
+import router, { ContextRoute, get } from 'wezi-router'
 
 const getAll = (): Bear[] => bears
 const getById = ({ params }: ContextRoute<Pick<Bear,'type'>>): Bear => params.type 
