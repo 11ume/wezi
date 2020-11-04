@@ -23,10 +23,10 @@
     "standard": "^14.3.4",
     "ts-node": "^9.0.0",
     "test-listen": "^1.1.0",
-    "node-fetch": "^2.6.1",
-    "typescript": "^4.0.3"
+    "node-fetch": "^2.6.1"
   },
   "dependencies": {
-    "lerna": "^3.22.1"
+    "lerna": "^3.22.1",
+    "typescript": "^4.0.3"
   }
 }

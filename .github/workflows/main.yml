@@ -32,7 +32,7 @@ jobs:
         with:
           path: "."
           key: ${{ github.sha }}
-      - run: yarn test
+      - run: yarn lint
 
   test:
     runs-on: ubuntu-latest
@@ -43,4 +43,4 @@ jobs:
         with:
           path: "."
           key: ${{ github.sha }}
-      - run: yarn lint
+      - run: yarn test
