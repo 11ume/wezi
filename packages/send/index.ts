@@ -4,8 +4,8 @@ import { Context } from 'wezi-types'
 
 const noContentType = (context: Context) => !context.res.getHeader('Content-Type')
 
-export const buffer = (context: Context, statusCode = 200, obj: Buffer) => {
-    context.res.statusCode = statusCode
+export const buffer = (context: Context, statusCode: number, obj: Buffer) => {
+    context.res.statusCode = statusCode ?? 200
     if (Buffer.isBuffer(obj)) {
         if (noContentType(context)) {
             context.res.setHeader('Content-Type', 'application/octet-stream')
@@ -19,7 +19,8 @@ export const buffer = (context: Context, statusCode = 200, obj: Buffer) => {
     context.res.end()
 }
 
-export const stream = (context: Context, statusCode = 200, obj: Readable) => {
+export const stream = (context: Context, statusCode: number, obj: Readable) => {
+    statusCode ?? 200
     context.res.statusCode = statusCode
     if (obj instanceof Stream || isReadable(obj)) {
         if (noContentType(context)) {
