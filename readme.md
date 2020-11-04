@@ -17,6 +17,8 @@
 <div align="center"> 
     
 [![Build Status](https://img.shields.io/github/workflow/status/11ume/wezi/Build?style=flat&colorA=000000&colorB=000000)](https://github.com/11ume/wezi/actions?query=workflow%3ABuild)
+[![js-standard-style](https://img.shields.io/badge/code%20style%20-standard-standard?style=flat&colorA=000000&colorB=000000)](http://standardjs.com)
+[![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=92E8FF)](https://discord.com)
 
 </div>
     
