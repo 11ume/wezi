@@ -33,13 +33,13 @@ export const stream = (context: Context, statusCode = 200, obj: Readable) => {
     context.res.end()
 }
 
-export const send = (context: Context, statusCode?: number, obj?: any) => {
+export const send = (context: Context, statusCode?: number, obj?) => {
     if (obj === null) {
         context.res.statusCode = 204
         context.res.end()
         return
     }
-    
+
     context.res.statusCode = statusCode ?? 200
     let payload = obj ?? ''
     if (typeof obj === 'object' || typeof obj === 'number') {

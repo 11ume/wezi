@@ -10,13 +10,13 @@ export class HttpError extends Error {
 }
 
 const createError = (status: number, message?: string, error?: Error) => {
-    let msg = message ? message : codes[status]
+    const msg = message || codes[status]
     if (status > 511 || status < 100) {
         throw Error(`Invalid status code ${status}`)
     }
     return new HttpError(msg, status, error)
 }
 
-export const error = (error: Error, message?: string) => createError(500, message, error)
+export const error = (err: Error, message?: string) => createError(500, message, err)
 
 export default createError

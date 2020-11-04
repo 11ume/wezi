@@ -15,8 +15,7 @@ const execute = async (context: Context, handler: Handler, payload: unknown) => 
             send(context, context.res.statusCode, val)
             return
         }
-    }
-    catch (err) {
+    } catch (err) {
         context.next(err)
     }
 }

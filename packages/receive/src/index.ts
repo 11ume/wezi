@@ -19,7 +19,6 @@ export const json = <T>(context: Context, { limit = '1mb', encoding }: GetRawBod
         return parseJSON(str)
     })
 
-
 export const buffer = (context: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}) => {
     const body = rawBodyMap.get(context.req)
     const type = context.req.headers['content-type'] || 'text/plain'
@@ -27,8 +26,12 @@ export const buffer = (context: Context, { limit = '1mb', encoding }: GetRawBody
     if (body) return Promise.resolve(body)
     if (encoding === undefined) {
         const parameters = contentType.parse(type)?.parameters
-        return parseBody({ context, length, limit, encoding: parameters?.charset })
+        return parseBody({
+            context, length, limit, encoding: parameters?.charset
+        })
     }
 
-    return parseBody({ context, length, limit, encoding })
+    return parseBody({
+        context, length, limit, encoding
+    })
 }

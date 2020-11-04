@@ -27,7 +27,7 @@ const regexparam = (path: string, loose?: string) => {
 
     return {
         keys
-        , pattern: new RegExp('^' + pattern + (loose ? '(?=$|\/)' : '\/?$'), 'i')
+        , pattern: new RegExp('^' + pattern + (loose ? '(?=$|/)' : '/?$'), 'i')
     }
 }
 

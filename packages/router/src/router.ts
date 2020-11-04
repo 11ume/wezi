@@ -35,7 +35,7 @@ const notMethodMatch = (method: string, entityMethod: string) => method !== enti
 
 const exetPatternMatch = (path: string, entity: RouteEntity) => entity.route.pattern.exec(path)
 
-const createRouteContext = (context: ContextRoute, query: ParsedUrlQuery, params: {}) => Object.assign(context, {
+const createRouteContext = (context: ContextRoute, query: ParsedUrlQuery, params: unknown) => Object.assign(context, {
     query
     , params
 })
