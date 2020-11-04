@@ -9,8 +9,7 @@
     "build": "tsc",
     "test": "node node_modules/.bin/ava",
     "lint": "node node_modules/.bin/eslint .",
-    "pretest": "node node_modules/.bin/lerna bootstrap",
-    "prepublish": "cp readme.md packages/wezi/."
+    "bootstrap": "node node_modules/.bin/lerna bootstrap"
   },
   "devDependencies": {
     "@types/node": "^14.14.0",
