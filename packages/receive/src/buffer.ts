@@ -9,9 +9,9 @@ export const rawBodyMap: WeakMap<IncomingMessage, string> = new WeakMap()
 
 type ParseBody = {
     context: Context
-    , length: string
-    , limit: string | number
-    , encoding: getRawBody.Encoding
+    length: string
+    limit: string | number
+    encoding: getRawBody.Encoding
 }
 
 export const parseBody = ({ context, length, limit, encoding }: ParseBody) => getRawBody(context.req, {

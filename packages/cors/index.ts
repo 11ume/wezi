@@ -53,6 +53,8 @@ const cors = (options: CorsOptions = {}) => (context: Context) => {
         context.res.setHeader('Access-Control-Allow-Headers', allowHeaders.join(','))
         context.res.setHeader('Access-Control-Max-Age', String(maxAge))
     }
+
+    context.next()
 }
 
 export default cors
