@@ -8,10 +8,8 @@ import contentType from 'content-type'
 export const json = toJson()
 export const buffer = toBuffer()
 
-export const text = (context: Context, options?: GetRawBodyOptions) => {
-    return buffer(context, options)
-        .then((body) => body.toString())
-}
+export const text = (context: Context, options?: GetRawBodyOptions) => buffer(context, options)
+    .then((body) => body.toString())
 
 export function toBuffer() {
     // avoid to read multiple times same stream object
