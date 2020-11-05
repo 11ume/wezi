@@ -25,7 +25,7 @@ export type CorsOptions = {
     , maxAge?: number
     , allowMethods?: string[]
     , allowHeaders?: string[]
-    , allowCredentials?: true
+    , allowCredentials?: boolean
     , exposeHeaders?: string[]
 }
 
@@ -51,7 +51,7 @@ const cors = (options: CorsOptions = {}) => (context: Context) => {
     if (preFlight) {
         context.res.setHeader('Access-Control-Allow-Methods', allowMethods.join(','))
         context.res.setHeader('Access-Control-Allow-Headers', allowHeaders.join(','))
-        context.res.setHeader('Access-Control-Max-Age', String(maxAge))
+        context.res.setHeader('Access-Control-Max-Age', maxAge.toString())
     }
 
     context.next()
