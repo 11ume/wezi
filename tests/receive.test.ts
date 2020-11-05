@@ -94,7 +94,7 @@ test('json from rawBodyMap works', async (t) => {
     }
 
     const fn = async (c: Context) => {
-        const bodyOne = await json<Body>(c)
+        const bodyOne = await json<Body>(c) // esta mal
         const bodyTwo = await json<Body>(c)
 
         t.deepEqual(bodyOne, bodyTwo)

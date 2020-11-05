@@ -3,25 +3,22 @@ import { Context } from 'wezi-types'
 import createError from 'wezi-error'
 import getRawBody, { RawBodyError } from 'raw-body'
 
-// Maps requests to buffered raw bodies so that
-// multiple calls to `json` work as expected
-export const rawBodyMap: WeakMap<IncomingMessage, string> = new WeakMap()
-
 type ParseBody = {
     context: Context
-    , length: string
     , limit: string | number
+    , length: string
     , encoding: getRawBody.Encoding
+    , rawBodyCache: WeakMap<IncomingMessage, unknown>
 }
 
-export const parseBody = ({ context, length, limit, encoding }: ParseBody) => getRawBody(context.req, {
+export const parseBody = ({ context, limit, length, encoding, rawBodyCache }: ParseBody) => getRawBody(context.req, {
     limit
     , length
     , encoding
 })
-    .then((buf) => {
-        rawBodyMap.set(context.req, buf)
-        return buf
+    .then((rawBody) => {
+        rawBodyCache.set(context.req, rawBody)
+        return rawBody
     })
     .catch((err: RawBodyError) => {
         if (err.type === 'entity.too.large') {

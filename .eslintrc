@@ -8,16 +8,6 @@
         "standard",
         "plugin:@typescript-eslint/recommended"
     ],
-    "overrides": [
-        {
-            "files": [
-                "build"
-            ],
-            "parserOptions": {
-                "project": "./tsconfig.json"
-            }
-        }
-    ],
     "rules": {
         "@typescript-eslint/explicit-module-boundary-types": 0,
         "no-tabs": 0,
