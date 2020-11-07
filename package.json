@@ -5,13 +5,14 @@
     "name": "Horacio Rivero",
     "email": "horacioriverods@gmail.com"
   },
-  "files": [
-    "**"
+  "workspaces": [
+    "packages/*"
   ],
   "scripts": {
-    "build": "tsc",
+    "pub": "lerna publish",
+    "clean": "lerna run clean",
+    "build": "lerna run build",
     "test": "node node_modules/.bin/ava",
-    "lint": "node node_modules/.bin/eslint .",
-    "lerna:bootstrap": "node node_modules/.bin/lerna bootstrap"
+    "lint": "node node_modules/.bin/eslint ."
   }
 }

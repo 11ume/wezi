@@ -2,17 +2,21 @@
   "name": "wezi",
   "version": "0.1.1-alpha.0",
   "description": "",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "types": "index.ts",
   "license": "MIT",
   "author": {
     "name": "Horacio Rivero",
     "email": "horacioriverods@gmail.com"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "npm run clean && npm run compile",
-    "clean": "rm -rf ./build",
-    "compile": "tsc"
+    "build": "yarn run clean && yarn run compile",
+    "clean": "rm -rf ./dist",
+    "compile": "tsc",
+    "prepublishOnly": "yarn run build"
   },
   "dependencies": {
     "wezi-types": "0.1.1-alpha.0",
