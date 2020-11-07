@@ -1,5 +1,6 @@
 {
   "private": true,
+  "description": "Small, simple and expressive library to create robust web services",
   "repository": "11ume/wezi",
   "author": {
     "name": "Horacio Rivero",
