@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es2019",
+    "outDir": "build",
+    "target": "ESNext",
     "module": "commonjs",
+    "composite": true,
     "incremental": true,
     "moduleResolution": "node",
     "noImplicitAny": false,
@@ -15,7 +17,33 @@
     "skipLibCheck": true,
     "removeComments": true,
     "esModuleInterop": true,
-    "outDir": "./build"
+    "baseUrl": "packages",
+    "paths": {
+      "wezi-composer": [
+        "packages/composer"
+      ],
+      "wezi-cors": [
+        "packages/cors"
+      ],
+      "wezi-error": [
+        "packages/error"
+      ],
+      "wezi-receive": [
+        "packages/receive"
+      ],
+      "wezi-router": [
+        "packages/router"
+      ],
+      "wezi-send": [
+        "packages/send"
+      ],
+      "wezi-types": [
+        "packages/types"
+      ],
+      "wezi": [
+        "packages/wezi"
+      ]
+    }
   },
   "exclude": [
     "test",
