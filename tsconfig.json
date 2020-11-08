@@ -15,8 +15,11 @@
     "skipLibCheck": true,
     "removeComments": true,
     "esModuleInterop": true,
-    "baseUrl": "packages",
+    "baseUrl": ".",
     "paths": {
+      "wezi": [
+        "packages/wezi"
+      ],
       "wezi-composer": [
         "packages/composer"
       ],
@@ -26,20 +29,17 @@
       "wezi-error": [
         "packages/error"
       ],
+      "wezi-send": [
+        "packages/send"
+      ],
       "wezi-receive": [
         "packages/receive"
       ],
       "wezi-router": [
         "packages/router"
       ],
-      "wezi-send": [
-        "packages/send"
-      ],
       "wezi-types": [
         "packages/types"
-      ],
-      "wezi": [
-        "packages/wezi"
       ]
     }
   },
