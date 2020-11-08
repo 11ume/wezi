@@ -1,10 +1,6 @@
 {
+  "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "commonjs",
-    "sourceMap": true,
-    "incremental": true,
-    "moduleResolution": "node",
     "noImplicitAny": false,
     "preserveConstEnums": true,
     "strictFunctionTypes": true,
@@ -42,9 +38,5 @@
         "packages/types"
       ]
     }
-  },
-  "exclude": [
-    "test",
-    "node_modules"
-  ]
+  }
 }

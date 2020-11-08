@@ -6,4 +6,5 @@ coverage
 *.lock.json
 *.log
 *.lerna_backup
+dist
 dev
