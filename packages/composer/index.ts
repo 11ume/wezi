@@ -11,6 +11,12 @@ const execute = async (context: Context, handler: Handler, payload: unknown) => 
             send(context, 204, val)
             return
         }
+
+        if (val instanceof Error) {
+            context.next(val)
+            return
+        }
+
         if (val !== undefined) {
             send(context, context.res.statusCode, val)
             return
