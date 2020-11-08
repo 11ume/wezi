@@ -6,5 +6,8 @@ coverage
 *.lock.json
 *.log
 *.lerna_backup
+*.tsbuildinfo
 dist
 dev
+index.js
+index.js.map

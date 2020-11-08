@@ -1,5 +1,6 @@
 import { Context, Handler } from 'wezi-types'
 import { send } from 'wezi-send'
+import { HttpError } from 'wezi-error'
 
 type Dispatch = (context: Context, payload: unknown) => void
 
@@ -14,6 +15,9 @@ const execute = async (context: Context, handler: Handler, payload: unknown) => 
         if (val !== undefined) {
             send(context, context.res.statusCode, val)
             return
+        }
+        if (val instanceof HttpError) {
+            context.next(val)
         }
     } catch (err) {
         context.next(err)
