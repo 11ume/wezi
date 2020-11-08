@@ -6,13 +6,13 @@ import composer from 'wezi-composer'
 export const errorHandler = (ctx: Context) => {
     const status = ctx.error.statusCode || 500
     if (ctx.error.message) {
-        send(ctx, status)
+        send(ctx, status, {
+            message: ctx.error.message
+        })
         return
     }
 
-    send(ctx, status, {
-        message: ctx.error.message
-    })
+    send(ctx, status)
 }
 
 export const listen = (run: RequestListener, port: number) => new Promise((resolve, reject) => {
