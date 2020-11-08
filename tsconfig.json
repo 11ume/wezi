@@ -1,16 +1,6 @@
 {
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "noImplicitAny": false,
-    "preserveConstEnums": true,
-    "strictFunctionTypes": true,
-    "noImplicitReturns": true,
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
-    "noEmitOnError": true,
-    "skipLibCheck": true,
-    "removeComments": true,
-    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
       "wezi": [
