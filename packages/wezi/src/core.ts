@@ -5,6 +5,11 @@ import composer from 'wezi-composer'
 
 export const errorHandler = (ctx: Context) => {
     const status = ctx.error.statusCode || 500
+    if (ctx.error.message) {
+        send(ctx, status)
+        return
+    }
+
     send(ctx, status, {
         message: ctx.error.message
     })
