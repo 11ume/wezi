@@ -1,18 +1,20 @@
 {
   "private": true,
+  "description": "Small, simple and expressive library to create robust web services",
   "repository": "11ume/wezi",
   "author": {
     "name": "Horacio Rivero",
     "email": "horacioriverods@gmail.com"
   },
-  "files": [
-    "**"
+  "workspaces": [
+    "packages/*"
   ],
   "scripts": {
-    "build": "tsc",
+    "pub": "lerna publish",
+    "clean": "lerna run clean",
+    "build": "lerna run build",
     "test": "node node_modules/.bin/ava",
-    "lint": "node node_modules/.bin/eslint .",
-    "lerna:bootstrap": "node node_modules/.bin/lerna bootstrap"
+    "lint": "node node_modules/.bin/eslint ."
   },
   "devDependencies": {
     "@ava/babel": "^1.0.1",

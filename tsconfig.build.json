@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "target": "ES2019",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "incremental": true,
+        "esModuleInterop": true,
+        "noImplicitAny": false,
+        "preserveConstEnums": true,
+        "strictFunctionTypes": true,
+        "noImplicitReturns": true,
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "noEmitOnError": true,
+        "skipLibCheck": true,
+        "removeComments": true,
+    },
+    "exclude": [
+        "test",
+        "node_modules"
+    ]
+}
