@@ -19,6 +19,7 @@ test('create and return http error', async (t) => {
     const url = await server(() => createError(420))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
+
     t.is(res.status, 420)
     t.is(body.message, 'Enhance Your Calm')
 })
@@ -27,6 +28,7 @@ test('create and return http error whit custom status code and message', async (
     const url = await server(() => createError(418, 'Im a teapot'))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
+
     t.is(res.status, 418)
     t.is(body.message, 'Im a teapot')
 })
