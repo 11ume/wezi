@@ -1,9 +1,5 @@
 import test from 'ava'
-import http from 'http'
-import listen from 'test-listen'
 import fetch from 'node-fetch'
-import wezi from '../packages/wezi'
-import { Handler } from '../packages/types'
 import createError from '../packages/error'
 import * as receive from '../packages/receive'
 import router, { ContextRoute
@@ -14,11 +10,7 @@ import router, { ContextRoute
     , post
     , put
     , del } from '../packages/router'
-
-const server = (fn: Handler) => {
-    const app = wezi(fn)
-    return listen(http.createServer(app()))
-}
+import { server } from './helpers'
 
 test('test base path', async t => {
     const hello = () => 'hello'

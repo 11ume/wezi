@@ -1,15 +1,8 @@
 import test from 'ava'
-import http from 'http'
-import listen from 'test-listen'
 import fetch from 'node-fetch'
-import wezi from '../packages/wezi'
-import { Handler, Context } from '../packages/types'
+import { Context } from '../packages/types'
 import { send } from '../packages/send'
-
-const server = (fn: Handler) => {
-    const app = wezi(fn)
-    return listen(http.createServer(app()))
-}
+import { server } from './helpers'
 
 test('send message', async (t) => {
     const fn = (c: Context) => send(c, 200, 'hello')
