@@ -28,7 +28,7 @@ const execute = async (context: Context, handler: Handler, payload: unknown) => 
 
 // create a function "next" used fo pass to next handler in the handler stack
 const createNext = (context: Context, dispatch: Dispatch) => {
-    return function next(payload: unknown) {
+    return function next(payload: unknown): void {
         let ctx = context
         if (payload instanceof Error) {
             ctx = Object.assign(context, {
@@ -46,7 +46,7 @@ const end = (main: boolean, context: Context) => main && context.res.end()
 // used for create a multi handler flow execution controller
 const composer = (main: boolean, ...handlers: Handler[]) => {
     let i = 0
-    return function dispatch(context: Context, payload?: unknown) {
+    return function dispatch(context: Context, payload?: unknown): void {
         if (context.res.writableEnded) return
         if (context.error) {
             context.errorHandler(context)
