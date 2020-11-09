@@ -14,7 +14,8 @@
     "clean": "lerna run clean",
     "build": "lerna run build",
     "test": "node node_modules/.bin/ava",
-    "lint": "node node_modules/.bin/eslint ."
+    "lint": "node node_modules/.bin/eslint .",
+    "bench": "export NODE_ENV=production && node node_modules/.bin/ts-node dev/serve"
   },
   "devDependencies": {
     "@ava/babel": "^1.0.1",
