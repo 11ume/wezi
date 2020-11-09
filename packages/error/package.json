@@ -9,9 +9,6 @@
     "name": "Horacio Rivero",
     "email": "horacioriverods@gmail.com"
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "yarn run clean && yarn run compile",
     "clean": "rm -rf ./dist",
