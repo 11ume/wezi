@@ -33,6 +33,33 @@ test('main composer multi handlers async', async (t) => {
     t.is(r, 'hello')
 })
 
+test('main composer multi handlers pass parameters whit next', async (t) => {
+    const check = (c: Context) => c.next('hello')
+    const hello = (_, message: string) => Promise.resolve(message)
+    const url = await server(check, hello)
+
+    const res = await fetch(`${url}/`)
+    const r = await res.text()
+    t.is(r, 'hello')
+})
+
+test('main composer multi handlers pass async parameters whit next', async (t) => {
+    const delay = (time: number, msg: string): Promise<string> => new Promise((r) => setTimeout(r, time, msg))
+    const check = async (c: Context) => {
+        const body = await delay(500, 'hello')
+        c.next(body)
+    }
+    const hello = (_, message: string) => {
+        t.is(message, 'hello')
+        return message
+    }
+    const url = await server(check, hello)
+
+    const res = await fetch(`${url}/`)
+    const r = await res.text()
+    t.is(r, 'hello')
+})
+
 test('main composer multi handlers next error', async (t) => {
     const check = (c: Context) => c.next(createError(400))
     const hello = () => Promise.resolve('hello')
