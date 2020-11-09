@@ -1,6 +1,6 @@
 {
   "name": "wezi",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "",
   "main": "dist/index.js",
   "types": "index.ts",
@@ -16,9 +16,9 @@
     "prepublishOnly": "yarn run build"
   },
   "dependencies": {
-    "wezi-composer": "^1.0.0-alpha.2",
-    "wezi-send": "^1.0.0-alpha.2",
-    "wezi-types": "^1.0.0-alpha.2"
+    "wezi-composer": "^1.0.0-alpha.3",
+    "wezi-send": "^1.0.0-alpha.3",
+    "wezi-types": "^1.0.0-alpha.3"
   },
   "devDependencies": {
     "@types/node": "^14.14.0",
