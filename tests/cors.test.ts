@@ -1,15 +1,7 @@
 import test from 'ava'
-import http from 'http'
-import listen from 'test-listen'
 import fetch from 'node-fetch'
-import wezi from '../packages/wezi'
 import cors from '../packages/cors'
-import { Handler } from '../packages/types'
-
-const server = (...fns: Handler[]) => {
-    const app = wezi(...fns)
-    return listen(http.createServer(app()))
-}
+import { server } from './helpers'
 
 const methods = [
     'POST'

@@ -1,19 +1,12 @@
 import test from 'ava'
-import http from 'http'
-import listen from 'test-listen'
 import fetch from 'node-fetch'
-import wezi from '../packages/wezi'
-import { Handler, Context } from '../packages/types'
+import { Context } from '../packages/types'
 import { text, json, buffer } from '../packages/receive'
+import { server } from './helpers'
 
 type ErrorPayload = {
     message: string
-}
-
-const server = (fn: Handler) => {
-    const app = wezi(fn)
-    return listen(http.createServer(app()))
-}
+};
 
 test('receive json', async (t) => {
     type Characters = {
