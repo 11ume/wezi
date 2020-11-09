@@ -16,7 +16,7 @@ const server = (...fns: Handler[]) => {
 }
 
 test('create and return http error', async (t) => {
-    const url = await server(() => createError(420))
+    const url = await server((c: Context) => c.next(createError(420)))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -25,7 +25,7 @@ test('create and return http error', async (t) => {
 })
 
 test('create and return http error whit custom status code and message', async (t) => {
-    const url = await server(() => createError(418, 'Im a teapot'))
+    const url = await server((c: Context) => c.next(createError(418, 'Im a teapot')))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -34,7 +34,7 @@ test('create and return http error whit custom status code and message', async (
 })
 
 test('create and return http error multiple handlers', async (t) => {
-    const url = await server((c: Context) => c.next(), () => createError(420), () => 'not')
+    const url = await server((c: Context) => c.next(), (c: Context) => c.next(createError(420)), () => 'not')
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
