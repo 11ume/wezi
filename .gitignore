@@ -6,5 +6,6 @@ coverage
 *.lock.json
 *.log
 *.lerna_backup
+*.build.tsbuildinfo
 dist
 dev

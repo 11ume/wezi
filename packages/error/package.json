@@ -1,6 +1,6 @@
 {
   "name": "wezi-error",
-  "version": "0.1.1-alpha.0",
+  "version": "1.0.0-alpha.0",
   "description": "",
   "main": "dist/index.js",
   "types": "index.ts",
@@ -9,9 +9,6 @@
     "name": "Horacio Rivero",
     "email": "horacioriverods@gmail.com"
   },
-  "files": [
-    "dist"
-  ],
   "scripts": {
     "build": "yarn run clean && yarn run compile",
     "clean": "rm -rf ./dist",
