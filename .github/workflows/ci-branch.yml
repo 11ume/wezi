@@ -2,8 +2,9 @@ name: ci branch
 
 on:
   push:
-    branches-ignore:
-      - master
+    branches:
+      - '**'        # matches every branch
+      - '!master'   # excludes master
   pull_request:
     types: [opened, synchronize]
 
