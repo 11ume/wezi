@@ -34,6 +34,20 @@ test('test not found', async t => {
     t.is(res.status, 404)
 })
 
+test('test pattern match /(.*)', async t => {
+    const hello = () => 'hello'
+    const url = await server(router(get('*', hello)))
+    const res = await fetch(`${url}/`)
+    const resTwo = await fetch(url)
+    const body = await res.text()
+    const bodyTwo = await resTwo.text()
+
+    t.is(res.status, 200)
+    t.is(body, 'hello')
+    t.is(resTwo.status, 200)
+    t.is(bodyTwo, 'hello')
+})
+
 test('different routes whit static paths diferent methods (CRUD)', async (t) => {
     type User = {
         id: string
