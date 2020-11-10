@@ -7,7 +7,7 @@
 <br>
 
 <p align="center"> 
-    wezi is a small, simple and expressive library
+    Wezi is a simple, small and expressive library
     <br>
     to create a e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶s  robust web services like polar bears!. 
 <p>
@@ -28,16 +28,25 @@
 
 <br>
 
-* **Small** only contains what you will need
-* **Fast** high performance (even JSON parsing is opt-in)  
-* **Clean** thinked for implement the best practices
-* **Async** fully asynchronous, implements enhanced flow handlers
-* **Functional** functional programing friendly
-* **Intuitive** has features similar to other popular projects
-* **Solid** desing for work whit Typescript
+* **Small** Only contains the essential.
+* **Fast** Hight performance (even JSON parsing is opt-in).  
+* **Clean** Thinked for implement the best practices.
+* **Async** Fully asynchronous, implements enhanced flow handlers.
+* **Functional** Is functional programing friendly.  
+* **Friendly** Has features similar to other popular projects.
+* **Safe** Is designed from scratch to work with Typescript.
 
 <br>
 
+### Install
+
+
+```bash
+npm install wezi
+```
+
+
+<br>
 
 ### Usage
 
