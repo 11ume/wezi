@@ -15,7 +15,6 @@
     "build": "lerna run build",
     "test": "node node_modules/.bin/ava",
     "lint": "node node_modules/.bin/eslint .",
-    "bench": "export NODE_ENV=production && node node_modules/.bin/ts-node dev/serve",
     "test:coverage": "nyc --reporter=json ava",
     "clean:coverage": "rm -rf .nyc_output coverage"
   },
