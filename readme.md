@@ -69,13 +69,10 @@ listen(w(), 3000)
 <br>
 
 
-> Send and receive messages
+> Simple send and receive messages
 
 
 ```ts
-import wezi, { Context, listen } from 'wezi'
-import { json } from 'wezi-receive'
-
 type Bear = {
     name: string
     type: string 
@@ -85,6 +82,11 @@ const locate = (type: string) => ({
     'polar': 'North pole',
     'grezzly': 'Yellowstone National Park'
 })[type]
+```
+
+```ts
+import wezi, { Context, listen } from 'wezi'
+import { json } from 'wezi-receive'
 
 const find = async (c: Context) => {
     const bear = await json<Bear>(c)
@@ -100,11 +102,14 @@ listen(w(), 3000)
 <br>
 
 
-> Using the router
+> Using middlewares
 
 
 ```ts
-type Bear = {
+
+// bear.ts
+
+export type Bear = {
     type: string
     location: string
 }
@@ -119,11 +124,14 @@ const bears: Bear[] = [
         location: 'Yellowstone National Park'
     }
 ]
+
+export default bears
 ```
 
 ```ts
 import wezi, { listen } from 'wezi'
 import router, { ContextRoute, get } from 'wezi-router'
+import bears, { Bear } from './bear'
 
 const getAll = (): Bear[] => bears
 const getById = ({ params }: ContextRoute<Pick<Bear,'type'>>): Bear => params.type 
@@ -137,5 +145,4 @@ const r = router(
 
 const w = wezi(r)
 listen(w(), 3000)
-
 ```
