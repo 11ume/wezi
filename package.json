@@ -15,7 +15,14 @@
     "build": "lerna run build",
     "test": "node node_modules/.bin/ava",
     "lint": "node node_modules/.bin/eslint .",
-    "bench": "export NODE_ENV=production && node node_modules/.bin/ts-node dev/serve"
+    "bench": "export NODE_ENV=production && node node_modules/.bin/ts-node dev/serve",
+    "test:coverage": "nyc --reporter=json ava",
+    "clean:coverage": "rm -rf .nyc_output coverage"
+  },
+  "nyc": {
+    "extension": [
+      ".ts"
+    ]
   },
   "devDependencies": {
     "@ava/babel": "^1.0.1",
@@ -32,6 +39,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "lerna": "^3.22.1",
     "node-fetch": "^2.6.1",
+    "nyc": "^15.1.0",
     "test-listen": "^1.1.0",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
