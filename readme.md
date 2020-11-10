@@ -28,7 +28,7 @@
 
 <br>
 
-* **Small** Only contains the essential.
+* **Small** Only contains essential features.
 * **Fast** Hight performance (even JSON parsing is opt-in).  
 * **Clean** Thinked for implement the best practices.
 * **Async** Fully asynchronous, implements enhanced flow handlers.
