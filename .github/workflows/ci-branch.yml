@@ -1,8 +1,9 @@
-name: ci master
+name: ci branch
 
 on:
   push:
-    branches: [main, master]
+    branches-ignore:
+      - master
   pull_request:
     types: [opened, synchronize]
 
