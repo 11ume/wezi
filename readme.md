@@ -16,9 +16,10 @@
 
 <div align="center"> 
     
-[![Build Status](https://img.shields.io/github/workflow/status/11ume/wezi/Build?style=flat&colorA=000000&colorB=000000)](https://github.com/11ume/wezi/actions?query=workflow%3ABuild)
+[![ci status](https://img.shields.io/github/workflow/status/11ume/wezi/ci?style=flat&colorA=000000&colorB=000000)](https://github.com/11ume/wezi/actions?query=workflow%3Aci)
 [![js-standard-style](https://img.shields.io/badge/code%20style%20-standard-standard?style=flat&colorA=000000&colorB=000000)](http://standardjs.com)
-[![Discord Shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=92E8FF)](https://discord.com)
+[![codecov](https://img.shields.io/badge/☂%20-coverage-☂?style=flat&colorA=000000&colorB=000000)](https://codecov.io/gh/11ume/wezi/branch/main)
+[![discord shield](https://img.shields.io/discord/740090768164651008?style=flat&colorA=000000&colorB=000000&label=discord&logo=discord&logoColor=92E8FF)](https://discord.com)
 
 </div>
     
@@ -28,7 +29,7 @@
 
 <br>
 
-* **Small** Only contains the essential.
+* **Small** Only contains essential features.
 * **Fast** Hight performance (even JSON parsing is opt-in).  
 * **Clean** Thinked for implement the best practices.
 * **Async** Fully asynchronous, implements enhanced flow handlers.
@@ -69,13 +70,10 @@ listen(w(), 3000)
 <br>
 
 
-> Send and receive messages
+> Simple send and receive messages
 
 
 ```ts
-import wezi, { Context, listen } from 'wezi'
-import { json } from 'wezi-receive'
-
 type Bear = {
     name: string
     type: string 
@@ -85,6 +83,11 @@ const locate = (type: string) => ({
     'polar': 'North pole',
     'grezzly': 'Yellowstone National Park'
 })[type]
+```
+
+```ts
+import wezi, { Context, listen } from 'wezi'
+import { json } from 'wezi-receive'
 
 const find = async (c: Context) => {
     const bear = await json<Bear>(c)
@@ -100,11 +103,14 @@ listen(w(), 3000)
 <br>
 
 
-> Using the router
+> Using middlewares
 
 
 ```ts
-type Bear = {
+
+// bear.ts
+
+export type Bear = {
     type: string
     location: string
 }
@@ -119,11 +125,14 @@ const bears: Bear[] = [
         location: 'Yellowstone National Park'
     }
 ]
+
+export default bears
 ```
 
 ```ts
 import wezi, { listen } from 'wezi'
 import router, { ContextRoute, get } from 'wezi-router'
+import bears, { Bear } from './bear'
 
 const getAll = (): Bear[] => bears
 const getById = ({ params }: ContextRoute<Pick<Bear,'type'>>): Bear => params.type 
@@ -137,5 +146,4 @@ const r = router(
 
 const w = wezi(r)
 listen(w(), 3000)
-
 ```
