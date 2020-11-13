@@ -46,7 +46,7 @@ export const sendText = (context: Context, payload: string | number, statusCode?
     const payloadStr = typeof payload === 'number' ? payload.toString() : payload
     context.res.statusCode = statusCode ?? 200
     if (noContentType(context)) {
-        context.res.setHeader('Content-Type', 'text/plain')
+        context.res.setHeader('Content-Type', 'text/plain charset=utf-8')
     }
 
     context.res.setHeader('Content-Length', Buffer.byteLength(payloadStr))
