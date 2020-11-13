@@ -4,18 +4,49 @@ import { Context } from '../packages/types'
 import { send } from '../packages/send'
 import { server } from './helpers'
 
-test('send message', async (t) => {
+test('send text message', async (t) => {
     const fn = (c: Context) => send(c, 200, 'hello')
     const url = await server(fn)
-    const res = await fetch(url, {
-        method: 'POST'
-        , body: 'hello'
-    })
+    const res = await fetch(url)
 
     const body = await res.text()
     t.is(body, 'hello')
     t.is(res.headers.get('Content-Length'), '5')
     t.is(res.headers.get('Content-Type'), 'text/plain')
+})
+
+test('send json message', async (t) => {
+    const fn = (c: Context) => send(c, 200, {
+        message: 'hello'
+    })
+    const url = await server(fn)
+    const res = await fetch(url)
+
+    const body: { message: string } = await res.json()
+    t.is(res.status, 200)
+    t.is(body.message, 'hello')
+    t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
+})
+
+test('send empty', async (t) => {
+    const fn = (c: Context) => send(c)
+    const url = await server(fn)
+    const res = await fetch(url)
+
+    t.is(res.status, 204)
+})
+
+test('send payload whit status code', async (t) => {
+    const fn = (c: Context) => send(c, 401, {
+        message: 'hello'
+    })
+    const url = await server(fn)
+    const res = await fetch(url)
+
+    const body: { message: string } = await res.json()
+    t.is(res.status, 401)
+    t.is(body.message, 'hello')
+    t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
 })
 
 test('send only status code', async (t) => {
@@ -26,27 +57,7 @@ test('send only status code', async (t) => {
     t.is(res.status, 400)
 })
 
-test('send json message', async (t) => {
-    const fn = (c: Context) => send(c, 400, {
-        message: 'Bad Request'
-    })
-    const url = await server(fn)
-    const res = await fetch(url)
-
-    const body: { message: string } = await res.json()
-    t.is(res.status, 400)
-    t.is(body.message, 'Bad Request')
-})
-
 test('send Not Content whit other status', async (t) => {
-    const fn = (c: Context) => send(c, 400, null)
-    const url = await server(fn)
-    const res = await fetch(url)
-
-    t.is(res.status, 400)
-})
-
-test('send empty whit out status code', async (t) => {
     const fn = (c: Context) => send(c, 400, null)
     const url = await server(fn)
     const res = await fetch(url)
@@ -85,3 +96,4 @@ test('send direct Not Content 204', async (t) => {
 
     t.is(res.status, 204)
 })
+
