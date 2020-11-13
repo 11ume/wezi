@@ -1,10 +1,8 @@
 import { Stream, Readable } from 'stream'
-import { isReadable } from './utils'
 import { Context } from 'wezi-types'
+import { isEmpty, isReadable, noContentType } from './utils'
 
-const noContentType = (context: Context) => !context.res.getHeader('Content-Type')
-
-export const buffer = (context: Context, statusCode: number, obj: Buffer) => {
+export const buffer = (context: Context, statusCode: number, obj: Buffer): Promise<void> => new Promise((resolve) => {
     context.res.statusCode = statusCode ?? 200
     if (Buffer.isBuffer(obj)) {
         if (noContentType(context)) {
@@ -16,12 +14,11 @@ export const buffer = (context: Context, statusCode: number, obj: Buffer) => {
         return
     }
 
-    context.res.end()
-}
+    context.res.end(resolve)
+})
 
-export const stream = (context: Context, statusCode: number, obj: Readable) => {
-    statusCode ?? 200
-    context.res.statusCode = statusCode
+export const stream = (context: Context, statusCode: number, obj: Readable): Promise<void> => new Promise((resolve) => {
+    context.res.statusCode = statusCode ?? 200
     if (obj instanceof Stream || isReadable(obj)) {
         if (noContentType(context)) {
             context.res.setHeader('Content-Type', 'application/octet-stream')
@@ -31,28 +28,44 @@ export const stream = (context: Context, statusCode: number, obj: Readable) => {
         return
     }
 
-    context.res.end()
-}
+    context.res.end(resolve)
+})
 
-export const send = (context: Context, statusCode?: number, obj?) => {
-    if (obj === null) {
-        context.res.statusCode = 204
-        context.res.end()
-        return
-    }
-
+export const json = <T = void>(context: Context, payload: T, statusCode?: number): Promise<void> => new Promise((resolve) => {
+    const payloadStr = JSON.stringify(payload)
     context.res.statusCode = statusCode ?? 200
-    let payload = obj ?? ''
-    if (typeof obj === 'object' || typeof obj === 'number') {
-        payload = JSON.stringify(obj)
-        if (noContentType(context)) {
-            context.res.setHeader('Content-Type', 'application/json charset=utf-8')
-        }
+    if (noContentType(context)) {
+        context.res.setHeader('Content-Type', 'application/json charset=utf-8')
     }
 
+    context.res.setHeader('Content-Length', Buffer.byteLength(payloadStr))
+    context.res.end(payloadStr, resolve)
+})
+
+export const text = (context: Context, payload: string | number, statusCode?: number): Promise<void> => new Promise((resolve) => {
+    const payloadStr = typeof payload === 'number' ? payload.toString() : payload
+    context.res.statusCode = statusCode ?? 200
     if (noContentType(context)) {
-        context.res.setHeader('Content-Type', 'text/plain')
+        context.res.setHeader('Content-Type', 'text/plain charset=utf-8')
     }
-    context.res.setHeader('Content-Length', Buffer.byteLength(payload))
-    context.res.end(payload)
+
+    context.res.setHeader('Content-Length', Buffer.byteLength(payloadStr))
+    context.res.end(payloadStr, resolve)
+})
+
+export const empty = (context: Context, statusCode?: number): Promise<void> => new Promise((resolve) => {
+    context.res.statusCode = statusCode ?? 204
+    context.res.end(resolve)
+})
+
+export const send = (context: Context, statusCode?: number, payload?) => {
+    if (isEmpty(payload)) {
+        return empty(context, statusCode)
+    }
+
+    if (typeof payload === 'object') {
+        return json(context, payload, statusCode)
+    }
+
+    return text(context, payload, statusCode)
 }

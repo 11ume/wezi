@@ -1,9 +1,9 @@
 import http, { RequestListener, IncomingMessage, ServerResponse } from 'http'
-import { send } from 'wezi-send'
-import { Context, Handler } from 'wezi-types'
 import composer from 'wezi-composer'
+import { Context, Handler } from 'wezi-types'
+import { send } from 'wezi-send'
 
-export const defaultErrorHandler = (ctx: Context) => {
+const defaultErrorHandler = (ctx: Context) => {
     const status = ctx.error.statusCode || 500
     if (ctx.error.message) {
         send(ctx, status, {
