@@ -15,13 +15,6 @@ const defaultErrorHandler = (ctx: Context) => {
     send(ctx, status)
 }
 
-export const listen = (run: RequestListener, port: number) => new Promise((resolve, reject) => {
-    const server = http.createServer(run)
-    server.on('listening', resolve)
-    server.on('error', reject)
-    return server.listen(port)
-})
-
 const run = (...handlers: Handler[]) => (errorHandler: Handler = defaultErrorHandler) => {
     return (req: IncomingMessage, res: ServerResponse) => {
         const dispatch = composer(true, ...handlers)
@@ -36,5 +29,13 @@ const run = (...handlers: Handler[]) => (errorHandler: Handler = defaultErrorHan
         dispatch(context)
     }
 }
+
+export const listen = (handler: RequestListener, port: number) => new Promise((resolve, reject) => {
+    const server = http.createServer(handler)
+    server.on('listening', resolve)
+    server.on('error', reject)
+    server.listen(port)
+    return server
+})
 
 export default run
