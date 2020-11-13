@@ -3,7 +3,7 @@ import { send } from 'wezi-send'
 import { Context, Handler } from 'wezi-types'
 import composer from 'wezi-composer'
 
-export const errorHandler = (ctx: Context) => {
+export const defaultErrorHandler = (ctx: Context) => {
     const status = ctx.error.statusCode || 500
     if (ctx.error.message) {
         send(ctx, status, {
@@ -22,7 +22,7 @@ export const listen = (run: RequestListener, port: number) => new Promise((resol
     return server.listen(port)
 })
 
-const run = (...handlers: Handler[]) => (errHandler: Handler = errorHandler) => {
+const run = (...handlers: Handler[]) => (errorHandler: Handler = defaultErrorHandler) => {
     return (req: IncomingMessage, res: ServerResponse) => {
         const dispatch = composer(true, ...handlers)
         const context: Context = {
@@ -30,7 +30,7 @@ const run = (...handlers: Handler[]) => (errHandler: Handler = errorHandler) => 
             , res
             , next: null
             , error: null
-            , errorHandler: errHandler
+            , errorHandler
         }
 
         dispatch(context)
