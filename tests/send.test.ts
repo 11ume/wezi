@@ -18,7 +18,7 @@ test('send message', async (t) => {
     t.is(res.headers.get('Content-Type'), 'text/plain')
 })
 
-test('send only status', async (t) => {
+test('send only status code', async (t) => {
     const fn = (c: Context) => send(c, 400)
     const url = await server(fn)
     const res = await fetch(url)
@@ -38,12 +38,20 @@ test('send json message', async (t) => {
     t.is(body.message, 'Bad Request')
 })
 
-test('send Not Content 204', async (t) => {
+test('send Not Content whit other status', async (t) => {
     const fn = (c: Context) => send(c, 400, null)
     const url = await server(fn)
     const res = await fetch(url)
 
-    t.is(res.status, 204)
+    t.is(res.status, 400)
+})
+
+test('send empty whit out status code', async (t) => {
+    const fn = (c: Context) => send(c, 400, null)
+    const url = await server(fn)
+    const res = await fetch(url)
+
+    t.is(res.status, 400)
 })
 
 test('send direct message', async (t) => {
