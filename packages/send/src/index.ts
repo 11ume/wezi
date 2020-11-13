@@ -1,6 +1,6 @@
 import { Stream, Readable } from 'stream'
-import { isEmpty, isReadable, noContentType } from './utils'
 import { Context } from 'wezi-types'
+import { isEmpty, isReadable, noContentType } from './utils'
 
 export const buffer = (context: Context, statusCode: number, obj: Buffer): Promise<void> => new Promise((resolve) => {
     context.res.statusCode = statusCode ?? 200
@@ -31,7 +31,7 @@ export const stream = (context: Context, statusCode: number, obj: Readable): Pro
     context.res.end(resolve)
 })
 
-export const sendJson = <T = void>(context: Context, payload: T, statusCode?: number): Promise<void> => new Promise((resolve) => {
+export const json = <T = void>(context: Context, payload: T, statusCode?: number): Promise<void> => new Promise((resolve) => {
     const payloadStr = JSON.stringify(payload)
     context.res.statusCode = statusCode ?? 200
     if (noContentType(context)) {
@@ -42,7 +42,7 @@ export const sendJson = <T = void>(context: Context, payload: T, statusCode?: nu
     context.res.end(payloadStr, resolve)
 })
 
-export const sendText = (context: Context, payload: string | number, statusCode?: number): Promise<void> => new Promise((resolve) => {
+export const text = (context: Context, payload: string | number, statusCode?: number): Promise<void> => new Promise((resolve) => {
     const payloadStr = typeof payload === 'number' ? payload.toString() : payload
     context.res.statusCode = statusCode ?? 200
     if (noContentType(context)) {
@@ -53,19 +53,19 @@ export const sendText = (context: Context, payload: string | number, statusCode?
     context.res.end(payloadStr, resolve)
 })
 
-export const sendEmpty = (context: Context, statusCode?: number): Promise<void> => new Promise((resolve) => {
+export const empty = (context: Context, statusCode?: number): Promise<void> => new Promise((resolve) => {
     context.res.statusCode = statusCode ?? 204
     context.res.end(resolve)
 })
 
 export const send = (context: Context, statusCode?: number, payload?) => {
     if (isEmpty(payload)) {
-        return sendEmpty(context, statusCode)
+        return empty(context, statusCode)
     }
 
     if (typeof payload === 'object') {
-        return sendJson(context, payload, statusCode)
+        return json(context, payload, statusCode)
     }
 
-    return sendText(context, payload, statusCode)
+    return text(context, payload, statusCode)
 }

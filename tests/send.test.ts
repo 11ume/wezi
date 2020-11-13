@@ -1,7 +1,7 @@
 import test from 'ava'
 import fetch from 'node-fetch'
-import { Context } from '../packages/types'
 import { send } from '../packages/send'
+import { Context } from '../packages/types'
 import { server } from './helpers'
 
 test('send text string message', async (t) => {
