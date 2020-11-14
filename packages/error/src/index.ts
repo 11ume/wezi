@@ -16,5 +16,3 @@ export const createError = (status: number, message?: string, error?: Error) => 
     }
     return new HttpError(msg, status, error)
 }
-
-export const error = (err: Error, message?: string) => createError(500, message, err)

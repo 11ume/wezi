@@ -6,6 +6,10 @@ import { send, buffer, stream } from '../packages/send'
 import { Context } from '../packages/types'
 import { server } from './helpers'
 
+type ErrorPayload = {
+    message: string
+};
+
 test('send text string message', async (t) => {
     const fn = (c: Context) => send(c, 200, 'hello')
     const url = await server(fn)
@@ -145,4 +149,26 @@ test('send buffer', async (t) => {
 
     t.is(res.status, 200)
     t.is(body, 'foo')
+})
+
+test('try send not buffer', async (t) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fn = (c: Context) => buffer(c, 200, '' as any)
+    const url = await server(fn)
+    const res = await fetch(url)
+    const body: ErrorPayload = await res.json()
+
+    t.is(res.status, 500)
+    t.is(body.message, 'buffer payload must be a instance of Buffer')
+})
+
+test('try send not stream', async (t) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fn = (c: Context) => stream(c, 200, '' as any)
+    const url = await server(fn)
+    const res = await fetch(url)
+    const body: ErrorPayload = await res.json()
+
+    t.is(res.status, 500)
+    t.is(body.message, 'stream payload must be a instance of Stream')
 })
