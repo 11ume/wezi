@@ -126,6 +126,34 @@ test('send stream readable', async (t) => {
     t.is(body, 'foo')
 })
 
+test('send custom abtract stream readable', async (t) => {
+    const fn = (c: Context) => {
+        const handlers = {}
+        const abtractReadable = {
+            readable: true
+            , _read: () => ''
+            , _readableState: {}
+            , on: (key: string, fns: () => void) => {
+                handlers[key] = fns
+            }
+            , emit: (key: string) => {
+                handlers[key]()
+            }
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            , pipe: () => { }
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            , end: () => { }
+        }
+
+        send(c, 200, abtractReadable)
+        abtractReadable.emit('close')
+    }
+
+    const url = await server(fn)
+    const res = await fetch(url)
+    t.is(res.status, 200)
+})
+
 test('send file read stream', async (t) => {
     const readable = fs.createReadStream('./package.json')
     const fn = (c: Context) => stream(c, 200, readable)
