@@ -11,13 +11,6 @@ const defaultErrorHandler = (ctx: Context) => {
         send(ctx, status)
         return
     }
-    if (message) {
-        send(ctx, status, {
-            message
-        })
-        return
-    }
-
     send(ctx, status, {
         message
     })
