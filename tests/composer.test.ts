@@ -8,7 +8,7 @@ test('main composer handler flow', async (t) => {
     const hello = () => 'hello'
     const url = await server(hello)
 
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const r = await res.text()
     t.is(r, 'hello')
 })
@@ -18,7 +18,7 @@ test('main composer multi handlers', async (t) => {
     const hello = () => 'hello'
     const url = await server(check, hello)
 
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const r = await res.text()
     t.is(r, 'hello')
 })
@@ -28,7 +28,7 @@ test('main composer multi handlers async', async (t) => {
     const hello = () => Promise.resolve('hello')
     const url = await server(check, hello)
 
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const r = await res.text()
     t.is(r, 'hello')
 })
@@ -38,7 +38,7 @@ test('main composer multi handlers pass parameters whit next', async (t) => {
     const hello = (_, message: string) => Promise.resolve(message)
     const url = await server(check, hello)
 
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const r = await res.text()
     t.is(r, 'hello')
 })
@@ -55,7 +55,7 @@ test('main composer multi handlers pass async parameters whit next', async (t) =
     }
     const url = await server(check, hello)
 
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const r = await res.text()
     t.is(r, 'hello')
 })
@@ -68,7 +68,7 @@ test('main composer multi handlers next error', async (t) => {
         context.res.end()
     }
     const url = await server(check, hello, errorHandler)
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
 
     t.is(res.status, 400)
 })
@@ -84,7 +84,7 @@ test('main composer multi handlers throw error', async (t) => {
     }
     const url = await server(check, hello, errorHandler)
 
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const r = await res.json()
 
     t.is(r.message, 'Something wrong is happened')

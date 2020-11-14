@@ -3,7 +3,6 @@ import { send } from 'wezi-send'
 
 type Dispatch = (context: Context, payload: unknown) => void
 
-// execute and manage the return of a handler
 const execute = async (context: Context, handler: Handler, payload: unknown) => {
     try {
         const val = await handler(context, payload)
@@ -21,7 +20,6 @@ const execute = async (context: Context, handler: Handler, payload: unknown) => 
     }
 }
 
-// create a function "next" used fo pass to next handler in the handler stack
 const createNext = (context: Context, dispatch: Dispatch) => {
     return function next(payload: unknown): void {
         let ctx = context
@@ -38,7 +36,6 @@ const createNext = (context: Context, dispatch: Dispatch) => {
 // end response if all higher-order handlers are executed, and none of them have ended the response
 const end = (main: boolean, context: Context) => main && context.res.end()
 
-// used for create a multi handler flow execution controller
 const composer = (main: boolean, ...handlers: Handler[]) => {
     let i = 0
     return function dispatch(context: Context, payload?: unknown): void {

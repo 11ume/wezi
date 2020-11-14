@@ -36,7 +36,7 @@ test('main composer handler flow', async (t) => {
         dispatch(context)
     })
 
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const r = await res.text()
     t.is(r, 'hello')
 })
@@ -56,7 +56,7 @@ test('main composer multi handlers', async (t) => {
         dispatch(context)
     })
 
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const r = await res.text()
     t.is(r, 'hello')
 })
@@ -76,7 +76,7 @@ test('main composer multi handlers async', async (t) => {
         dispatch(context)
     })
 
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const r = await res.text()
     t.is(r, 'hello')
 })
@@ -99,7 +99,7 @@ test('main composer multi handlers next error', async (t) => {
         dispatch(context)
     })
 
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     t.is(res.status, 400)
 })
 
@@ -123,7 +123,7 @@ test('main composer multi handlers throw error', async (t) => {
         dispatch(context)
     })
 
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const r = await res.json()
 
     t.is(r.message, 'Something wrong is happened')
