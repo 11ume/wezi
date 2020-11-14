@@ -7,9 +7,9 @@ import { server } from './helpers'
 test('main composer handler flow', async (t) => {
     const hello = () => 'hello'
     const url = await server(hello)
-
     const res = await fetch(url)
     const r = await res.text()
+
     t.is(r, 'hello')
 })
 
@@ -17,9 +17,9 @@ test('main composer multi handlers', async (t) => {
     const check = (c: Context) => c.next()
     const hello = () => 'hello'
     const url = await server(check, hello)
-
     const res = await fetch(url)
     const r = await res.text()
+
     t.is(r, 'hello')
 })
 
@@ -27,9 +27,9 @@ test('main composer multi handlers async', async (t) => {
     const check = (c: Context) => c.next()
     const hello = () => Promise.resolve('hello')
     const url = await server(check, hello)
-
     const res = await fetch(url)
     const r = await res.text()
+
     t.is(r, 'hello')
 })
 
@@ -37,9 +37,9 @@ test('main composer multi handlers pass parameters whit next', async (t) => {
     const check = (c: Context) => c.next('hello')
     const hello = (_, message: string) => Promise.resolve(message)
     const url = await server(check, hello)
-
     const res = await fetch(url)
     const r = await res.text()
+
     t.is(r, 'hello')
 })
 
@@ -54,9 +54,9 @@ test('main composer multi handlers pass async parameters whit next', async (t) =
         return message
     }
     const url = await server(check, hello)
-
     const res = await fetch(url)
     const r = await res.text()
+
     t.is(r, 'hello')
 })
 
@@ -83,7 +83,6 @@ test('main composer multi handlers throw error', async (t) => {
         }))
     }
     const url = await server(check, hello, errorHandler)
-
     const res = await fetch(url)
     const r = await res.json()
 
