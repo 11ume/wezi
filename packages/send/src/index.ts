@@ -2,7 +2,7 @@ import { Stream, Readable } from 'stream'
 import { Context } from 'wezi-types'
 import { isEmpty, isReadable, noContentType } from './utils'
 
-export const buffer = (context: Context, statusCode: number, obj: Buffer): Promise<void> => new Promise((resolve) => {
+export const buffer = (context: Context, statusCode: number, obj: Buffer) => {
     context.res.statusCode = statusCode ?? 200
     if (Buffer.isBuffer(obj)) {
         if (noContentType(context)) {
@@ -14,10 +14,10 @@ export const buffer = (context: Context, statusCode: number, obj: Buffer): Promi
         return
     }
 
-    context.res.end(resolve)
-})
+    context.res.end()
+}
 
-export const stream = (context: Context, statusCode: number, obj: Readable): Promise<void> => new Promise((resolve) => {
+export const stream = (context: Context, statusCode: number, obj: Readable) => {
     context.res.statusCode = statusCode ?? 200
     if (obj instanceof Stream || isReadable(obj)) {
         if (noContentType(context)) {
@@ -28,10 +28,10 @@ export const stream = (context: Context, statusCode: number, obj: Readable): Pro
         return
     }
 
-    context.res.end(resolve)
-})
+    context.res.end()
+}
 
-export const json = <T = void>(context: Context, payload: T, statusCode?: number): Promise<void> => new Promise((resolve) => {
+export const json = <T = void>(context: Context, payload: T, statusCode?: number) => {
     const payloadStr = JSON.stringify(payload)
     context.res.statusCode = statusCode ?? 200
     if (noContentType(context)) {
@@ -39,10 +39,10 @@ export const json = <T = void>(context: Context, payload: T, statusCode?: number
     }
 
     context.res.setHeader('Content-Length', Buffer.byteLength(payloadStr))
-    context.res.end(payloadStr, resolve)
-})
+    context.res.end(payloadStr)
+}
 
-export const text = (context: Context, payload: string | number, statusCode?: number): Promise<void> => new Promise((resolve) => {
+export const text = (context: Context, payload: string | number, statusCode?: number) => {
     const payloadStr = typeof payload === 'number' ? payload.toString() : payload
     context.res.statusCode = statusCode ?? 200
     if (noContentType(context)) {
@@ -50,13 +50,13 @@ export const text = (context: Context, payload: string | number, statusCode?: nu
     }
 
     context.res.setHeader('Content-Length', Buffer.byteLength(payloadStr))
-    context.res.end(payloadStr, resolve)
-})
+    context.res.end(payloadStr)
+}
 
-export const empty = (context: Context, statusCode?: number): Promise<void> => new Promise((resolve) => {
+export const empty = (context: Context, statusCode?: number) => {
     context.res.statusCode = statusCode ?? 204
-    context.res.end(resolve)
-})
+    context.res.end()
+}
 
 export const send = (context: Context, statusCode?: number, payload?) => {
     if (isEmpty(payload)) {
