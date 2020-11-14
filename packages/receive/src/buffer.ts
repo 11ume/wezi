@@ -11,7 +11,13 @@ type ParseBody = {
     , rawBodyCache: WeakMap<IncomingMessage, unknown>
 }
 
-export const parseBody = ({ context, limit, length, encoding, rawBodyCache }: ParseBody) => getRawBody(context.req, {
+export const parseBody = ({
+    context
+    , limit
+    , length
+    , encoding
+    , rawBodyCache
+}: ParseBody) => getRawBody(context.req, {
     limit
     , length
     , encoding
