@@ -41,6 +41,21 @@ test('main composer handler flow', async (t) => {
     t.is(r, 'hello')
 })
 
+test('main composer handler flow end if end response if all higher-order handlers are executed, and none of them have ended the response', async (t) => {
+    const url = await server((req, res) => {
+        const dispatch = composer(true, (c: Context) => c.next(), (c: Context) => c.next())
+        const context = createContext({
+            req
+            , res
+        })
+
+        dispatch(context)
+    })
+
+    const res = await fetch(url)
+    t.truthy(res.ok)
+})
+
 test('main composer multi handlers', async (t) => {
     const url = await server((req, res) => {
         const check = (c: Context) => {

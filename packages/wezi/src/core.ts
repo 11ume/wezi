@@ -6,19 +6,20 @@ import { isProd } from './utils'
 
 const defaultErrorHandler = (ctx: Context) => {
     const status = ctx.error.statusCode || 500
+    const message = ctx.error.message || 'unknown'
     if (isProd()) {
         send(ctx, status)
         return
     }
-    if (ctx.error.message) {
+    if (message) {
         send(ctx, status, {
-            message: ctx.error.message
+            message
         })
         return
     }
 
     send(ctx, status, {
-        message: 'unknown'
+        message
     })
 }
 
