@@ -1,45 +1,50 @@
 import { Stream, Readable } from 'stream'
+import createError from 'wezi-error'
 import { Context } from 'wezi-types'
-import { isEmpty, isReadable, noContentType } from './utils'
+import { isEmpty, noContentType } from './utils'
 
-export const buffer = (context: Context, statusCode: number, obj: Buffer) => {
+export const buffer = (context: Context, statusCode: number, payload: Buffer) => {
     context.res.statusCode = statusCode ?? 200
-    if (Buffer.isBuffer(obj)) {
+    if (Buffer.isBuffer(payload)) {
         if (noContentType(context)) {
             context.res.setHeader('Content-Type', 'application/octet-stream')
         }
 
-        context.res.setHeader('Content-Length', obj.length)
-        context.res.end(obj)
+        context.res.setHeader('Content-Length', payload.length)
+        context.res.end(payload)
         return
     }
 
-    context.res.end()
+    context.next(createError(500, 'send buffer must be a instance of Buffer'))
 }
 
-export const stream = (context: Context, statusCode: number, obj: Readable) => {
+export const stream = (context: Context, statusCode: number, payload: Readable) => {
     context.res.statusCode = statusCode ?? 200
-    if (obj instanceof Stream || isReadable(obj)) {
+    if (payload instanceof Stream) {
         if (noContentType(context)) {
             context.res.setHeader('Content-Type', 'application/octet-stream')
         }
 
-        obj.pipe(context.res)
+        payload.pipe(context.res)
         return
     }
 
-    context.res.end()
+    context.next(createError(500, 'send stream must be a instance of Stream'))
 }
 
 export const json = <T = void>(context: Context, payload: T, statusCode?: number) => {
-    const payloadStr = JSON.stringify(payload)
-    context.res.statusCode = statusCode ?? 200
-    if (noContentType(context)) {
-        context.res.setHeader('Content-Type', 'application/json charset=utf-8')
-    }
+    try {
+        const payloadStr = JSON.stringify(payload)
+        context.res.statusCode = statusCode ?? 200
+        if (noContentType(context)) {
+            context.res.setHeader('Content-Type', 'application/json charset=utf-8')
+        }
 
-    context.res.setHeader('Content-Length', Buffer.byteLength(payloadStr))
-    context.res.end(payloadStr)
+        context.res.setHeader('Content-Length', Buffer.byteLength(payloadStr))
+        context.res.end(payloadStr)
+    } catch (err) {
+        context.next(createError(500, 'send json must be a stringifiable object', err))
+    }
 }
 
 export const text = (context: Context, payload: string | number, statusCode?: number) => {
