@@ -1,10 +1,13 @@
 import queryString from 'querystring'
 import { Route, RouteEntity } from './router'
 
-// extracts all params of an matched url pattern as key/value
+type Params = {
+    [key: string]: string
+}
+
 const regExpExtractParams = (route: Route, match: RegExpExecArray) => {
     let i = 0
-    const params = {}
+    const params: Params = {}
     while (i < route.keys.length) {
         const key = route.keys[i]
         params[key] = match[++i] || null
@@ -13,7 +16,6 @@ const regExpExtractParams = (route: Route, match: RegExpExecArray) => {
     return params
 }
 
-// detect any wildcard of requested url
 const checkQuery = (url: string) => {
     const index = url.indexOf('?', 1)
     const isQuery = index !== -1
@@ -23,7 +25,6 @@ const checkQuery = (url: string) => {
     }
 }
 
-// discard the wildcard and get the pathname cleanly, then return a parsed url query
 const getQueryString = (url: string, idx: number) => {
     const search = url.substring(idx)
     const path = search.substring(1)
@@ -35,12 +36,8 @@ const getQueryString = (url: string, idx: number) => {
     }
 }
 
-// parse and extract all url params as key/values
-export const getUrlParams = (item: RouteEntity, match: RegExpExecArray) => match
-    ? regExpExtractParams(item.route, match)
-    : {}
+export const getUrlParams = (item: RouteEntity, match: RegExpExecArray) => match && regExpExtractParams(item.route, match)
 
-// parse and extract all url query as key/values
 export const getUrlQuery = (baseUrl: string) => {
     const cq = checkQuery(baseUrl)
     if (cq.isQuery) return getQueryString(baseUrl, cq.index)

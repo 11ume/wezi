@@ -4,6 +4,6 @@ import wezi from '../../packages/wezi'
 import { Handler } from '../../packages/types'
 
 export const server = (...fn: Handler[]) => {
-    const app = wezi(...fn)
-    return listen(http.createServer(app()))
+    const w = wezi(...fn)
+    return listen(http.createServer(w()))
 }

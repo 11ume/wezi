@@ -3,6 +3,16 @@ import fetch from 'node-fetch'
 import createError from '../packages/error'
 import { Context } from '../packages/types'
 import { server } from './helpers'
+import wezi, { listen } from 'wezi'
+
+test('server listen', async (t) => {
+    const w = wezi(() => 'hello')
+    await listen(w(), 3000)
+    const res = await fetch('http://localhost:3000')
+    const r = await res.text()
+
+    t.is(r, 'hello')
+})
 
 test('main composer handler flow', async (t) => {
     const hello = () => 'hello'
