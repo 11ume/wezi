@@ -1,6 +1,8 @@
 import test from 'ava'
+import fs from 'fs'
 import fetch from 'node-fetch'
-import { send } from '../packages/send'
+import { Readable } from 'stream'
+import { send, buffer, stream } from '../packages/send'
 import { Context } from '../packages/types'
 import { server } from './helpers'
 
@@ -108,3 +110,39 @@ test('send direct Not Content 204', async (t) => {
     t.is(res.status, 204)
 })
 
+test('send stream readable', async (t) => {
+    const readable = new Readable()
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    readable._read = () => { }
+    readable.push('foo')
+    readable.push(null)
+
+    const fn = (c: Context) => stream(c, 200, readable)
+    const url = await server(fn)
+    const res = await fetch(url)
+    const body = await res.text()
+
+    t.is(res.status, 200)
+    t.is(body, 'foo')
+})
+
+test('send file read stream', async (t) => {
+    const readable = fs.createReadStream('./package.json')
+    const fn = (c: Context) => stream(c, 200, readable)
+    const url = await server(fn)
+    const res = await fetch(url)
+    const body: { repository: string } = await res.json()
+
+    t.is(res.status, 200)
+    t.is(body.repository, '11ume/wezi')
+})
+
+test('send buffer', async (t) => {
+    const fn = (c: Context) => buffer(c, 200, Buffer.from('foo'))
+    const url = await server(fn)
+    const res = await fetch(url)
+    const body = await res.text()
+
+    t.is(res.status, 200)
+    t.is(body, 'foo')
+})
