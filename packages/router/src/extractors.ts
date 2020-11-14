@@ -1,9 +1,13 @@
 import queryString from 'querystring'
 import { Route, RouteEntity } from './router'
 
+type Params = {
+    [key: string]: string
+}
+
 const regExpExtractParams = (route: Route, match: RegExpExecArray) => {
     let i = 0
-    const params = {}
+    const params: Params = {}
     while (i < route.keys.length) {
         const key = route.keys[i]
         params[key] = match[++i] || null
@@ -32,9 +36,7 @@ const getQueryString = (url: string, idx: number) => {
     }
 }
 
-export const getUrlParams = (item: RouteEntity, match: RegExpExecArray) => match
-    ? regExpExtractParams(item.route, match)
-    : {}
+export const getUrlParams = (item: RouteEntity, match: RegExpExecArray) => match && regExpExtractParams(item.route, match)
 
 export const getUrlQuery = (baseUrl: string) => {
     const cq = checkQuery(baseUrl)
