@@ -36,6 +36,7 @@
 * **Functional** Is functional programing friendly.  
 * **Friendly** Has features similar to other popular projects.
 * **Safe** Is designed from scratch to work with Typescript.
+* **Middlwares** Implements a  middleware logic.
 
 <br>
 
@@ -45,7 +46,6 @@
 ```bash
 npm install wezi
 ```
-
 
 <br>
 
@@ -57,7 +57,15 @@ npm install wezi
     <img src="https://github.com/11ume/wezi-assets/blob/main/hi2.png?raw=true" width="200" height="auto"/>
 </div>
 
-> Say hello
+#### Send
+
+<br>
+
+> Exists two ways to send messages
+
+*The most simple and natural way, is a direct return* 
+
+*Note*: By default a direct return emit a status code 200.
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -69,81 +77,40 @@ listen(w(), 3000)
 
 <br>
 
-
-> Simple send and receive messages
-
-
-```ts
-type Bear = {
-    name: string
-    type: string 
-}
-
-const locate = (type: string) => ({
-    'polar': 'North pole',
-    'grezzly': 'Yellowstone National Park'
-})[type]
-```
-
-```ts
-import wezi, { Context, listen } from 'wezi'
-import { json } from 'wezi-receive'
-
-const find = async (c: Context) => {
-    const bear = await json<Bear>(c)
-    const location = locate(bear.type)
-    if (location) return `The ${bear.name} lives in ${location}`
-    return null
-}
-
-const w = wezi(find)
-listen(w(), 3000)
-```
-
-<br>
-
-
-> Using middlewares
-
-
-```ts
-
-// bear.ts
-
-export type Bear = {
-    type: string
-    location: string
-}
-
-const bears: Bear[] = [
-    {
-        type: 'polar',
-        location: 'North pole'
-    },
-    {
-        type: 'grezzly', 
-        location: 'Yellowstone National Park'
-    }
-]
-
-export default bears
-```
+*The second way is through the send function, this allows you to define a status code* 
 
 ```ts
 import wezi, { listen } from 'wezi'
-import router, { ContextRoute, get } from 'wezi-router'
-import bears, { Bear } from './bear'
+import { Context } from 'wezi-types'
+import { send } from 'wezi-send'
 
-const getAll = (): Bear[] => bears
-const getById = ({ params }: ContextRoute<Pick<Bear,'type'>>): Bear => params.type 
-    ? bears.find((bear) => bear.type === params.type) 
-    : null 
-
-const r = router(
-    get('/bears', getAll)
-    , get('/bears/:type', getById)
-)
-
-const w = wezi(r)
+const hello = (c: Context) => send(c, 200, 'Hi, i'm a small polar bear!')
+const w = wezi(hello)
 listen(w(), 3000)
 ```
+
+#### Recibe
+
+> The payload of each messages is parsed by his type, this makes wezi really fast, since the type is not inferred in each request that is made.
+
+*Note*: By default the wezi does not handle HTTP methods, to achieve this you must use the router package.
+
+```ts
+import wezi, { listen } from 'wezi'
+import { Context } from 'wezi-types'
+import { json } from 'wezi-receive'
+
+type Bear = {
+    type: string
+}
+
+const getBearType = async (c: Context) => {
+    const bear = await json<Bear>(c)
+    return bear.type
+}
+
+const w = wezi(getBearType)
+listen(w(), 3000)
+```
+
+
