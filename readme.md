@@ -67,10 +67,6 @@ npm install wezi
 
 <br>
 
-**Note**: By default a direct return emit a status code 200.
-
-<br>
-
 ```ts
 import wezi, { listen } from 'wezi'
 
@@ -78,6 +74,8 @@ const hello = () => 'Hi, i'm a small polar bear!'
 const w = wezi(hello)
 listen(w(), 3000)
 ```
+
+**Note**: By default a direct return emit a status code 200.
 
 <br>
 
@@ -103,10 +101,6 @@ listen(w(), 3000)
 
 <br>
 
-**Note**: By default the wezi does not handle HTTP methods, to achieve this you must use the router package.
-
-<br>
-
 ```ts
 import wezi, { listen } from 'wezi'
 import { Context } from 'wezi-types'
@@ -125,4 +119,5 @@ const w = wezi(getBearType)
 listen(w(), 3000)
 ```
 
+**Note**: By default the wezi does not handle HTTP methods, to achieve this you must use the router package.
 
