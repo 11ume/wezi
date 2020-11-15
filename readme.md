@@ -167,7 +167,7 @@ listen(w(), 3000)
 
 <br>
 
-> By default each handler run inside a controlled context, and are controlled by a default error handler, but you can define your own.
+> By default each handler run inside a safe context, and are controlled by a default error handler, but you can define your own.
 
 <br>
 
