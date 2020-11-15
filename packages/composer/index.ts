@@ -3,6 +3,11 @@ import { send } from 'wezi-send'
 
 type Dispatch = (context: Context, payload: unknown) => void
 
+// end response if all higher-order handlers are executed, and none of them have ended the response
+const end = (main: boolean, context: Context) => main && context.res.end()
+
+const createContext = <T>(context: Context, newContext: T) => Object.assign(context, newContext)
+
 const execute = async (context: Context, handler: Handler, payload: unknown) => {
     try {
         const val = await handler(context, payload)
@@ -21,33 +26,24 @@ const execute = async (context: Context, handler: Handler, payload: unknown) => 
 }
 
 const createNext = (context: Context, dispatch: Dispatch) => {
-    return function next(payload: unknown): void {
-        let ctx = context
-        if (payload instanceof Error) {
-            ctx = Object.assign(context, {
-                error: payload
-            })
-        }
-
-        dispatch(ctx, payload)
+    return function next(payload?: unknown): void {
+        const newContext = createContext(context, {})
+        dispatch(newContext, payload)
     }
 }
-
-// end response if all higher-order handlers are executed, and none of them have ended the response
-const end = (main: boolean, context: Context) => main && context.res.end()
 
 const composer = (main: boolean, ...handlers: Handler[]) => {
     let i = 0
     return function dispatch(context: Context, payload?: unknown): void {
         if (context.res.writableEnded) return
-        if (context.error) {
-            context.errorHandler(context)
+        if (payload && payload instanceof Error) {
+            context.errorHandler(context, payload)
             return
         }
         if (i < handlers.length) {
             const handler = handlers[i++]
             const next = createNext(context, dispatch)
-            const newContext = Object.assign(context, {
+            const newContext = createContext(context, {
                 next
             })
 

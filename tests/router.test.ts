@@ -287,9 +287,7 @@ test('multiple matching routes match whit wildcards', async t => {
 
 test('multiple routes handlers', async t => {
     const checkChar = (context: ContextRoute<{ name: string }>) => {
-        if (context.params.name !== 'john') {
-            context.next(createError(400, 'Bad request'))
-        }
+        if (context.params.name !== 'john') throw createError(400, 'Bad request')
         context.next()
     }
     const getChar = (context: ContextRoute<{ name: string }>) => context.params.name
@@ -305,7 +303,7 @@ test('multiple routes handlers fail next', async t => {
     const checkChar = async (context: ContextRoute) => {
         const char = await receive.json<{ name?: string, power?: string }>(context)
         if (char.name && char.power) context.next()
-        else context.next(createError(400, 'Bad request'))
+        else throw createError(400, 'Bad request')
     }
     const getChar = () => null
     const routes = router(post('/character', checkChar, getChar))
