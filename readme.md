@@ -183,46 +183,5 @@ listen(w(), 3000)
 
 <br>
 
-> Calling **next** function passing an error as argument.
-
-**Note**: when passing an error to the **next** function, the error handler will be invoked, and that will be ended the request.
-
-```ts
-import wezi, { listen } from 'wezi'
-import { Context } from 'wezi-types'
-
-const error = (c: Context) => c.next(new Error('Something wrong has happened')) 
-const w = wezi(error)
-listen(w(), 3000)
-
-```
-<br>
-
 
 **Return** status code **500** { message: 'Something wrong has happened' }
-
-<br>
-
-> Define a custom error handler.
-
-
-```ts
-import wezi, { listen } from 'wezi'
-import { Context } from 'wezi-types'
-import { send } from 'wezi-send'
-
-const error = () => {
-    throw Error('Something wrong has happened')
-}
-
-const errorHandler = (c: Context) => {
-    const status = c.error.statusCode || 500
-    console.log(status, c.error.message)
-    send(c, 200, {
-        message: c.error.message
-    })
-}
-
-const w = wezi(error)
-listen(w(errorHandler), 3000)
-```
