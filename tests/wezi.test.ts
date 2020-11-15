@@ -1,6 +1,6 @@
 import test from 'ava'
 import fetch from 'node-fetch'
-import createError from '../packages/error'
+import createError, { HttpError } from '../packages/error'
 import { Context } from '../packages/types'
 import { server } from './helpers'
 import wezi, { listen } from 'wezi'
@@ -70,11 +70,13 @@ test('main composer multi handlers pass async parameters whit next', async (t) =
     t.is(r, 'hello')
 })
 
-test('main composer multi handlers next error', async (t) => {
-    const check = (c: Context) => c.next(createError(400))
+test('main composer multi handlers error', async (t) => {
+    const check = () => {
+        throw createError(400)
+    }
     const hello = () => Promise.resolve('hello')
-    const errorHandler = (context: Context) => {
-        context.res.statusCode = context.error.statusCode || 500
+    const errorHandler = (context: Context, error: Partial<HttpError>) => {
+        context.res.statusCode = error.statusCode || 500
         context.res.end()
     }
     const url = await server(check, hello, errorHandler)
@@ -86,10 +88,10 @@ test('main composer multi handlers next error', async (t) => {
 test('main composer multi handlers throw error', async (t) => {
     const check = (c: Context) => c.next()
     const hello = () => Promise.reject(new Error('Something wrong is happened'))
-    const errorHandler = (context: Context) => {
+    const errorHandler = (context: Context, error: Partial<HttpError>) => {
         context.res.statusCode = 500
         context.res.end(JSON.stringify({
-            message: context.error.message
+            message: error.message
         }))
     }
     const url = await server(check, hello, errorHandler)

@@ -1,12 +1,13 @@
 import http, { RequestListener, IncomingMessage, ServerResponse } from 'http'
 import composer from 'wezi-composer'
 import { Context, Handler } from 'wezi-types'
+import { HttpError } from 'wezi-error'
 import { send } from 'wezi-send'
 import { isProd } from './utils'
 
-const defaultErrorHandler = (ctx: Context) => {
-    const status = ctx.error.statusCode || 500
-    const message = ctx.error.message || 'unknown'
+const defaultErrorHandler = (ctx: Context, error: Partial<HttpError>) => {
+    const status = error.statusCode || 500
+    const message = error.message || 'unknown'
     if (isProd()) {
         send(ctx, status)
         return
@@ -23,7 +24,6 @@ const run = (...handlers: Handler[]) => (errorHandler: Handler = defaultErrorHan
             req
             , res
             , next: null
-            , error: null
             , errorHandler
         }
 
