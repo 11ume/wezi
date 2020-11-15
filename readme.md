@@ -130,7 +130,7 @@ listen(w(), 3000)
 
 <br>
 
-> Each handler  can do two things, return a value and end the request, or pass some value to the next handler, using the **next** function.
+> Each handler must do two things in his execution, return a value and end the request, or pass to next handler, using the **next** function. Also through the **next** function you can pass some value to the next handler.
 
 <br>
 
