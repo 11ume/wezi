@@ -258,6 +258,53 @@ test('main composer multi handler, throw error inside first handler, <Error>', a
     t.is(res.status, 500)
 })
 
+test('main composer multi handlers, pass parameters whit next, next<string>, direct<Promise<string:200>>', async (t) => {
+    const url = await server((req, res) => {
+        const next = (c: Context) => c.next('hello')
+        const greet = (_, message: string) => message
+        const dispatch = composer(true, next, greet)
+        const context = createContext({
+            req
+            , res
+        })
+
+        dispatch(context)
+    })
+
+    const res = await fetch(url)
+    const r = await res.text()
+
+    t.is(res.status, 200)
+    t.is(r, 'hello')
+})
+
+test('main composer multi handlers async, pass parameters whit next, next<string>, direct<Promise<string:200>>', async (t) => {
+    const delay = (time: number, msg: string) => new Promise((r) => setTimeout(r, time, msg))
+    const url = await server((req, res) => {
+        const next = async (c: Context) => {
+            const msg = await delay(2000, 'hello')
+            c.next(msg)
+        }
+        const greet = (_, message: string) => {
+            t.is(message, 'hello')
+            return message
+        }
+        const dispatch = composer(true, next, greet)
+        const context = createContext({
+            req
+            , res
+        })
+
+        dispatch(context)
+    })
+
+    const res = await fetch(url)
+    const r = await res.text()
+
+    t.is(res.status, 200)
+    t.is(r, 'hello')
+})
+
 test('main composer end the response if higher-order handlers are executed and none of them have call end, next<empty> next<empty>', async (t) => {
     const url = await server((req, res) => {
         const dispatch = composer(true, (c: Context) => c.next(), (c: Context) => c.next())
