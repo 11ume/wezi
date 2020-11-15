@@ -75,7 +75,7 @@ const w = wezi(hello)
 listen(w(), 3000)
 ```
 
-**Note**: By default a direct return, emit a status code 200.
+**Note**: By default a direct return, emit a status code 200 or 204 if you return a **null** value, and only support objects that can be interpreted by **JSON.stringify**, to send other data types you must use special methods of the **send** package.
 
 <br>
 
@@ -130,7 +130,7 @@ listen(w(), 3000)
 
 <br>
 
-> Each handler must do two things in his execution, return a value and end the request, or pass to next handler, using the **next** function. Also through the **next** function you can pass some value to the next handler.
+> Each handler must do two things in his execution, return a value and end the request, or pass to next handler using the **next** function. Also through the **next** function you can pass some value to the next handler.
 
 <br>
 
@@ -145,8 +145,7 @@ const w = wezi(passName, greet)
 listen(w(), 3000)
 ```
 
-*If you wonder what is the sense of passing values through the **next** function, well it is a very clear and pure way of handling the flow of data from one handler to the other*.
-
+*Passing values through the **next** function, is a very clear and intuitive way for handling the flow of data from one handler to other*.
 
 <br>
 
@@ -154,9 +153,11 @@ listen(w(), 3000)
 
 <br>
 
-> By default each handler runs within a controlled context, and wezi has a default error handler.
+> By default each handler run inside a controlled context, and are controlled by a default error handler, but you can define your own.
 
 <br>
+
+> Automatic error handling 
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -171,7 +172,7 @@ listen(w(), 3000)
 
 <br>
 
-> Automatic errors handling in promises 
+> Automatic error handling in promises 
 
 ```ts
 import wezi, { listen } from 'wezi'
