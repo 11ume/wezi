@@ -138,10 +138,10 @@ listen(w(), 3000)
 import wezi, { listen } from 'wezi'
 import { Context } from 'wezi-types'
 
-const check = (c: Context) => c.next('John')
+const passName = (c: Context) => c.next('John')
 const greet = (_, name: string) => `Hi ${name}!`
 
-const w = wezi(check, greet)
+const w = wezi(passName, greet)
 listen(w(), 3000)
 ```
 
