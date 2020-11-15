@@ -124,11 +124,13 @@ listen(w(), 3000)
 **Note**: By default the wezi does not discriminate between HTTP methods, to achieve this you must use the router package.
 
 
+<br>
+
 #### The flow of handlers 
 
 <br>
 
-> Each handler  can do two things, return a value and end the request or pass some value to the next handler, using the **next** function.
+> Each handler  can do two things, return a value and end the request, or pass some value to the next handler, using the **next** function.
 
 <br>
 
