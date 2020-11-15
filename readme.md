@@ -70,7 +70,20 @@ npm install wezi
 ```ts
 import wezi, { listen } from 'wezi'
 
-const hello = () => 'Hi, i'm a small polar bear!'
+const hello = () => 'Hi, im a small polar bear!'
+const w = wezi(hello)
+listen(w(), 3000)
+```
+
+```ts
+import wezi, { listen } from 'wezi'
+
+const delay = (time: number) => new Promise((r) => setTimeout(r, time))
+const hello = async () => {
+    await delay(2000)
+    return 'Hi, im a small polar bear!'
+}
+
 const w = wezi(hello)
 listen(w(), 3000)
 ```
@@ -108,16 +121,17 @@ import wezi, { listen } from 'wezi'
 import { Context } from 'wezi-types'
 import { json } from 'wezi-receive'
 
-type Bear = {
-    type: string
+type Human = {
+    name: string
+    surname: string
 }
 
-const getBearType = async (c: Context) => {
-    const bear = await json<Bear>(c)
-    return bear.type
+const greet = async (c: Context) => {
+    const human = await json<Human>(c)
+    return `Hi ${human.name} ${human.surname}`
 }
 
-const w = wezi(getBearType)
+const w = wezi(greet)
 listen(w(), 3000)
 ```
 
