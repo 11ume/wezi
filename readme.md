@@ -97,6 +97,8 @@ listen(w(), 3000)
 
 #### Recibe
 
+<br>
+
 > The payload of each messages is parsed by his type, this makes wezi really fast, since the type is not inferred in each request that is made.
 
 <br>
@@ -119,5 +121,5 @@ const w = wezi(getBearType)
 listen(w(), 3000)
 ```
 
-**Note**: By default the wezi does not handle HTTP methods, to achieve this you must use the router package.
+**Note**: By default the wezi does not discriminate between HTTP methods, to achieve this you must use the router package.
 
