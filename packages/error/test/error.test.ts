@@ -1,5 +1,5 @@
 import test from 'ava'
-import createError, { error } from '..'
+import createError from '..'
 
 test('create http status simple error', (t) => {
     const err = createError(200)
@@ -22,7 +22,3 @@ test('create http error from error', (t) => {
     t.is(err.originalError.message, 'Im a error')
 })
 
-test('create simple error', (t) => {
-    const err = error(new Error('Im a error'))
-    t.is(err.originalError.message, 'Im a error')
-})

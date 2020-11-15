@@ -2,20 +2,22 @@ import test from 'ava'
 import fetch from 'node-fetch'
 import createError from '../packages/error'
 import * as receive from '../packages/receive'
-import router, { ContextRoute
+import router, {
+    ContextRoute
     , ContextRouteWild
     , withNamespace
     , get
     , head
     , post
     , put
-    , del } from '../packages/router'
+    , del
+} from '../packages/router'
 import { server } from './helpers'
 
 test('test base path', async t => {
     const hello = () => 'hello'
     const url = await server(router(get('/', hello)))
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const body = await res.text()
 
     t.is(body, 'hello')
@@ -25,7 +27,7 @@ test('test not found', async t => {
     const foo = () => 'foo'
     const bar = () => 'bar'
     const url = await server(router(get('/foo', foo), get('/bar', bar)))
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const body = await res.json()
 
     t.deepEqual(body, {
@@ -37,7 +39,7 @@ test('test not found', async t => {
 test('test pattern match /(.*)', async t => {
     const hello = () => 'hello'
     const url = await server(router(get('*', hello)))
-    const res = await fetch(`${url}/`)
+    const res = await fetch(url)
     const resTwo = await fetch(url)
     const body = await res.text()
     const bodyTwo = await resTwo.text()
