@@ -123,3 +123,25 @@ listen(w(), 3000)
 
 **Note**: By default the wezi does not discriminate between HTTP methods, to achieve this you must use the router package.
 
+
+#### The flow of handlers 
+
+<br>
+
+> Each handler  can do two things, return a value and end the request or pass some value to the next handler, using the **next** function.
+
+<br>
+
+```ts
+import wezi, { listen } from 'wezi'
+import { Context } from 'wezi-types'
+
+const check = (c: Context) => c.next('John')
+const greet = (_, name: string) => `Hi ${name}!`
+
+const w = wezi(check, greet)
+listen(w(), 3000)
+```
+
+*If you wonder what is the sense of passing values through the **next** function, well it is a very clear and pure way of handling the flow of data from one handler to the other*.
+
