@@ -147,3 +147,37 @@ listen(w(), 3000)
 
 *If you wonder what is the sense of passing values through the **next** function, well it is a very clear and pure way of handling the flow of data from one handler to the other*.
 
+
+<br>
+
+#### Error handling
+
+<br>
+
+> By default each handler runs within a controlled context, and wezi has a default error handler.
+
+<br>
+
+```ts
+import wezi, { listen } from 'wezi'
+
+const error = () => {
+    throw Error('Something wrong has happened')
+}
+
+const w = wezi(error)
+listen(w(), 3000)
+```
+
+<br>
+
+```ts
+import wezi, { listen } from 'wezi'
+
+const error = () => Promise.reject(new Error('Something wrong has happened'))
+const w = wezi(error)
+listen(w(), 3000)
+```
+<br>
+
+**Return** status code **500** { message: 'Something wrong has happened' }
