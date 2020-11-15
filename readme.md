@@ -200,3 +200,29 @@ listen(w(), 3000)
 
 
 **Return** status code **500** { message: 'Something wrong has happened' }
+
+<br>
+
+> Define a custom error handler.
+
+
+```ts
+import wezi, { listen } from 'wezi'
+import { Context } from 'wezi-types'
+import { send } from 'wezi-send'
+
+const error = () => {
+    throw Error('Something wrong has happened')
+}
+
+const errorHandler = (c: Context) => {
+    const status = c.error.statusCode || 500
+    console.log(status, c.error.message)
+    send(c, 200, {
+        message: c.error.message
+    })
+}
+
+const w = wezi(error)
+listen(w(errorHandler), 3000)
+```
