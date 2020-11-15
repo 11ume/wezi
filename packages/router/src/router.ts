@@ -102,8 +102,12 @@ const createRouteEntity = (method: string) => (path: string, ...handlers: Handle
     }
 }
 
-export const createRouter = (...entities: RouteEntity[] | RouteEntity[][]) => prepareRoutes(entities.flat())
-export const withNamespace = (namespace: string) => (...entities: RouteEntity[]) => prepareRoutesWhitNamespace(entities, namespace)
+export const createRouter = (...entities: RouteEntity[] | RouteEntity[][]) => {
+    const flat = [].concat(...entities)
+    return prepareRoutes(flat)
+}
+
+export const route = (namespace: string) => (...entities: RouteEntity[]) => prepareRoutesWhitNamespace(entities, namespace)
 
 export const post = createRouteEntity('POST')
 export const get = createRouteEntity('GET')
