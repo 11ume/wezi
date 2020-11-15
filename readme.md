@@ -75,6 +75,9 @@ const w = wezi(hello)
 listen(w(), 3000)
 ```
 
+> Direct return of promises  
+
+
 ```ts
 import wezi, { listen } from 'wezi'
 
