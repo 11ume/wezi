@@ -61,7 +61,7 @@ npm install wezi
 
 <br>
 
-> Exists two ways to send messages
+> Exists two ways to send messages.
 
 *The most simple and natural way, is a direct return*.
 
@@ -75,11 +75,11 @@ const w = wezi(hello)
 listen(w(), 3000)
 ```
 
-**Note**: By default a direct return emit a status code 200.
+**Note**: By default a direct return, emit a status code 200.
 
 <br>
 
-*The second way is through the send function, this allows you to define a status code*.
+*The second way is through the **send** function, which allows you to define a status code*.
 
 <br>
 
@@ -99,7 +99,7 @@ listen(w(), 3000)
 
 <br>
 
-> The payload of each messages is parsed by his type, this makes wezi really fast, since the type is not inferred in each request that is made.
+> The payload of each messages is parsed in explicit form, this makes wezi really fast, since the type is not inferred in each request that is made.
 
 <br>
 
