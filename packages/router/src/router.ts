@@ -1,7 +1,6 @@
 import { ParsedUrlQuery } from 'querystring'
 import { Context, Handler } from 'wezi-types'
 import composer from 'wezi-composer'
-import createError from 'wezi-error'
 import { getUrlQuery, getUrlParams } from './extractors'
 import regexparam from './regexparam'
 
@@ -68,11 +67,12 @@ const findRouteMatch = (stack: RouteEntity[]) => (context: ContextRoute) => {
     }
 
     // no route has matched
-    context.next(createError(404))
+    context.next()
 }
 
 const creteRouteEntity = (entity: RouteEntity, namespace: string) => {
-    const route = entity.route ?? regexparam(`${namespace}${entity.path}`)
+    const namespaceMerge = `${namespace}${entity.namespace}`
+    const route = entity.route ?? regexparam(`${namespaceMerge}${entity.path}`)
     return {
         ...entity
         , route
@@ -89,7 +89,8 @@ const prepareRoutes = (entities: RouteEntity[]) => {
 }
 
 const prepareRoutesWhitNamespace = (entities: RouteEntity[], namespace?: string) => {
-    return prepareRouteStack(entities, namespace)
+    const stack = prepareRouteStack(entities, namespace)
+    return findRouteMatch(stack)
 }
 
 const createRouteEntity = (method: string) => (path: string, ...handlers: Handler[]): RouteEntity => {
@@ -102,8 +103,22 @@ const createRouteEntity = (method: string) => (path: string, ...handlers: Handle
     }
 }
 
-export const createRouter = (...entities: RouteEntity[] | RouteEntity[][]) => prepareRoutes(entities.flat())
-export const withNamespace = (namespace: string) => (...entities: RouteEntity[]) => prepareRoutesWhitNamespace(entities, namespace)
+export const createRouter = (namespace?: string) => (...entities: RouteEntity[] | RouteEntity[][]) => {
+    const flat = [].concat(...entities)
+    if (namespace) return prepareRoutesWhitNamespace(flat, namespace)
+    return prepareRoutes(flat)
+}
+
+export const routes = (namespace?: string) => (...entities: RouteEntity[]) => {
+    if (namespace) {
+        return entities.map((entity) => {
+            entity.namespace = namespace
+            return entity
+        })
+    }
+
+    return entities
+}
 
 export const post = createRouteEntity('POST')
 export const get = createRouteEntity('GET')
