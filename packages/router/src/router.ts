@@ -71,7 +71,8 @@ const findRouteMatch = (stack: RouteEntity[]) => (context: ContextRoute) => {
 }
 
 const creteRouteEntity = (entity: RouteEntity, namespace: string) => {
-    const route = entity.route ?? regexparam(`${namespace}${entity.path}`)
+    const namespaceMerge = `${namespace}${entity.namespace}`
+    const route = entity.route ?? regexparam(`${namespaceMerge}${entity.path}`)
     return {
         ...entity
         , route
@@ -102,13 +103,22 @@ const createRouteEntity = (method: string) => (path: string, ...handlers: Handle
     }
 }
 
-export const createRouter = (...entities: RouteEntity[] | RouteEntity[][]) => (namespace?: string) => {
+export const createRouter = (namespace?: string) => (...entities: RouteEntity[] | RouteEntity[][]) => {
     const flat = [].concat(...entities)
     if (namespace) return prepareRoutesWhitNamespace(flat, namespace)
     return prepareRoutes(flat)
 }
 
-export const routes = (...entities: RouteEntity[]) => entities
+export const routes = (namespace?: string) => (...entities: RouteEntity[]) => {
+    if (namespace) {
+        return entities.map((entity) => {
+            entity.namespace = namespace
+            return entity
+        })
+    }
+
+    return entities
+}
 
 export const post = createRouteEntity('POST')
 export const get = createRouteEntity('GET')
