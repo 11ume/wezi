@@ -317,5 +317,5 @@ test('main composer end the response if higher-order handlers are executed and n
     })
 
     const res = await fetch(url)
-    t.truthy(res.ok)
+    t.is(res.status, 404)
 })
