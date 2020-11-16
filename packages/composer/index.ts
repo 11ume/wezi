@@ -4,7 +4,10 @@ import { send } from 'wezi-send'
 type Dispatch = (context: Context, payload: unknown) => void
 
 // end response if all higher-order handlers are executed, and none of them have ended the response
-const end = (main: boolean, context: Context) => main && context.res.end()
+const end = (context: Context) => {
+    context.res.statusCode = 404
+    context.res.end()
+}
 
 const createContext = <T>(context: Context, newContext: T) => Object.assign(context, newContext)
 
@@ -51,7 +54,7 @@ const composer = (main: boolean, ...handlers: Handler[]) => {
             return
         }
 
-        end(main, context)
+        main && end(context)
     }
 }
 
