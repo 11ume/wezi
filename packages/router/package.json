@@ -1,6 +1,6 @@
 {
   "name": "wezi-router",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description": "",
   "main": "dist/index.js",
   "types": "index.ts",
@@ -16,7 +16,7 @@
     "prepublishOnly": "yarn run build"
   },
   "dependencies": {
-    "wezi-composer": "^1.0.0-alpha.4",
+    "wezi-composer": "^1.0.0-alpha.5",
     "wezi-error": "^1.0.0-alpha.4",
     "wezi-types": "^1.0.0-alpha.4"
   },
