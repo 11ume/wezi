@@ -1,3 +1,3 @@
-import run from './src/core'
-export * from './src/core'
+import run from './src'
+export * from './src'
 export default run
