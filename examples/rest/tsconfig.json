@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "target": "ES2019",
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "incremental": true,
+        "esModuleInterop": true,
+        "noImplicitAny": false,
+        "preserveConstEnums": true,
+        "strictFunctionTypes": true,
+        "noImplicitReturns": true,
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "noEmitOnError": true,
+        "skipLibCheck": true,
+        "removeComments": true,
+        "outDir": "build",
+        "baseUrl": "src",
+        "paths": {
+            "api/*": [
+                "api/*"
+            ]
+        }
+    },
+    "exclude": [
+        "test",
+        "node_modules"
+    ]
+}
