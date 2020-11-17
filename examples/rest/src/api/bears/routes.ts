@@ -12,12 +12,13 @@ import {
     , update
     , remove
 } from 'api/bears/handlers'
+import { validate, validateId } from 'api/bears/validations'
 
 const r = routes()
 export default r(
     get('/bears', getAll)
-    , get('/bears/:id', getById)
-    , post('/bears', create)
-    , put('/bears', update)
-    , del('/bears/:id', remove)
+    , get('/bears/:id', validateId, getById)
+    , post('/bears', validate, create)
+    , put('/bears', validate, update)
+    , del('/bears/:id', validateId, remove)
 )

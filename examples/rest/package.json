@@ -10,6 +10,7 @@
   },
   "author": "Horacio Rivero",
   "dependencies": {
+    "joi": "^17.3.0",
     "wezi": "^1.0.0-alpha.6",
     "wezi-receive": "^1.0.0-alpha.6",
     "wezi-router": "^1.0.0-alpha.6",
