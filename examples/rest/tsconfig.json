@@ -15,7 +15,13 @@
         "noEmitOnError": true,
         "skipLibCheck": true,
         "removeComments": true,
-        "outDir": "build"
+        "outDir": "build",
+        "baseUrl": "src",
+        "paths": {
+            "api/*": [
+                "api/*"
+            ]
+        }
     },
     "exclude": [
         "test",

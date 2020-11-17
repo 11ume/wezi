@@ -11,7 +11,7 @@ import {
     , create
     , update
     , remove
-} from './handlers'
+} from 'api/bears/handlers'
 
 const r = routes()
 export default r(
