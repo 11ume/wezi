@@ -75,7 +75,7 @@ const w = wezi(hello)
 listen(w(), 3000)
 ```
 
-> Direct return of promises  
+> Direct return of promises.  
 
 
 ```ts
@@ -179,11 +179,11 @@ listen(w(), 3000)
 ```ts
 import wezi, { listen } from 'wezi'
 
-const error = () => {
+const handler = () => {
     throw Error('Something wrong has happened')
 }
 
-const w = wezi(error)
+const w = wezi(handler)
 listen(w(), 3000)
 ```
 
@@ -194,8 +194,8 @@ listen(w(), 3000)
 ```ts
 import wezi, { listen } from 'wezi'
 
-const error = () => Promise.reject(new Error('Something wrong has happened'))
-const w = wezi(error)
+const handler = () => Promise.reject(new Error('Something wrong has happened'))
+const w = wezi(handler)
 listen(w(), 3000)
 ```
 
