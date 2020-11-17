@@ -25,6 +25,10 @@
     
 <br>
 
+> ⚠️ Wezi is currently under development and experimentation.
+
+<br>
+
 > Features
 
 <br>
