@@ -37,7 +37,7 @@ const createNext = (context: Context, dispatch: Dispatch) => {
         }
 
         if (typeof payload === 'object') {
-            data = Object.assign(payload)
+            data = Object.assign({}, payload)
         }
 
         if (data instanceof Error) {
