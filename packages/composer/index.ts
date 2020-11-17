@@ -1,7 +1,8 @@
 import { Context, Handler } from 'wezi-types'
 import { send } from 'wezi-send'
+import { isObject, isError } from './src/utils'
 
-type Dispatch = (context: Context, payload: unknown) => void
+type Dispatch = (context: Context, payload: any) => void
 
 // end response if all higher-order handlers are executed, and none of them have ended the response
 const end = (context: Context) => {
@@ -11,7 +12,7 @@ const end = (context: Context) => {
 
 const createContext = <T>(context: Context, newContext: T) => Object.assign(context, newContext)
 
-const execute = async (context: Context, handler: Handler, payload: unknown) => {
+const execute = async (context: Context, handler: Handler, payload: any) => {
     try {
         const val = await handler(context, payload)
         if (val === null) {
@@ -29,28 +30,31 @@ const execute = async (context: Context, handler: Handler, payload: unknown) => 
 }
 
 const createNext = (context: Context, dispatch: Dispatch) => {
-    return function next(payload?: unknown): void {
-        const newContext = createContext(context, {})
-        dispatch(newContext, payload)
+    return function next(payload?: any): void {
+        let data = payload
+        if (isObject(payload)) {
+            data = Object.assign(payload)
+        }
+        dispatch(context, data)
     }
 }
 
 const composer = (main: boolean, ...handlers: Handler[]) => {
     let i = 0
-    return function dispatch(context: Context, payload?: unknown): void {
+    return function dispatch(context: Context, payload?: any): void {
         if (context.res.writableEnded) return
-        if (payload && payload instanceof Error) {
+        if (isError(payload)) {
             context.errorHandler(context, payload)
             return
         }
         if (i < handlers.length) {
             const handler = handlers[i++]
             const next = createNext(context, dispatch)
-            const newContext = createContext(context, {
+            const contextCopy = createContext(context, {
                 next
             })
 
-            setImmediate(execute, newContext, handler, payload)
+            setImmediate(execute, contextCopy, handler, payload)
             return
         }
 

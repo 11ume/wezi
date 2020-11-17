@@ -152,7 +152,6 @@ test('send buffer', async (t) => {
 })
 
 test('try send not buffer', async (t) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const fn = (c: Context) => buffer(c, 200, '' as any)
     const url = await server(fn)
     const res = await fetch(url)
@@ -163,7 +162,6 @@ test('try send not buffer', async (t) => {
 })
 
 test('try send not stream', async (t) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const fn = (c: Context) => stream(c, 200, '' as any)
     const url = await server(fn)
     const res = await fetch(url)
