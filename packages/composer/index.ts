@@ -1,6 +1,5 @@
 import { Context, Handler } from 'wezi-types'
 import { send } from 'wezi-send'
-import { isObject, isError } from './src/utils'
 
 type Dispatch = (context: Context, payload: any) => void
 
@@ -32,9 +31,20 @@ const execute = async (context: Context, handler: Handler, payload: any) => {
 const createNext = (context: Context, dispatch: Dispatch) => {
     return function next(payload?: any): void {
         let data = payload
-        if (isObject(payload)) {
+        if (data === undefined || data === null) {
+            dispatch(context, data)
+            return
+        }
+
+        if (typeof payload === 'object') {
             data = Object.assign(payload)
         }
+
+        if (data instanceof Error) {
+            context.errorHandler(context, data)
+            return
+        }
+
         dispatch(context, data)
     }
 }
@@ -43,10 +53,6 @@ const composer = (main: boolean, ...handlers: Handler[]) => {
     let i = 0
     return function dispatch(context: Context, payload?: any): void {
         if (context.res.writableEnded) return
-        if (isError(payload)) {
-            context.errorHandler(context, payload)
-            return
-        }
         if (i < handlers.length) {
             const handler = handlers[i++]
             const next = createNext(context, dispatch)
