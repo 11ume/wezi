@@ -14,6 +14,7 @@ export const validateId = (c: ContextRoute<Pick<Bear, 'id'>>) => {
     const valid = bearSchemaId.validate(c.params.id)
     if (valid.error) {
         c.next(valid.error)
+        return
     }
 
     c.next()
