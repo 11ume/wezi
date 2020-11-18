@@ -13,7 +13,7 @@ const bearSchema = Joi.object({
 export const validateId = (c: ContextRoute<Pick<Bear, 'id'>>) => {
     const valid = bearSchemaId.validate(c.params.id)
     if (valid.error) {
-        c.next(valid.error)
+        c.panic(valid.error)
         return
     }
 
@@ -24,7 +24,7 @@ export const validate = async (c: ContextRoute<Bear>) => {
     const bear = await json<Bear>(c)
     const valid = bearSchema.validate(bear)
     if (valid.error) {
-        c.next(valid.error)
+        c.panic(valid.error)
         return
     }
 
