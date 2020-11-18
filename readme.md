@@ -218,11 +218,15 @@ listen(w(), 3000)
 
 <br>
 
-**Note**: All the errors that are emitted in production mode, return a default error message like this:
+**Note**: All the errors that are emitted in production mode whitout status code or error message, return a default error message like this:
 
-type: application/json 
-body: "{ "message": "your message" }" 
-status code: 500
+```bash
+curl http://localhost:3000 -v
+
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json charset=utf-8
+{"message":"Internal Server Error"}
+```
 
 <br>
 
@@ -250,7 +254,6 @@ const errorHandler = (c: Context, error: Partial<HttpError>) => {
 const w = wezi(greet)
 listen(w(errorHandler), 3000)
 ```
-
 
 ```bash
 curl http://localhost:3000 -v
