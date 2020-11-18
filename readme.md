@@ -166,6 +166,38 @@ const w = wezi(passName, greet)
 listen(w(), 3000)
 ```
 
+> Is a good practice pass to next handlers, tuples instead of types primitives or  plain objects writables.
+
+(https://refactoring.guru/es/smells/primitive-obsession)[Avoid primitive bsession]
+
+<br>
+
+```ts
+import wezi, { listen } from 'wezi'
+import { Context } from 'wezi-types'
+
+type Character = Readonly<{
+    name: string
+    surname: string
+}>
+
+const createCharacter = (c: Context) => {
+    const character: Character = {
+        name: 'John'
+        , surname: 'Connor'
+    }
+    c.next(character)
+}
+
+const greet = (_, character: Character) => {
+    character.name = 't900' // Cannot assign to 'name' because it is a read-only property
+    return `Hi ${character.name} ${character.surname}!`
+}
+
+const w = wezi(createCharacter, greet)
+listen(w(), 3000)
+```
+
 *Passing values through the **next** function, is a very clear and intuitive way for handling the flow of data from one handler to other*.
 
 <br>
