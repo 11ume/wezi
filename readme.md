@@ -231,10 +231,10 @@ status code: 500
 ```ts
 import wezi, { listen } from 'wezi'
 import { Context } from 'wezi-types'
+import createError, { HttpError } from 'wezi-error'
 import { send } from 'wezi-send'
-import { HttpError } from 'wezi-error'
 
-const greet = (c: Context) => c.panic(Error('Something wrong has happened'))
+const greet = (c: Context) => c.panic(createError(400))
 const errorHandler = (c: Context, error: Partial<HttpError>) => {
     const status = error.statusCode || 500
     const message = error.message || 'unknown'
@@ -249,5 +249,13 @@ const errorHandler = (c: Context, error: Partial<HttpError>) => {
 
 const w = wezi(greet)
 listen(w(errorHandler), 3000)
+```
 
+
+```bash
+curl http://localhost:3000 -v
+
+HTTP/1.1 400 Bad Request
+Content-Type: application/json charset=utf-8
+{"message":"Bad Request"}
 ```
