@@ -14,11 +14,13 @@ const createContext = ({
     req
     , res
     , next = null
+    , shared = {}
     , errorHandler = null
 }): Context => ({
     req
     , res
     , next
+    , shared
     , errorHandler
 })
 
