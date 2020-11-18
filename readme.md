@@ -299,10 +299,6 @@ const greet = (c: Context) => c.panic(createError(400))
 const errorHandler = (c: Context, error: InternalError) => {
     const status = error.statusCode || 500
     const message = error.message || 'unknown'
-    if (process.env.NOVE_ENV === 'production') {
-        send(c, status)
-        return
-    }
     send(c, status, {
         message
     })
