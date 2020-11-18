@@ -162,7 +162,7 @@ listen(w(), 3000)
 
 <br>
 
-#### The flow of handlers 
+#### The data flow between handlers 
 
 <br>
 
@@ -182,17 +182,30 @@ const w = wezi(passName, greet)
 listen(w(), 3000)
 ```
 
+<br>
+
 ```ts
 import wezi, { listen } from 'wezi'
 import { Context } from 'wezi-types'
 import { json } from 'wezi-receive'
+import createError from 'wezi-error'
 
-const passName = (c: Context) => {
-const bear = c.next('John')
+type Bear = {
+    type: string
+    location: string
 }
-const greet = (_, name: string) => `Hi ${name}!`
 
-const w = wezi(passName, greet)
+const check = async (c: Context) => {
+    const bear = await json<Bear>(c)
+    if (bear.type && bear.location) {
+        c.next(bear)
+        return
+    }
+    c.panic(createError(400, 'Type and location are required'))
+}
+
+const locate = async (_, { type, location }: Bear) => `The ${type} bear lives in ${location}`
+const w = wezi(check, locate)
 listen(w(), 3000)
 ```
 
