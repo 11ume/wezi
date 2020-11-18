@@ -15,7 +15,7 @@ export const buffer = (context: Context, statusCode: number, payload: Buffer) =>
         return
     }
 
-    context.next(createError(500, 'buffer payload must be a instance of Buffer'))
+    context.panic(createError(500, 'buffer payload must be a instance of Buffer'))
 }
 
 export const stream = (context: Context, statusCode: number, payload: Readable) => {
@@ -29,7 +29,7 @@ export const stream = (context: Context, statusCode: number, payload: Readable) 
         return
     }
 
-    context.next(createError(500, 'stream payload must be a instance of Stream'))
+    context.panic(createError(500, 'stream payload must be a instance of Stream'))
 }
 
 export const json = <T = void>(context: Context, payload: T, statusCode?: number) => {

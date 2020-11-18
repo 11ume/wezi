@@ -1,7 +1,9 @@
 import { Context, Handler } from 'wezi-types'
 import { send } from 'wezi-send'
+// import isPlainObject from 'is-plain-obj'
+import createError from 'wezi-error'
 
-type Dispatch = (context: Context, payload: any) => void
+type Dispatch = (context: Context, payload?: unknown) => void
 
 // end response if all higher-order handlers are executed, and none of them have ended the response
 const end = (context: Context) => {
@@ -9,9 +11,9 @@ const end = (context: Context) => {
     context.res.end()
 }
 
-const createContext = <T>(context: Context, newContext: T) => Object.assign(context, newContext)
+const createContext = <T>(context: Context, obj: T) => Object.assign(context, obj)
 
-const execute = async (context: Context, handler: Handler, payload: any) => {
+const execute = async (context: Context, handler: Handler, payload: unknown) => {
     try {
         const val = await handler(context, payload)
         if (val === null) {
@@ -24,19 +26,14 @@ const execute = async (context: Context, handler: Handler, payload: any) => {
             return
         }
     } catch (err) {
-        context.next(err)
+        context.panic(err)
     }
 }
 
 const createNext = (context: Context, dispatch: Dispatch) => {
-    return function next(payload?: any): void {
-        if (payload === undefined || payload === null) {
-            dispatch(context, payload)
-            return
-        }
-
-        if (payload instanceof Error) {
-            context.errorHandler(context, payload)
+    return function next(payload?: unknown): void {
+        if (payload === undefined) {
+            dispatch(context)
             return
         }
 
@@ -44,18 +41,31 @@ const createNext = (context: Context, dispatch: Dispatch) => {
     }
 }
 
+const createPanic = (context: Context) => {
+    return function panic(error?: Error): void {
+        if (error instanceof Error) {
+            context.errorHandler(context, error)
+            return
+        }
+
+        context.errorHandler(context, createError(500, 'panic payload must be instance of Error'))
+    }
+}
+
 const composer = (main: boolean, ...handlers: Handler[]) => {
     let i = 0
-    return function dispatch(context: Context, payload?: any): void {
+    return function dispatch(context: Context, payload?: unknown): void {
         if (context.res.writableEnded) return
         if (i < handlers.length) {
             const handler = handlers[i++]
             const next = createNext(context, dispatch)
-            const contextCopy = createContext(context, {
+            const panic = createPanic(context)
+            const newContext = createContext(context, {
                 next
+                , panic
             })
 
-            setImmediate(execute, contextCopy, handler, payload)
+            setImmediate(execute, newContext, handler, payload)
             return
         }
 

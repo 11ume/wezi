@@ -14,13 +14,13 @@ const createContext = ({
     req
     , res
     , next = null
-    , shared = {}
+    , panic = null
     , errorHandler = null
 }): Context => ({
     req
     , res
     , next
-    , shared
+    , panic
     , errorHandler
 })
 
@@ -184,7 +184,7 @@ test('main composer multi handler async, direct promise return in second handler
 
 test('main composer multi handler async, direct promise error return in first handler, next<Error:400>', async (t) => {
     const url = await server((req, res) => {
-        const check = (c: Context) => c.next(createError(400))
+        const check = (c: Context) => c.panic(createError(400))
         const never = () => Promise.resolve('hello')
         const errorHandler = (context: Context, error: Partial<HttpError>) => {
             context.res.statusCode = error.statusCode || 500
@@ -320,4 +320,29 @@ test('main composer end the response if higher-order handlers are executed and n
 
     const res = await fetch(url)
     t.is(res.status, 404)
+})
+
+test('main composer call panic whiout pass an error, panic<not error type>', async (t) => {
+    const url = await server((req, res) => {
+        const dispatch = composer(true, (c: Context) => c.panic({
+            foo: 'foo'
+        } as any))
+        const errorHandler = (context: Context, error: Partial<HttpError>) => {
+            context.res.statusCode = error.statusCode || 500
+            context.res.end(error.message)
+        }
+        const context = createContext({
+            req
+            , res
+            , errorHandler
+        })
+
+        dispatch(context)
+    })
+
+    const res = await fetch(url)
+    const body: string = await res.text()
+
+    t.is(body, 'panic payload must be instance of Error')
+    t.is(res.status, 500)
 })
