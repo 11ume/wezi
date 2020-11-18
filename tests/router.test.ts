@@ -28,7 +28,7 @@ test('not found', async (t) => {
     const foo = () => 'foo'
     const bar = () => 'bar'
     const r = router()
-    const notFound = (c: ContextRoute) => c.next(createError(404))
+    const notFound = (c: ContextRoute) => c.panic(createError(404))
     const url = await server(r(get('/foo', foo), get('/bar', bar)), notFound)
     const res = await fetch(url)
     const body: { message: string } = await res.json()

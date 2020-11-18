@@ -8,9 +8,9 @@ type ErrorPayload = {
     message: string
 };
 
-test.before('pass to next http error in production', async (t) => {
+test.before('pass to panic http error in production', async (t) => {
     process.env.NODE_ENV = 'production'
-    const url = await server((c: Context) => c.next(createError(420)))
+    const url = await server((c: Context) => c.panic(createError(420)))
     const res = await fetch(url)
     const body: string = await res.text()
 
@@ -19,8 +19,8 @@ test.before('pass to next http error in production', async (t) => {
     t.is(body, '')
 })
 
-test('pass to next empty error', async (t) => {
-    const url = await server((c: Context) => c.next(new Error()))
+test('pass to panic empty error', async (t) => {
+    const url = await server((c: Context) => c.panic(new Error()))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -28,8 +28,8 @@ test('pass to next empty error', async (t) => {
     t.is(body.message, 'unknown')
 })
 
-test('pass to next random error whit message', async (t) => {
-    const url = await server((c: Context) => c.next(new Error('opps')))
+test('pass to panic random error whit message', async (t) => {
+    const url = await server((c: Context) => c.panic(new Error('opps')))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -38,7 +38,7 @@ test('pass to next random error whit message', async (t) => {
 })
 
 test('create and pass to next http error', async (t) => {
-    const url = await server((c: Context) => c.next(createError(420)))
+    const url = await server((c: Context) => c.panic(createError(420)))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -46,8 +46,8 @@ test('create and pass to next http error', async (t) => {
     t.is(body.message, 'Enhance Your Calm')
 })
 
-test('create and pass to next http error whit custom status code and message', async (t) => {
-    const url = await server((c: Context) => c.next(createError(418, 'Im a teapot')))
+test('create and pass to panic http error whit custom status code and message', async (t) => {
+    const url = await server((c: Context) => c.panic(createError(418, 'Im a teapot')))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -55,8 +55,8 @@ test('create and pass to next http error whit custom status code and message', a
     t.is(body.message, 'Im a teapot')
 })
 
-test('create and pass to next http error multiple handlers', async (t) => {
-    const url = await server((c: Context) => c.next(), (c: Context) => c.next(createError(420)), () => 'not')
+test('create and pass http error to panic, whit multiple handlers combine next and panic', async (t) => {
+    const url = await server((c: Context) => c.next(), (c: Context) => c.panic(createError(420)), () => 'not')
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
