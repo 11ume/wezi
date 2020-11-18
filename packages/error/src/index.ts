@@ -1,10 +1,9 @@
 import codes from './codes'
-
-export class HttpError extends Error {
+export class InteralError extends Error {
     constructor(
-        public message: string
-        , public statusCode: number
-        , public originalError?: Error) {
+        public readonly message: string
+        , public readonly statusCode?: number
+        , public readonly originalError?: Error) {
         super(message)
     }
 }
@@ -12,7 +11,7 @@ export class HttpError extends Error {
 export const createError = (status: number, message?: string, error?: Error) => {
     const msg = message || codes[status]
     if (status > 511 || status < 100) {
-        throw Error(`Invalid status code ${status}`)
+        throw new Error(`Invalid status code ${status}`)
     }
-    return new HttpError(msg, status, error)
+    return new InteralError(msg, status, error)
 }

@@ -188,7 +188,7 @@ listen(w(), 3000)
 import wezi, { listen } from 'wezi'
 import { Context } from 'wezi-types'
 import { json } from 'wezi-receive'
-import createError from 'wezi-error'
+import { createError } from 'wezi-error'
 
 type Bear = {
     type: string
@@ -292,11 +292,11 @@ Content-Type: application/json charset=utf-8
 ```ts
 import wezi, { listen } from 'wezi'
 import { Context } from 'wezi-types'
-import createError, { HttpError } from 'wezi-error'
+import { createError, InternalError } from 'wezi-error'
 import { send } from 'wezi-send'
 
 const greet = (c: Context) => c.panic(createError(400))
-const errorHandler = (c: Context, error: Partial<HttpError>) => {
+const errorHandler = (c: Context, error: InternalError) => {
     const status = error.statusCode || 500
     const message = error.message || 'unknown'
     if (process.env.NOVE_ENV === 'production') {

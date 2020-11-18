@@ -1,17 +1,16 @@
 import { Context, Handler } from 'wezi-types'
+import { createError } from 'wezi-error'
 import { send } from 'wezi-send'
-// import isPlainObject from 'is-plain-obj'
-import createError from 'wezi-error'
 
 type Dispatch = (context: Context, payload?: unknown) => void
+
+const createContext = <T>(context: Context, obj: T) => Object.assign(context, obj)
 
 // end response if all higher-order handlers are executed, and none of them have ended the response
 const end = (context: Context) => {
     context.res.statusCode = 404
     context.res.end()
 }
-
-const createContext = <T>(context: Context, obj: T) => Object.assign(context, obj)
 
 const execute = async (context: Context, handler: Handler, payload: unknown) => {
     try {

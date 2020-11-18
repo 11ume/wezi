@@ -1,6 +1,6 @@
 import test from 'ava'
 import fetch from 'node-fetch'
-import createError from '../packages/error'
+import { createError } from '../packages/error'
 import * as receive from '../packages/receive'
 import router, {
     ContextRoute
