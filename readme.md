@@ -61,15 +61,20 @@ npm install wezi
     <img src="https://github.com/11ume/wezi-assets/blob/main/hi2.png?raw=true" width="200" height="auto"/>
 </div>
 
+
 #### Send
 
 <br>
 
+
 > Exists two ways to send messages.
+
+<br>
 
 *The most simple and natural way, is a direct return*.
 
 <br>
+
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -79,8 +84,11 @@ const w = wezi(hello)
 listen(w(), 3000)
 ```
 
+<br>
+
 > Direct return of promises.  
 
+<br>
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -95,6 +103,8 @@ const w = wezi(hello)
 listen(w(), 3000)
 ```
 
+<br>
+
 **Note**: By default a direct return, emit a status code 200 or 204 if you return a **null** value, and only support objects that can be interpreted by **JSON.stringify**, to send other data types you must use special methods of the **send** package.
 
 <br>
@@ -102,6 +112,7 @@ listen(w(), 3000)
 *The second way is through the **send** function, which allows you to define a status code*.
 
 <br>
+
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -111,11 +122,12 @@ import { send } from 'wezi-send'
 const hello = (c: Context) => send(c, 200, 'Hi, i'm a small polar bear!')
 const w = wezi(hello)
 listen(w(), 3000)
-```
 
+```
 <br>
 
 #### Recibe
+
 
 <br>
 
@@ -123,27 +135,30 @@ listen(w(), 3000)
 
 <br>
 
+
 ```ts
 import wezi, { listen } from 'wezi'
 import { Context } from 'wezi-types'
 import { json } from 'wezi-receive'
 
-type Human = {
-    name: string
-    surname: string
+type Bear = {
+    type: string
+    location: string
 }
 
-const greet = async (c: Context) => {
-    const human = await json<Human>(c)
-    return `Hi ${human.name} ${human.surname}`
+const locate = async (c: Context) => {
+    const { type, location } = await json<Bear>(c)
+    return `The ${type} bear lives in ${location}`
 }
 
-const w = wezi(greet)
+const w = wezi(locate)
 listen(w(), 3000)
+
 ```
 
-**Note**: By default the wezi does not discriminate between HTTP methods, to achieve this you must use the router package.
+<br>
 
+**Note**: By default the wezi does not discriminate between HTTP methods, to achieve this you must use the **router** package.
 
 <br>
 
@@ -154,6 +169,7 @@ listen(w(), 3000)
 > Each handler must do two things in his execution, return a value and end the request, or pass to next handler using the **next** function. Also through the **next** function you can pass some value to the next handler.
 
 <br>
+
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -166,39 +182,26 @@ const w = wezi(passName, greet)
 listen(w(), 3000)
 ```
 
-> Is a good practice pass to next handlers, tuples instead of types primitives or plain objects writables.
-
-<br>
-
 ```ts
 import wezi, { listen } from 'wezi'
 import { Context } from 'wezi-types'
+import { json } from 'wezi-receive'
 
-type Character = Readonly<{
-    name: string
-    surname: string
-}>
-
-const createCharacter = (c: Context) => {
-    const character: Character = {
-        name: 'John'
-        , surname: 'Connor'
-    }
-    c.next(character)
+const passName = (c: Context) => {
+const bear = c.next('John')
 }
+const greet = (_, name: string) => `Hi ${name}!`
 
-const greet = (_, character: Character) => {
-    character.name = 't900' // Cannot assign to 'name' because it is a read-only property
-    return `Hi ${character.name} ${character.surname}!`
-}
-
-const w = wezi(createCharacter, greet)
+const w = wezi(passName, greet)
 listen(w(), 3000)
 ```
+
+<br>
 
 *Passing values through the **next** function, is a very clear and intuitive way for handling the flow of data from one handler to other*.
 
 <br>
+
 
 #### Error handling
 
@@ -209,6 +212,9 @@ listen(w(), 3000)
 <br>
 
 > Automatic error handling 
+
+<br>
+
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -225,6 +231,8 @@ listen(w(), 3000)
 
 > Automatic error handling in promises 
 
+<br>
+
 ```ts
 import wezi, { listen } from 'wezi'
 
@@ -236,6 +244,8 @@ listen(w(), 3000)
 <br>
 
 > Error handling through panic function 
+
+<br>
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -250,6 +260,8 @@ listen(w(), 3000)
 
 **Note**: All the errors that are emitted in production mode whitout status code or error message, return a default error message like this:
 
+<br>
+
 ```bash
 curl http://localhost:3000 -v
 
@@ -261,6 +273,8 @@ Content-Type: application/json charset=utf-8
 <br>
 
 #### Defining your own error handler
+
+<br>
 
 ```ts
 import wezi, { listen } from 'wezi'
