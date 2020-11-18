@@ -30,22 +30,17 @@ const execute = async (context: Context, handler: Handler, payload: any) => {
 
 const createNext = (context: Context, dispatch: Dispatch) => {
     return function next(payload?: any): void {
-        let data = payload
-        if (data === undefined || data === null) {
-            dispatch(context, data)
+        if (payload === undefined || payload === null) {
+            dispatch(context, payload)
             return
         }
 
-        if (typeof payload === 'object') {
-            data = Object.assign({}, payload)
-        }
-
-        if (data instanceof Error) {
-            context.errorHandler(context, data)
+        if (payload instanceof Error) {
+            context.errorHandler(context, payload)
             return
         }
 
-        dispatch(context, data)
+        dispatch(context, payload)
     }
 }
 

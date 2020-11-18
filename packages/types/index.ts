@@ -1,10 +1,11 @@
 import { IncomingMessage, ServerResponse } from 'http'
 
 export type ErrorHandler = (context: Context, error: Error) => void
-export interface Context {
+export interface Context<S = any> {
     readonly req: IncomingMessage
     readonly res: ServerResponse
     readonly next: Next
+    readonly shared: S
     readonly errorHandler: ErrorHandler
 }
 

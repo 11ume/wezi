@@ -24,6 +24,7 @@ const run = (...handlers: Handler[]) => (errorHandler: Handler = defaultErrorHan
             req
             , res
             , next: null
+            , shared: {}
             , errorHandler
         }
 
