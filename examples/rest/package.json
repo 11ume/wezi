@@ -11,10 +11,10 @@
   "author": "Horacio Rivero",
   "dependencies": {
     "joi": "^17.3.0",
-    "wezi": "^1.0.0-alpha.6",
-    "wezi-receive": "^1.0.0-alpha.6",
-    "wezi-router": "^1.0.0-alpha.6",
-    "wezi-send": "^1.0.0-alpha.6"
+    "wezi": "^1.0.0-alpha.7",
+    "wezi-receive": "^1.0.0-alpha.7",
+    "wezi-router": "^1.0.0-alpha.7",
+    "wezi-send": "^1.0.0-alpha.7"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
