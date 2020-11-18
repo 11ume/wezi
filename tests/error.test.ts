@@ -1,7 +1,7 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from '../packages/types'
-import createError from '../packages/error'
+import { createError } from '../packages/error'
 import { server } from './helpers'
 
 type ErrorPayload = {

@@ -1,18 +1,18 @@
 import http, { RequestListener, IncomingMessage, ServerResponse } from 'http'
 import composer from 'wezi-composer'
 import { Context, Handler } from 'wezi-types'
-import { HttpError } from 'wezi-error'
+import { InteralError } from 'wezi-error'
 import { send } from 'wezi-send'
 import { isProd } from './utils'
 
-const defaultErrorHandler = (ctx: Context, error: Partial<HttpError>) => {
+const defaultErrorHandler = (context: Context, error: InteralError) => {
     const status = error.statusCode || 500
     const message = error.message || 'unknown'
     if (isProd()) {
-        send(ctx, status)
+        send(context, status)
         return
     }
-    send(ctx, status, {
+    send(context, status, {
         message
     })
 }
