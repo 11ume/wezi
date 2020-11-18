@@ -198,12 +198,56 @@ listen(w(), 3000)
 ```ts
 import wezi, { listen } from 'wezi'
 
-const handler = () => Promise.reject(new Error('Something wrong has happened'))
+const handler = () => Promise.reject(Error('Something wrong has happened'))
 const w = wezi(handler)
 listen(w(), 3000)
 ```
 
 <br>
 
+> Error handling through panic function 
 
-**Return** status code **500** { message: 'Something wrong has happened' }
+```ts
+import wezi, { listen } from 'wezi'
+import { Context } from 'wezi-types'
+
+const handler = (c: Context) => c.panic(Error('Something wrong has happened'))
+const w = wezi(handler)
+listen(w(), 3000)
+```
+
+<br>
+
+**Note**: All the errors that are emitted in production mode, return a default error message like this:
+
+type: application/json 
+body: "{ "message": "your message" }" 
+status code: 500
+
+<br>
+
+#### Defining your own error handler
+
+```ts
+import wezi, { listen } from 'wezi'
+import { Context } from 'wezi-types'
+import { send } from 'wezi-send'
+import { HttpError } from 'wezi-error'
+
+const greet = (c: Context) => c.panic(Error('Something wrong has happened'))
+const errorHandler = (c: Context, error: Partial<HttpError>) => {
+    const status = error.statusCode || 500
+    const message = error.message || 'unknown'
+    if (process.env.NOVE_ENV === 'production') {
+        send(c, status)
+        return
+    }
+    send(c, status, {
+        message
+    })
+}
+
+const w = wezi(greet)
+listen(w(errorHandler), 3000)
+
+```
