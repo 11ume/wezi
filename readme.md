@@ -166,9 +166,7 @@ const w = wezi(passName, greet)
 listen(w(), 3000)
 ```
 
-> Is a good practice pass to next handlers, tuples instead of types primitives or  plain objects writables.
-
-(https://refactoring.guru/es/smells/primitive-obsession)[Avoid primitive bsession]
+> Is a good practice pass to next handlers, tuples instead of types primitives or plain objects writables.
 
 <br>
 
