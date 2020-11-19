@@ -1,7 +1,7 @@
 import { Stream, Readable } from 'stream'
 import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
-import { isEmpty, noContentType } from './utils'
+import { isEmpty, isJsonable, noContentType } from './utils'
 
 export const buffer = (context: Context, statusCode: number, payload: Buffer) => {
     context.res.statusCode = statusCode ?? 200
@@ -59,12 +59,12 @@ export const empty = (context: Context, statusCode?: number) => {
     context.res.end()
 }
 
-export const send = (context: Context, statusCode?: number, payload?) => {
+export const send = (context: Context, statusCode?: number, payload?: any) => {
     if (isEmpty(payload)) {
         return empty(context, statusCode)
     }
 
-    if (typeof payload === 'object') {
+    if (isJsonable(payload)) {
         return json(context, payload, statusCode)
     }
 

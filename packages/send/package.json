@@ -16,6 +16,7 @@
     "prepublishOnly": "yarn run build"
   },
   "dependencies": {
+    "is-plain-obj": "^3.0.0",
     "wezi-types": "^1.0.0-alpha.7"
   },
   "devDependencies": {
