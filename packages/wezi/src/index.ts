@@ -5,6 +5,12 @@ import { InteralError } from 'wezi-error'
 import { send } from 'wezi-send'
 import { isProd } from './utils'
 
+const redirect = (context: Context, location: string) => {
+    context.res.statusCode = 301
+    context.res.setHeader('Location', location)
+    context.res.end()
+}
+
 const defaultErrorHandler = (context: Context, error: InteralError) => {
     const status = error.statusCode || 500
     const message = error.message || 'unknown'
@@ -25,6 +31,7 @@ const run = (...handlers: Handler[]) => (errorHandler: Handler = defaultErrorHan
             , res
             , next: null
             , panic: null
+            , redirect
             , errorHandler
         }
 
