@@ -1,7 +1,7 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
-import wezi, { listen, redirect } from 'wezi'
+import wezi, { listen } from 'wezi'
 
 test('server listen, direct<string:200>', async (t) => {
     const w = wezi(() => 'hello')
@@ -18,7 +18,7 @@ test('Redirect response', async (t) => {
             c.res.end()
             return
         }
-        redirect(c, '/redirect')
+        c.redirect('/redirect')
     })
     await listen(w(), 3001)
     const res = await fetch('http://localhost:3001')

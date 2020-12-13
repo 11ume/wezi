@@ -3,7 +3,7 @@ import http, { IncomingMessage, ServerResponse } from 'http'
 import listen from 'test-listen'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
-import { createError, InteralError } from 'wezi-error'
+import { createError, InternalError } from 'wezi-error'
 import composer from '..'
 
 const server = (fn: (req: IncomingMessage, res: ServerResponse) => void) => {
@@ -13,14 +13,18 @@ const server = (fn: (req: IncomingMessage, res: ServerResponse) => void) => {
 const createContext = ({
     req
     , res
+    , send = null
     , next = null
     , panic = null
+    , redirect = null
     , errorHandler = null
 }): Context => ({
     req
     , res
+    , send
     , next
     , panic
+    , redirect
     , errorHandler
 })
 
@@ -186,7 +190,7 @@ test('main composer multi handler async, direct promise error return in first ha
     const url = await server((req, res) => {
         const check = (c: Context) => c.panic(createError(400))
         const never = () => Promise.resolve('hello')
-        const errorHandler = (context: Context, error: Partial<InteralError>) => {
+        const errorHandler = (context: Context, error: Partial<InternalError>) => {
             context.res.statusCode = error.statusCode || 500
             context.res.end(error.message)
         }
@@ -211,7 +215,7 @@ test('main composer multi handler async, direct promise error return in second h
     const url = await server((req, res) => {
         const next = (c: Context) => c.next()
         const greet = () => Promise.reject(createError(400))
-        const errorHandler = (context: Context, error: Partial<InteralError>) => {
+        const errorHandler = (context: Context, error: Partial<InternalError>) => {
             context.res.statusCode = error.statusCode || 500
             context.res.end(error.message)
         }
@@ -239,7 +243,7 @@ test('main composer multi handler, throw error inside first handler, <Error>', a
             throw new Error('Something wrong is happened')
         }
         const never = () => 'hello'
-        const errorHandler = (context: Context, error: Partial<InteralError>) => {
+        const errorHandler = (context: Context, error: Partial<InternalError>) => {
             context.res.statusCode = 500
             context.res.end(error.message)
         }
@@ -327,7 +331,7 @@ test('main composer call panic whiout pass an error, panic<not error type>', asy
         const dispatch = composer(true, (c: Context) => c.panic({
             foo: 'foo'
         } as any))
-        const errorHandler = (context: Context, error: Partial<InteralError>) => {
+        const errorHandler = (context: Context, error: Partial<InternalError>) => {
             context.res.statusCode = error.statusCode || 500
             context.res.end(error.message)
         }
