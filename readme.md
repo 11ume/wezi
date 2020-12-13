@@ -155,6 +155,13 @@ const w = wezi(locate)
 listen(w(), 3000)
 
 ```
+
+<br>
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{ "type": "Polar", "location": "North Pole" }' http://localhost:3000
+```
+
 <br>
 
 > Receive Text
@@ -195,7 +202,7 @@ listen(w(), 3000)
 <br>
 
 ```bash
-curl http://localhost:3000 -H "Content-Type: text/plain" --data "Wezi" 
+curl http://localhost:3000 -H "Content-Type: text/plain" --data "wezi" 
 ```
 
 <br>
