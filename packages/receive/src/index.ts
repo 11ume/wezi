@@ -8,6 +8,20 @@ import contentType from 'content-type'
 export const json = toJson()
 export const buffer = toBuffer()
 
+export interface Get {
+    json: <T>(options?: GetRawBodyOptions) => Promise<T>
+    text: (options?: GetRawBodyOptions) => Promise<string>
+    buffer: (options?: GetRawBodyOptions) => Promise<string>
+}
+
+export const createGet = (context: Context): Get => {
+    return {
+        json: <T>(options?: GetRawBodyOptions) => json<T>(context, options)
+        , text: (options?: GetRawBodyOptions) => text(context, options)
+        , buffer: (options?: GetRawBodyOptions) => buffer(context, options)
+    }
+}
+
 export const text = (context: Context, options?: GetRawBodyOptions) => buffer(context, options)
     .then((body) => body.toString())
 

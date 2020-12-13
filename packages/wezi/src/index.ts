@@ -7,8 +7,9 @@ import http, {
 import composer from 'wezi-composer'
 import { Context, Handler } from 'wezi-types'
 import { InternalError } from 'wezi-error'
-import { createActions } from 'wezi-actions'
+import { createGet } from 'wezi-receive'
 import { createSend } from 'wezi-send'
+import { createActions } from 'wezi-actions'
 import { isProd } from './utils'
 
 const defaultErrorHandler = ({ send }: Context, error: InternalError) => {
@@ -32,6 +33,7 @@ const createContext = (req: IncomingMessage
         , res
         , next: null
         , panic: null
+        , get: null
         , send: null
         , actions: null
         , errorHandler
@@ -41,6 +43,7 @@ const createContext = (req: IncomingMessage
 const createEnhancedContext = (context: Context): Context => {
     return {
         ...context
+        , get: createGet(context)
         , send: createSend(context)
         , actions: createActions(context)
     }
