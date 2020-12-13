@@ -125,7 +125,7 @@ listen(w(), 3000)
 ```
 <br>
 
-#### Recibe
+#### Receive
 
 
 <br>
