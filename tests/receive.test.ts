@@ -9,32 +9,30 @@ type ErrorPayload = {
 };
 
 test('receive json', async (t) => {
-    type Characters = {
+    type Character = {
         name: string
     }
 
-    const fn = async (c: Context) => {
-        const characters = await json<Characters[]>(c)
-        return characters.map((char) => char.name)
-    }
+    const chars: Character[] = [
+        {
+            name: 't800'
+        }
+        , {
+            name: 'John Connor'
+        }
+    ]
+
+    const fn = async (c: Context) => json<Character[]>(c)
     const url = await server(fn)
     const res = await fetch(url, {
         method: 'POST'
-        , body: JSON.stringify([
-            {
-                name: 't800'
-            }
-            , {
-                name: 'John Connor'
-            }
-        ])
+        , body: JSON.stringify(chars)
     })
 
-    const body: string[] = await res.json()
-
+    const body: Character[] = await res.json()
     t.is(res.headers.get('content-type'), 'application/json charset=utf-8')
-    t.is(body[0], 't800')
-    t.is(body[1], 'John Connor')
+    t.is(body[0].name, 't800')
+    t.is(body[1].name, 'John Connor')
 })
 
 test('json parse error', async (t) => {
@@ -62,10 +60,11 @@ test('receive buffer', async (t) => {
     const url = await server(fn)
 
     const res = await fetch(url, {
-        method: 'POST', body: '🐻'
+        method: 'POST'
+        , body: '🐻'
     })
-    const body = await res.text()
 
+    const body = await res.text()
     t.is(body, '🐻')
 })
 
@@ -74,10 +73,11 @@ test('receive text', async (t) => {
     const url = await server(fn)
 
     const res = await fetch(url, {
-        method: 'POST', body: '🐻 im a small polar bear'
+        method: 'POST'
+        , body: '🐻 im a small polar bear'
     })
-    const body = await res.text()
 
+    const body = await res.text()
     t.is(body, '🐻 im a small polar bear')
 })
 

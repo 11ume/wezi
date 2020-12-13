@@ -28,6 +28,51 @@ test('context redirect response', async (t) => {
     t.true(res.redirected)
 })
 
+test('context receive json', async (t) => {
+    type Character = {
+        name: string
+    }
+
+    const fn = async ({ receive }: Context): Promise<Character> => receive.json()
+    const url = await server(fn)
+    const res = await fetch(url, {
+        method: 'POST'
+        , body: JSON.stringify({
+            name: 't800'
+        })
+    })
+
+    const body: Character = await res.json()
+    t.is(res.headers.get('content-type'), 'application/json charset=utf-8')
+    t.is(body.name, 't800')
+})
+
+test('context receive buffer', async (t) => {
+    const fn = async ({ receive }: Context) => receive.buffer()
+    const url = await server(fn)
+
+    const res = await fetch(url, {
+        method: 'POST'
+        , body: '🐻'
+    })
+
+    const body = await res.text()
+    t.is(body, '🐻')
+})
+
+test('context receive text', async (t) => {
+    const fn = async ({ receive }: Context) => receive.text()
+    const url = await server(fn)
+
+    const res = await fetch(url, {
+        method: 'POST'
+        , body: '🐻 im a small polar bear'
+    })
+
+    const body = await res.text()
+    t.is(body, '🐻 im a small polar bear')
+})
+
 test('context send text string message', async (t) => {
     const fn = ({ send }: Context) => send.text('hello')
     const url = await server(fn)
