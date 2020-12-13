@@ -1,15 +1,15 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { Send } from 'wezi-send'
+import { Actions } from 'wezi-actions'
 
 export type ErrorHandler = (context: Context, error: Error) => void
-export type Redirect = (location: string) => void
 export interface Context {
     readonly req: IncomingMessage
     readonly res: ServerResponse
     readonly send: Send
     readonly next: Next
     readonly panic: Panic
-    readonly redirect: Redirect
+    readonly actions: Actions
     readonly errorHandler: ErrorHandler
 }
 

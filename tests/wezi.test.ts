@@ -20,8 +20,9 @@ test('context redirect response', async (t) => {
             c.res.end()
             return
         }
-        c.redirect('/redirect')
+        c.actions.redirect('/redirect')
     })
+
     await listen(w(), 3001)
     const res = await fetch('http://localhost:3001')
     t.true(res.redirected)

@@ -16,7 +16,7 @@ const createContext = ({
     , send = null
     , next = null
     , panic = null
-    , redirect = null
+    , actions = null
     , errorHandler = null
 }): Context => ({
     req
@@ -24,7 +24,7 @@ const createContext = ({
     , send
     , next
     , panic
-    , redirect
+    , actions
     , errorHandler
 })
 
