@@ -1,13 +1,11 @@
 import { IncomingMessage, ServerResponse } from 'http'
 
-export type Redirect = (context: Context, location: string) => void
 export type ErrorHandler = (context: Context, error: Error) => void
 export interface Context {
     readonly req: IncomingMessage
     readonly res: ServerResponse
     readonly next: Next
     readonly panic: Panic
-    readonly redirect: Redirect
     readonly errorHandler: ErrorHandler
 }
 
