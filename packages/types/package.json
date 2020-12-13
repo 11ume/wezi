@@ -16,7 +16,10 @@
     "prepublishOnly": "yarn run build"
   },
   "dependencies": {
-    "wezi-error": "^1.0.0-alpha.7"
+    "wezi-error": "^1.0.0-alpha.7",
+    "wezi-send": "^1.0.0-alpha.7",
+    "wezi-receive": "^1.0.0-alpha.7",
+    "wezi-actions": "^1.0.0-alpha.7"
   },
   "devDependencies": {
     "@types/node": "^14.14.10",
