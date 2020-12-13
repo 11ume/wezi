@@ -1,5 +1,5 @@
 import codes from './codes'
-export class InteralError extends Error {
+export class InternalError extends Error {
     constructor(
         public readonly message: string
         , public readonly statusCode?: number
@@ -13,5 +13,5 @@ export const createError = (status: number, message?: string, error?: Error) => 
     if (status > 511 || status < 100) {
         throw new Error(`Invalid status code ${status}`)
     }
-    return new InteralError(msg, status, error)
+    return new InternalError(msg, status, error)
 }

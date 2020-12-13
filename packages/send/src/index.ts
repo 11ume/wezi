@@ -3,6 +3,24 @@ import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
 import { isEmpty, isJsonable, noContentType } from './utils'
 
+export interface Send {
+    json: <T>(payload: T, statusCode?: number) => void
+    text: (payload: string | number, statusCode?: number) => void
+    empty: (statusCode?: number) => void
+    stream: (payload: Readable, statusCode?: number) => void
+    buffer: (payload: Buffer, statusCode?: number) => void
+}
+
+export const createSend = (context: Context): Send => {
+    return {
+        json: <T>(payload: T, statusCode?: number) => json(context, payload, statusCode)
+        , text: (payload: string | number, statusCode?: number) => text(context, payload, statusCode)
+        , empty: (statusCode?: number) => empty(context, statusCode)
+        , buffer: (payload: Buffer, statusCode?: number) => buffer(context, statusCode, payload)
+        , stream: (payload: Readable, statusCode?: number) => stream(context, statusCode, payload)
+    }
+}
+
 export const buffer = (context: Context, statusCode: number, payload: Buffer) => {
     context.res.statusCode = statusCode ?? 200
     if (Buffer.isBuffer(payload)) {
