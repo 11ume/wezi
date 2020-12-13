@@ -157,6 +157,25 @@ listen(w(), 3000)
 ```
 <br>
 
+> Receive Text
+
+<br>
+
+```ts
+import wezi, { Context, listen } from 'wezi'
+
+const greet = async ({ receive }: Context) => {
+    const name = await receive.text() // "wezi"
+    return `Hi ${name}!`
+}
+
+const w = wezi(greet)
+listen(w(), 3000)
+
+```
+
+<br>
+
 > Receive Buffer
 
 <br>
@@ -165,13 +184,12 @@ listen(w(), 3000)
 import wezi, { Context, listen } from 'wezi'
 
 const greet = async ({ receive }: Context) => {
-    const name = await receive.text()
+    const name = await receive.buffer() // Buffer(7) [104, 111, 114, 97, 99, 105, 111]
     return `Hi ${name}!`
 }
 
 const w = wezi(greet)
 listen(w(), 3000)
-
 ```
 
 <br>
