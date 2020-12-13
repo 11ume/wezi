@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { Send } from 'wezi-send'
-import { Get } from 'wezi-receive'
+import { Receive } from 'wezi-receive'
 import { Actions } from 'wezi-actions'
 
 export type ErrorHandler = (context: Context, error: Error) => void
@@ -9,8 +9,8 @@ export interface Context {
     readonly res: ServerResponse
     readonly next: Next
     readonly panic: Panic
-    readonly get: Get
     readonly send: Send
+    readonly receive: Receive
     readonly actions: Actions
     readonly errorHandler: ErrorHandler
 }

@@ -1,13 +1,8 @@
-import http, {
-    Server
-    , RequestListener
-    , IncomingMessage
-    , ServerResponse
-} from 'http'
+import http, { RequestListener, IncomingMessage, ServerResponse } from 'http'
 import composer from 'wezi-composer'
 import { Context, Handler } from 'wezi-types'
 import { InternalError } from 'wezi-error'
-import { createGet } from 'wezi-receive'
+import { createReceive } from 'wezi-receive'
 import { createSend } from 'wezi-send'
 import { createActions } from 'wezi-actions'
 import { isProd } from './utils'
@@ -33,8 +28,8 @@ const createContext = (req: IncomingMessage
         , res
         , next: null
         , panic: null
-        , get: null
         , send: null
+        , receive: null
         , actions: null
         , errorHandler
     }
@@ -43,8 +38,8 @@ const createContext = (req: IncomingMessage
 const createEnhancedContext = (context: Context): Context => {
     return {
         ...context
-        , get: createGet(context)
         , send: createSend(context)
+        , receive: createReceive(context)
         , actions: createActions(context)
     }
 }
@@ -58,7 +53,7 @@ const run = (...handlers: Handler[]) => (errorHandler: Handler = defaultErrorHan
     }
 }
 
-export const listen = (handler: RequestListener, port: number): Promise<Server> => new Promise((resolve, reject) => {
+export const listen = (handler: RequestListener, port: number): Promise<http.Server> => new Promise((resolve, reject) => {
     const server = http.createServer(handler)
     server.on('listening', resolve)
     server.on('error', reject)
