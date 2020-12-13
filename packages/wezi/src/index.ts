@@ -32,6 +32,12 @@ const run = (...handlers: Handler[]) => (errorHandler: Handler = defaultErrorHan
     }
 }
 
+export const redirect = (context: Context, location: string) => {
+    context.res.statusCode = 301
+    context.res.setHeader('Location', location)
+    context.res.end()
+}
+
 export const listen = (handler: RequestListener, port: number): Promise<http.Server> => new Promise((resolve, reject) => {
     const server = http.createServer(handler)
     server.on('listening', resolve)
