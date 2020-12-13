@@ -7,14 +7,9 @@ import http, {
 import composer from 'wezi-composer'
 import { Context, Handler } from 'wezi-types'
 import { InternalError } from 'wezi-error'
+import { createActions } from 'wezi-actions'
 import { createSend } from 'wezi-send'
 import { isProd } from './utils'
-
-const redirect = (context: Context, location: string) => {
-    context.res.statusCode = 301
-    context.res.setHeader('Location', location)
-    context.res.end()
-}
 
 const defaultErrorHandler = ({ send }: Context, error: InternalError) => {
     const status = error.statusCode || 500
@@ -35,10 +30,10 @@ const createContext = (req: IncomingMessage
     return {
         req
         , res
-        , send: null
         , next: null
         , panic: null
-        , redirect: null
+        , send: null
+        , actions: null
         , errorHandler
     }
 }
@@ -46,8 +41,8 @@ const createContext = (req: IncomingMessage
 const createEnhancedContext = (context: Context): Context => {
     return {
         ...context
-        , redirect: (location: string) => redirect(context, location)
         , send: createSend(context)
+        , actions: createActions(context)
     }
 }
 
