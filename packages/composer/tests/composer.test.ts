@@ -13,17 +13,19 @@ const server = (fn: (req: IncomingMessage, res: ServerResponse) => void) => {
 const createContext = ({
     req
     , res
-    , send = null
     , next = null
     , panic = null
+    , send = null
+    , receive = null
     , actions = null
     , errorHandler = null
 }): Context => ({
     req
     , res
-    , send
     , next
     , panic
+    , send
+    , receive
     , actions
     , errorHandler
 })
