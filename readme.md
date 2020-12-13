@@ -105,7 +105,7 @@ listen(w(), 3000)
 
 <br>
 
-**Note**: By default a direct return, emit a status code 200 or 204 if you return a **null** value, and only support objects that can be interpreted by **JSON.stringify**, to send other data types you must use special methods of the **send** package.
+**Note**: By default a direct return, emit a status code 200 or 204 if you return a **null** value, and only support objects that can be interpreted by **JSON.stringify**, to send other data types like buffers or streams, you must use special methods of the **send** package.
 
 <br>
 
