@@ -115,11 +115,9 @@ listen(w(), 3000)
 
 
 ```ts
-import wezi, { listen } from 'wezi'
-import { Context } from 'wezi-types'
-import { send } from 'wezi-send'
+import wezi, { Context, listen } from 'wezi'
 
-const hello = (c: Context) => send(c, 200, 'Hi, i'm a small polar bear!')
+const hello = ({ send }: Context) => send.text('Hi, i'm a small polar bear!')
 const w = wezi(hello)
 listen(w(), 3000)
 
@@ -137,8 +135,7 @@ listen(w(), 3000)
 
 
 ```ts
-import wezi, { listen } from 'wezi'
-import { Context } from 'wezi-types'
+import wezi, { Context, listen } from 'wezi'
 import { json } from 'wezi-receive'
 
 type Bear = {
@@ -172,8 +169,7 @@ listen(w(), 3000)
 
 
 ```ts
-import wezi, { listen } from 'wezi'
-import { Context } from 'wezi-types'
+import wezi, { Context, listen } from 'wezi'
 
 const passName = (c: Context) => c.next('John')
 const greet = (_, name: string) => `Hi ${name}!`
@@ -185,8 +181,7 @@ listen(w(), 3000)
 <br>
 
 ```ts
-import wezi, { listen } from 'wezi'
-import { Context } from 'wezi-types'
+import wezi, { Context, listen } from 'wezi'
 import { json } from 'wezi-receive'
 import { createError } from 'wezi-error'
 
@@ -261,8 +256,7 @@ listen(w(), 3000)
 <br>
 
 ```ts
-import wezi, { listen } from 'wezi'
-import { Context } from 'wezi-types'
+import wezi, { Context, listen } from 'wezi'
 
 const handler = (c: Context) => c.panic(Error('Something wrong has happened'))
 const w = wezi(handler)
@@ -290,18 +284,17 @@ Content-Type: application/json charset=utf-8
 <br>
 
 ```ts
-import wezi, { listen } from 'wezi'
-import { Context } from 'wezi-types'
+import wezi, { Context, listen } from 'wezi'
 import { createError, InternalError } from 'wezi-error'
-import { send } from 'wezi-send'
 
 const greet = (c: Context) => c.panic(createError(400))
-const errorHandler = (c: Context, error: InternalError) => {
+const errorHandler = ({ send }: Context, error: InternalError) => {
     const status = error.statusCode || 500
     const message = error.message || 'unknown'
-    send(c, status, {
+    const payload = {
         message
-    })
+    }
+    send.json(c, payload, status)
 }
 
 const w = wezi(greet)
