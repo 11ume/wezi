@@ -25,7 +25,7 @@
     
 <br>
 
-> ⚠️ Wezi is currently under development and experimentation.
+> ⚠️ Wezi is currently under development.
 
 <br>
 
@@ -65,7 +65,6 @@ npm install wezi
 #### Send
 
 <br>
-
 
 > Exists two ways to send messages.
 
@@ -135,24 +134,50 @@ listen(w(), 3000)
 
 <br>
 
+> Receive JSON
+
+<br>
 
 ```ts
 import wezi, { Context, listen } from 'wezi'
-import { json } from 'wezi-receive'
 
 type Bear = {
     type: string
     location: string
 }
 
-const locate = async (c: Context) => {
-    const { type, location } = await json<Bear>(c)
+const locate = async ({ receive }: Context) => {
+    const { type, location } = await receive.json<Bear>()
     return `The ${type} bear lives in ${location}`
 }
 
 const w = wezi(locate)
 listen(w(), 3000)
 
+```
+<br>
+
+> Receive Buffer
+
+<br>
+
+```ts
+import wezi, { Context, listen } from 'wezi'
+
+const greet = async ({ receive }: Context) => {
+    const name = await receive.text()
+    return `Hi ${name}!`
+}
+
+const w = wezi(greet)
+listen(w(), 3000)
+
+```
+
+<br>
+
+```bash
+curl http://localhost:3000 -H "Content-Type: text/plain" --data "Wezi" 
 ```
 
 <br>
@@ -184,7 +209,6 @@ listen(w(), 3000)
 
 ```ts
 import wezi, { Context, listen } from 'wezi'
-import { json } from 'wezi-receive'
 import { createError } from 'wezi-error'
 
 type Bear = {
@@ -192,8 +216,8 @@ type Bear = {
     location: string
 }
 
-const check = async (c: Context) => {
-    const bear = await json<Bear>(c)
+const check = async ({ receive }: Context) => {
+    const bear = await receive.json<Bear>()
     if (bear.type && bear.location) {
         c.next(bear)
         return
