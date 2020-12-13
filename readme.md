@@ -117,7 +117,9 @@ listen(w(), 3000)
 ```ts
 import wezi, { Context, listen } from 'wezi'
 
-const hello = ({ send }: Context) => send.text('Hi, i'm a small polar bear!')
+const hello = ({ send }: Context) => send.json({
+    message: 'Enhance Your Calm ✌️'
+}, 420)
 const w = wezi(hello)
 listen(w(), 3000)
 
