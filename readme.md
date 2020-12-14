@@ -270,11 +270,14 @@ listen(w(), 3000)
 
 <br>
 
-#### Let's stop for a moment
+
+### Let's stop for a moment.
+
+When **panic** function is invoked, the composer immediately stops the sequence of handlers execution, and the system goes into a panic state 🔥, 
+and is invoked the error handling function 🚒.
 
 
-When **panic** function is invoked, the composer immediately stops sequence of handlers execution.
-The system goes into a panic state **⚠**.
+<br>
 
 <br>
 
