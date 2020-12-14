@@ -5,10 +5,10 @@ import { isEmpty, isJsonable, noContentType } from './utils'
 
 export const createSend = (context: Context): Send => {
     return {
-        json: <T>(payload: T, statusCode?: number) => json(context, payload, statusCode)
-        , text: (payload: string | number, statusCode?: number) => text(context, payload, statusCode)
-        , ok: (message: string) => ok(context, message)
+        ok: (message: string) => ok(context, message)
         , empty: (statusCode?: number) => empty(context, statusCode)
+        , json: <T>(payload: T, statusCode?: number) => json(context, payload, statusCode)
+        , text: (payload: string | number, statusCode?: number) => text(context, payload, statusCode)
         , buffer: (payload: Buffer, statusCode?: number) => buffer(context, statusCode, payload)
         , stream: (payload: Readable, statusCode?: number) => stream(context, statusCode, payload)
     }
