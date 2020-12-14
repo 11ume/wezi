@@ -3,7 +3,7 @@
 <br>
 
 <div align="center">
-    <img src="https://github.com/11ume/wezi-assets/blob/main/logo.svg" width="250" height="auto"/>
+    <img src="https://github.com/11ume/wezi-assets/blob/main/logo.png" width="300" height="auto"/>
 </div>
 
 <br>
