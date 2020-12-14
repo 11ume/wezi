@@ -47,7 +47,7 @@
 <br>
 
 **Wezi** is small and simple because are designed to work behind of an **API Gateway** or a **Reverse proxy**.
-Most of the functionalities of other libraries similar to this, are usually redundant and you surely never will need it.
+Most of the functionalities of other libraries similar to this, are usually redundant and you will probably never need to use them.
 
 Respect the [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle. 
 
