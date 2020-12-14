@@ -97,7 +97,7 @@ test('context send json message', async (t) => {
     t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
 })
 
-test('send ok', async (t) => {
+test('context send ok', async (t) => {
     const fn = ({ send }: Context) => send.ok()
     const url = await server(fn)
     const res = await fetch(url)
