@@ -6,8 +6,8 @@ export const createActions = (context: Context): Actions => {
     }
 }
 
-export const redirect = (context: Context, location: string) => {
-    context.res.statusCode = 301
+export const redirect = (context: Context, location: string, statusCode = 301) => {
+    context.res.statusCode = statusCode
     context.res.setHeader('Location', location)
     context.res.end()
 }
