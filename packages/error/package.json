@@ -1,6 +1,6 @@
 {
   "name": "wezi-error",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0-alpha.10",
   "description": "",
   "main": "dist/index.js",
   "types": "index.ts",

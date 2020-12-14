@@ -1,15 +1,7 @@
 import { Stream, Readable } from 'stream'
-import { Context } from 'wezi-types'
+import { Context, Send } from 'wezi-types'
 import { createError } from 'wezi-error'
 import { isEmpty, isJsonable, noContentType } from './utils'
-
-export interface Send {
-    json: <T>(payload: T, statusCode?: number) => void
-    text: (payload: string | number, statusCode?: number) => void
-    empty: (statusCode?: number) => void
-    stream: (payload: Readable, statusCode?: number) => void
-    buffer: (payload: Buffer, statusCode?: number) => void
-}
 
 export const createSend = (context: Context): Send => {
     return {

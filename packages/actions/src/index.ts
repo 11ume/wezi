@@ -1,8 +1,4 @@
-import { Context } from 'wezi-types'
-
-export interface Actions {
-    redirect: (location: string) => void
-}
+import { Context, Actions } from 'wezi-types'
 
 export const createActions = (context: Context): Actions => {
     return {

@@ -1,5 +1,5 @@
 import { IncomingMessage } from 'http'
-import { Context } from 'wezi-types'
+import { Context, Receive } from 'wezi-types'
 import { parseJSON } from './utils'
 import { parseBody } from './buffer'
 import { Options as GetRawBodyOptions } from 'raw-body'
@@ -7,12 +7,6 @@ import contentType from 'content-type'
 
 export const json = toJson()
 export const buffer = toBuffer()
-
-export interface Receive {
-    json: <T>(options?: GetRawBodyOptions) => Promise<T>
-    text: (options?: GetRawBodyOptions) => Promise<string>
-    buffer: (options?: GetRawBodyOptions) => Promise<string>
-}
 
 export const createReceive = (context: Context): Receive => {
     return {
