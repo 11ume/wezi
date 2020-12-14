@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://github.com/11ume/wezi-assets/blob/main/logo.png?raw=true" width="300" height="auto"/>
+    <img src="https://github.com/11ume/wezi-assets/blob/main/logo.svg" width="250" height="auto"/>
 </div>
 
 <br>
