@@ -97,6 +97,16 @@ test('context send json message', async (t) => {
     t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
 })
 
+test('send ok', async (t) => {
+    const fn = ({ send }: Context) => send.ok('fine')
+    const url = await server(fn)
+    const res = await fetch(url)
+
+    const body = await res.text()
+    t.is(body, 'fine')
+    t.is(res.status, 200)
+})
+
 test('context send empty', async (t) => {
     const fn = ({ send }: Context) => send.empty()
     const url = await server(fn)

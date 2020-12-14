@@ -9,6 +9,7 @@ export interface Actions {
 export interface Send {
     json: <T>(payload: T, statusCode?: number) => void
     text: (payload: string | number, statusCode?: number) => void
+    ok: (message: string) => void
     empty: (statusCode?: number) => void
     stream: (payload: Readable, statusCode?: number) => void
     buffer: (payload: Buffer, statusCode?: number) => void

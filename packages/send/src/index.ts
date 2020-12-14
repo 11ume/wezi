@@ -7,6 +7,7 @@ export const createSend = (context: Context): Send => {
     return {
         json: <T>(payload: T, statusCode?: number) => json(context, payload, statusCode)
         , text: (payload: string | number, statusCode?: number) => text(context, payload, statusCode)
+        , ok: (message: string) => ok(context, message)
         , empty: (statusCode?: number) => empty(context, statusCode)
         , buffer: (payload: Buffer, statusCode?: number) => buffer(context, statusCode, payload)
         , stream: (payload: Readable, statusCode?: number) => stream(context, statusCode, payload)
@@ -67,6 +68,11 @@ export const text = (context: Context, payload: string | number, statusCode?: nu
 export const empty = (context: Context, statusCode?: number) => {
     context.res.statusCode = statusCode ?? 204
     context.res.end()
+}
+
+export const ok = (context: Context, message?: string) => {
+    context.res.statusCode = 200
+    message ? context.res.end(message) : context.res.end()
 }
 
 export const send = (context: Context, statusCode?: number, payload?: any) => {

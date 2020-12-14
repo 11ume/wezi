@@ -2,9 +2,14 @@ import test from 'ava'
 import fs from 'fs'
 import fetch from 'node-fetch'
 import { Readable } from 'stream'
-import { send, buffer, stream } from '../packages/send'
 import { Context } from '../packages/types'
 import { server } from './helpers'
+import {
+    ok
+    , send
+    , buffer
+    , stream
+} from '../packages/send'
 
 type ErrorPayload = {
     message: string
@@ -43,6 +48,24 @@ test('send json message', async (t) => {
     t.is(res.status, 200)
     t.is(body.message, 'hello')
     t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
+})
+
+test('send ok whit message', async (t) => {
+    const fn = (c: Context) => ok(c, 'fine')
+    const url = await server(fn)
+    const res = await fetch(url)
+
+    const body = await res.text()
+    t.is(body, 'fine')
+    t.is(res.status, 200)
+})
+
+test('send ok empty', async (t) => {
+    const fn = (c: Context) => ok(c)
+    const url = await server(fn)
+    const res = await fetch(url)
+
+    t.is(res.status, 200)
 })
 
 test('send empty', async (t) => {
