@@ -1,33 +1,32 @@
 import { ContextRoute } from 'wezi-router'
-import { send } from 'wezi-send'
-import Bear from 'bear'
+import Bear, { BearId } from 'bear'
 import * as repository from 'api/bears/repository'
 
 export const getAll = () => repository.getAll()
 
-export const getById = ({ params }: ContextRoute<Pick<Bear, 'id'>>) => {
+export const getById = ({ params }: ContextRoute<BearId>) => {
     const bear = repository.getById(params.id)
     if (bear) return bear
     return null
 }
 
-export const create = (c: ContextRoute, bear: Bear) => {
+export const create = ({ send }: ContextRoute, bear: Bear) => {
     repository.create(bear)
-    send(c, 200, {
+    send.json(200, {
         meesage: 'created'
     })
 }
 
-export const update = (c: ContextRoute, bear: Bear) => {
-    if (repository.update(bear)) return send(c, 200)
-    return send(c, 404, {
+export const update = ({ send }: ContextRoute, bear: Bear) => {
+    if (repository.update(bear)) return send.ok()
+    return send.json(404, {
         message: 'resource not found'
     })
 }
 
-export const remove = (c: ContextRoute<Pick<Bear, 'id'>>) => {
-    if (repository.remove(c.params.id)) return send(c, 200)
-    return send(c, 404, {
+export const remove = ({ send, params }: ContextRoute<BearId>) => {
+    if (repository.remove(params.id)) return send.ok()
+    return send.json(404, {
         message: 'resource not found'
     })
 }

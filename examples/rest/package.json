@@ -1,7 +1,7 @@
 {
-  "name": "wezi-rest-example",
+  "name": "wezi-rest-api-example",
   "version": "1.0.0",
-  "description": "wezi rest service simple example",
+  "description": "wezi simple Rest API example",
   "main": "index.ts",
   "scripts": {
     "start": "cross-env NODE_ENV=production NODE_PATH=./build/src node build/bin/serve.js",
@@ -11,13 +11,11 @@
   "author": "Horacio Rivero",
   "dependencies": {
     "joi": "^17.3.0",
-    "wezi": "^1.0.0-alpha.7",
-    "wezi-receive": "^1.0.0-alpha.7",
-    "wezi-router": "^1.0.0-alpha.7",
-    "wezi-send": "^1.0.0-alpha.7"
+    "wezi": "^1.0.0-alpha.12",
+    "wezi-router": "^1.0.0-alpha.12"
   },
   "devDependencies": {
-    "cross-env": "^7.0.2",
-    "typescript": "^4.0.5"
+    "cross-env": "^7.0.3",
+    "typescript": "^4.1.3"
   }
 }

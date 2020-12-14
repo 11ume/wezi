@@ -1,7 +1,6 @@
 import Joi from 'joi'
-import Bear from 'bear'
+import Bear, { BearId } from 'bear'
 import { ContextRoute } from 'wezi-router'
-import { json } from 'wezi-receive'
 
 const bearSchemaId = Joi.string().max(3).min(0).required()
 const bearSchema = Joi.object({
@@ -10,23 +9,23 @@ const bearSchema = Joi.object({
     , location: Joi.string().max(100).min(0).required()
 })
 
-export const validateId = (c: ContextRoute<Pick<Bear, 'id'>>) => {
-    const valid = bearSchemaId.validate(c.params.id)
+export const validateId = ({ next, panic, params }: ContextRoute<BearId>) => {
+    const valid = bearSchemaId.validate(params.id)
     if (valid.error) {
-        c.panic(valid.error)
+        panic(valid.error)
         return
     }
 
-    c.next()
+    next()
 }
 
-export const validate = async (c: ContextRoute<Bear>) => {
-    const bear = await json<Bear>(c)
+export const validate = async ({ next, panic, receive }: ContextRoute<Bear>) => {
+    const bear = await receive.json<Bear>()
     const valid = bearSchema.validate(bear)
     if (valid.error) {
-        c.panic(valid.error)
+        panic(valid.error)
         return
     }
 
-    c.next(bear)
+    next(bear)
 }

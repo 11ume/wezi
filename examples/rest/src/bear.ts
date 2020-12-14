@@ -4,4 +4,5 @@ type Bear = {
     location: string
 }
 
+export type BearId = Pick<Bear, 'id'>
 export default Bear
