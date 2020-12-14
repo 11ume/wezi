@@ -273,8 +273,7 @@ listen(w(), 3000)
 
 ### Let's stop for a moment.
 
-When **panic** function is invoked, the composer immediately stops the sequence of handlers execution, and the system goes into a panic state 🔥, 
-and is invoked the error handling function 🚒.
+When **panic** function is invoked, the **composer** immediately stops the sequence of handlers execution, and the system goes into a panic state 🔥,so, the error passed in the panic function are controlled in the error handler function 🚒.
 
 
 <br>
@@ -328,14 +327,14 @@ listen(w(), 3000)
 ```ts
 import wezi, { Context, listen } from 'wezi'
 
-const handler = (c: Context) => c.panic(Error('Something wrong has happened'))
+const handler = (c: Context) => c.panic(new Error('Something wrong has happened'))
 const w = wezi(handler)
 listen(w(), 3000)
 ```
 
 <br>
 
-**Note**: All the errors that are emitted in production mode whitout status code or error message, return a default error message like this:
+**Note**: All the errors that are emitted in production mode whitout some status code or error message, return a default error message like this:
 
 <br>
 
