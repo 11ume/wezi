@@ -2,11 +2,14 @@ import test from 'ava'
 import fs from 'fs'
 import fetch from 'node-fetch'
 import { Readable } from 'stream'
-import {
-    send, buffer, stream, ok
-} from '../packages/send'
 import { Context } from '../packages/types'
 import { server } from './helpers'
+import {
+    ok
+    , send
+    , buffer
+    , stream
+} from '../packages/send'
 
 type ErrorPayload = {
     message: string
