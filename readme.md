@@ -37,14 +37,20 @@
 
 <br>
 
-* **Small** Only contains essential features.
-* **Fast** Hight performance (even JSON parsing is opt-in).  
-* **Clean** Thinked for implement the best practices.
+* **Simple** Only includes essential features.
+* **Small** It's really small and modular.
+* **Fast** High performance (even JSON parsing is opt-in).  
 * **Async** Fully asynchronous, implements enhanced flow handlers.
-* **Functional** Is functional programing friendly.  
-* **Friendly** Has features similar to other popular projects.
 * **Safe** Is designed from scratch to work with Typescript.
-* **Middlwares** Implements a  middleware logic.
+* **Middlwares** Implements a middleware logic.
+
+<br>
+
+
+**Wezi** is small and simple because designed to delegate responsibilities and run behind a gateway or reverse proxy.
+Most of the functionalities of other libraries similar to this, are usually redundant and you surely never will need it.
+
+Respect the [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle. 
 
 <br>
 
