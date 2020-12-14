@@ -23,6 +23,5 @@
   "devDependencies": {
     "@types/node": "^14.14.10",
     "typescript": "^4.0.3"
-  },
-  "gitHead": "facfe1cb02bbdd5840ca6314475d26e8bd5ca4a7"
+  }
 }
