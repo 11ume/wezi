@@ -2,7 +2,7 @@ import test from 'ava'
 import fs from 'fs'
 import fetch from 'node-fetch'
 import { Readable } from 'stream'
-import { Context } from '../packages/types'
+import { Context } from 'wezi-types'
 import { server } from './helpers'
 import {
     ok
@@ -51,12 +51,10 @@ test('send json message', async (t) => {
 })
 
 test('send ok whit message', async (t) => {
-    const fn = (c: Context) => ok(c, 'fine')
+    const fn = (c: Context) => ok(c)
     const url = await server(fn)
     const res = await fetch(url)
 
-    const body = await res.text()
-    t.is(body, 'fine')
     t.is(res.status, 200)
 })
 

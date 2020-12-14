@@ -59,9 +59,9 @@ export const empty = (context: Context, statusCode?: number) => {
     context.res.end()
 }
 
-export const ok = (context: Context, message?: string) => {
+export const ok = (context: Context) => {
     context.res.statusCode = 200
-    message ? context.res.end(message) : context.res.end()
+    context.res.end()
 }
 
 export const send = (context: Context, statusCode?: number, payload?: any) => {
@@ -78,7 +78,7 @@ export const send = (context: Context, statusCode?: number, payload?: any) => {
 
 export const createSend = (context: Context): Send => {
     return {
-        ok: (message: string) => ok(context, message)
+        ok: () => ok(context)
         , empty: (statusCode?: number) => empty(context, statusCode)
         , json: <T>(statusCode: number, payload: T) => json(context, payload, statusCode)
         , text: (statusCode: number, payload: string | number) => text(context, payload, statusCode)

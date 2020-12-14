@@ -98,12 +98,10 @@ test('context send json message', async (t) => {
 })
 
 test('send ok', async (t) => {
-    const fn = ({ send }: Context) => send.ok('fine')
+    const fn = ({ send }: Context) => send.ok()
     const url = await server(fn)
     const res = await fetch(url)
 
-    const body = await res.text()
-    t.is(body, 'fine')
     t.is(res.status, 200)
 })
 
