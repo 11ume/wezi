@@ -13,7 +13,7 @@
 <p align="center"> 
     Wezi is a simple, small and expressive library
     <br>
-    to create a e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶s robust web applications and microservices like polar bears!. 
+    to create e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶s robust web applications and microservices like polar bears!. 
 <p>
 
 <br>
