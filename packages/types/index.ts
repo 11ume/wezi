@@ -7,12 +7,12 @@ export interface Actions {
 }
 
 export interface Send {
-    ok: (message: string) => void
+    ok: (message?: string) => void
     empty: (statusCode?: number) => void
-    json: <T>(payload: T, statusCode?: number) => void
-    text: (payload: string | number, statusCode?: number) => void
-    stream: (payload: Readable, statusCode?: number) => void
-    buffer: (payload: Buffer, statusCode?: number) => void
+    json: <T>(statusCode: number, payload: T) => void
+    text: (statusCode: number, payload: string | number) => void
+    stream: (statusCode: number, payload: Readable) => void
+    buffer: (statusCode: number, payload: Buffer) => void
 }
 
 export interface Receive {

@@ -74,7 +74,7 @@ test('context receive text', async (t) => {
 })
 
 test('context send text string message', async (t) => {
-    const fn = ({ send }: Context) => send.text('hello')
+    const fn = ({ send }: Context) => send.text(200, 'hello')
     const url = await server(fn)
     const res = await fetch(url)
 
@@ -85,7 +85,7 @@ test('context send text string message', async (t) => {
 })
 
 test('context send json message', async (t) => {
-    const fn = ({ send }: Context) => send.json({
+    const fn = ({ send }: Context) => send.json(200, {
         message: 'hello'
     })
     const url = await server(fn)
@@ -116,7 +116,7 @@ test('context send empty', async (t) => {
 })
 
 test('context send buffer', async (t) => {
-    const fn = ({ send }: Context) => send.buffer(Buffer.from('foo'))
+    const fn = ({ send }: Context) => send.buffer(200, Buffer.from('foo'))
     const url = await server(fn)
     const res = await fetch(url)
     const body = await res.text()
@@ -132,7 +132,7 @@ test('send stream readable', async (t) => {
     readable.push('foo')
     readable.push(null)
 
-    const fn = ({ send }: Context) => send.stream(readable)
+    const fn = ({ send }: Context) => send.stream(200, readable)
     const url = await server(fn)
     const res = await fetch(url)
     const body = await res.text()

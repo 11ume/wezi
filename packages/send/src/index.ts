@@ -3,17 +3,6 @@ import { Context, Send } from 'wezi-types'
 import { createError } from 'wezi-error'
 import { isEmpty, isJsonable, noContentType } from './utils'
 
-export const createSend = (context: Context): Send => {
-    return {
-        ok: (message: string) => ok(context, message)
-        , empty: (statusCode?: number) => empty(context, statusCode)
-        , json: <T>(payload: T, statusCode?: number) => json(context, payload, statusCode)
-        , text: (payload: string | number, statusCode?: number) => text(context, payload, statusCode)
-        , buffer: (payload: Buffer, statusCode?: number) => buffer(context, statusCode, payload)
-        , stream: (payload: Readable, statusCode?: number) => stream(context, statusCode, payload)
-    }
-}
-
 export const buffer = (context: Context, statusCode: number, payload: Buffer) => {
     context.res.statusCode = statusCode ?? 200
     if (Buffer.isBuffer(payload)) {
@@ -85,4 +74,15 @@ export const send = (context: Context, statusCode?: number, payload?: any) => {
     }
 
     return text(context, payload, statusCode)
+}
+
+export const createSend = (context: Context): Send => {
+    return {
+        ok: (message: string) => ok(context, message)
+        , empty: (statusCode?: number) => empty(context, statusCode)
+        , json: <T>(statusCode: number, payload: T) => json(context, payload, statusCode)
+        , text: (statusCode: number, payload: string | number) => text(context, payload, statusCode)
+        , buffer: (statusCode: number, payload: Buffer) => buffer(context, statusCode, payload)
+        , stream: (statusCode: number, payload: Readable) => stream(context, statusCode, payload)
+    }
 }

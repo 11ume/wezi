@@ -8,7 +8,7 @@ import { createActions } from 'wezi-actions'
 import { isProd } from './utils'
 
 const defaultErrorHandler = ({ send }: Context, error: InternalError) => {
-    const status = error.statusCode || 500
+    const status = error.statusCode ?? 500
     const message = error.message || 'unknown'
     const payload = {
         message
@@ -17,7 +17,7 @@ const defaultErrorHandler = ({ send }: Context, error: InternalError) => {
         send.empty(status)
         return
     }
-    send.json(payload, status)
+    send.json(status, payload)
 }
 
 const createContext = (req: IncomingMessage
