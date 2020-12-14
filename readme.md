@@ -273,7 +273,12 @@ listen(w(), 3000)
 
 ### Let's stop for a moment.
 
-When **panic** function is invoked, the **composer** immediately stops the sequence of handlers execution, and the system goes into a panic state 🔥,so, the error passed in the panic function are controlled in the error handler function 🚒.
+<br>
+
+The **next** function is used to pass from current handler to next, and it can also pass parameters.
+The **panic** function is used to stop the sequence of execution of the stack of handlers.
+
+When **panic** function is invoked, the **composer** immediately stops the sequence of handlers execution, and the system goes into a panic state 🔥,so the error passed into panic function will be controlled by the error handler function 🚒.
 
 
 <br>
