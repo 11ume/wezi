@@ -125,9 +125,9 @@ listen(w(), 3000)
 ```ts
 import wezi, { Context, listen } from 'wezi'
 
-const hello = ({ send }: Context) => send.json({
+const hello = ({ send }: Context) => send.json(420, {
     message: 'Enhance Your Calm ✌️'
-}, 420)
+})
 const w = wezi(hello)
 listen(w(), 3000)
 
@@ -232,8 +232,8 @@ curl http://localhost:3000 -H "Content-Type: text/plain" --data "wezi"
 ```ts
 import wezi, { Context, listen } from 'wezi'
 
-const passName = (c: Context) => c.next('John')
-const greet = (_, name: string) => `Hi ${name}!`
+const passName = ({ next }: Context) => next('John')
+const greet = (_c: Context, name: string) => `Hi ${name}!`
 
 const w = wezi(passName, greet)
 listen(w(), 3000)
@@ -250,16 +250,16 @@ type Bear = {
     location: string
 }
 
-const check = async ({ receive }: Context) => {
+const check = async ({ next, panic, receive }: Context) => {
     const bear = await receive.json<Bear>()
     if (bear.type && bear.location) {
-        c.next(bear)
+        next(bear)
         return
     }
-    c.panic(createError(400, 'Type and location are required'))
+    panic(createError(400, 'Type and location are required'))
 }
 
-const locate = async (_, { type, location }: Bear) => `The ${type} bear lives in ${location}`
+const locate = async (_c: Context, { type, location }: Bear) => `The ${type} bear lives in ${location}`
 const w = wezi(check, locate)
 listen(w(), 3000)
 ```
@@ -278,7 +278,7 @@ listen(w(), 3000)
 The **next** function is used to pass from current handler to next, and it can also pass parameters.
 The **panic** function is used to stop the sequence of execution of the stack of handlers.
 
-When **panic** function is invoked, the **composer** immediately stops the sequence of handlers execution, and the system goes into a panic state 🔥,so the error passed into panic function will be controlled by the error handler function 🚒.
+When **panic** function is invoked, the **composer** immediately stops the sequence of handlers execution, and the system goes into a panic state 🔥, so the error passed into panic function will be controlled by the error handler function 🚒.
 
 
 <br>
@@ -332,7 +332,7 @@ listen(w(), 3000)
 ```ts
 import wezi, { Context, listen } from 'wezi'
 
-const handler = (c: Context) => c.panic(new Error('Something wrong has happened'))
+const handler = ({ panic }: Context) => panic(new Error('Something wrong has happened'))
 const w = wezi(handler)
 listen(w(), 3000)
 ```
@@ -361,14 +361,14 @@ Content-Type: application/json charset=utf-8
 import wezi, { Context, listen } from 'wezi'
 import { createError, InternalError } from 'wezi-error'
 
-const greet = (c: Context) => c.panic(createError(400))
+const greet = ({ panic }: Context) => panic(createError(400))
 const errorHandler = ({ send }: Context, error: InternalError) => {
-    const status = error.statusCode || 500
+    const status = error.statusCode ?? 500
     const message = error.message || 'unknown'
     const payload = {
         message
     }
-    send.json(c, payload, status)
+    send.json(status, payload)
 }
 
 const w = wezi(greet)
