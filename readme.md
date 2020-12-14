@@ -47,7 +47,7 @@
 <br>
 
 
-**Wezi** is small and simple because designed to delegate responsibilities and run behind a gateway or reverse proxy.
+**Wezi** is small and simple because designed to delegate responsibilities and run behind a **API Gateway** or **Reverse proxy**.
 Most of the functionalities of other libraries similar to this, are usually redundant and you surely never will need it.
 
 Respect the [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle. 
