@@ -11,6 +11,9 @@
     "rules": {
         "@typescript-eslint/explicit-module-boundary-types": 0,
         "@typescript-eslint/no-explicit-any": 0,
+        "@typescript-eslint/no-unused-vars": [
+            "error"
+        ],
         "no-tabs": 0,
         "node/no-new-require": 0,
         "node/no-path-concat": 0,
@@ -28,13 +31,7 @@
         "array-bracket-spacing": "error",
         "object-property-newline": "error",
         "object-curly-spacing": 1,
-        "no-unused-vars": [
-            "error",
-            {
-                "args": "all",
-                "argsIgnorePattern": "^_"
-            }
-        ],
+        "no-unused-vars": 0,
         "object-curly-newline": [
             "error",
             {
