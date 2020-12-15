@@ -3,7 +3,6 @@ import { Send } from './send'
 import { Receive } from './receive'
 import { Actions } from './actions'
 
-export type ErrorHandler = (context: Context, error: Error) => void
 export interface Context {
     readonly req: IncomingMessage
     readonly res: ServerResponse
@@ -18,3 +17,4 @@ export interface Context {
 export type Next = <T>(payload?: T) => void
 export type Panic = (error: Error) => void
 export type Handler = (context: Context, payload?: any) => any
+export type ErrorHandler = (context: Context, error: Error) => void
