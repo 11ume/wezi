@@ -13,6 +13,7 @@ const end = (context: Context) => {
 }
 
 const execute = async (context: Context, handler: Handler, payload: unknown) => {
+    if (context.res.writableEnded) return
     try {
         const val = await handler(context, payload)
         if (val === null) {
@@ -54,7 +55,6 @@ const createPanic = (context: Context) => {
 export const composer = (main: boolean, ...handlers: Handler[]) => {
     let i = 0
     return function dispatch(context: Context, payload?: unknown): void {
-        if (context.res.writableEnded) return
         if (i < handlers.length) {
             const handler = handlers[i++]
             const next = createNext(context, dispatch)
