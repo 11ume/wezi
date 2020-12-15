@@ -68,7 +68,7 @@ const composer = (main: boolean, ...handlers: Handler[]) => {
             return
         }
 
-        main && end(context)
+        main && setImmediate(end, context)
     }
 }
 
