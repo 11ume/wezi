@@ -23,7 +23,8 @@
     "wezi-composer": "^1.0.0-alpha.12",
     "wezi-receive": "^1.0.0-alpha.12",
     "wezi-send": "^1.0.0-alpha.12",
-    "wezi-types": "^1.0.0-alpha.12"
+    "wezi-types": "^1.0.0-alpha.12",
+    "wezi-error": "^1.0.0-alpha.12"
   },
   "devDependencies": {
     "@types/node": "^14.14.10",

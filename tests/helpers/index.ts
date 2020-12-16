@@ -5,5 +5,5 @@ import { Handler } from '../../packages/types'
 
 export const server = (...fn: Handler[]) => {
     const w = wezi(...fn)
-    return listen(http.createServer(w()))
+    return listen(http.createServer(w))
 }

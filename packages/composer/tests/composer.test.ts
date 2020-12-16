@@ -193,7 +193,7 @@ test('main composer multi handler async, direct promise error return in first ha
         const check = (c: Context) => c.panic(createError(400))
         const never = () => Promise.resolve('hello')
         const errorHandler = (context: Context, error: Partial<InternalError>) => {
-            context.res.statusCode = error.statusCode || 500
+            context.res.statusCode = error.statusCode ?? 500
             context.res.end(error.message)
         }
         const dispatch = composer(true, check, never)

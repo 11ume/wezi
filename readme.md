@@ -70,7 +70,6 @@ npm install wezi
     <img src="https://github.com/11ume/wezi-assets/blob/main/hi2.png?raw=true" width="200" height="auto"/>
 </div>
 
-
 #### Send
 
 <br>
@@ -89,7 +88,7 @@ import wezi, { listen } from 'wezi'
 
 const hello = () => 'Hi, im a small polar bear!'
 const w = wezi(hello)
-listen(w(), 3000)
+listen(w, 3000)
 ```
 
 <br>
@@ -108,7 +107,7 @@ const hello = async () => {
 }
 
 const w = wezi(hello)
-listen(w(), 3000)
+listen(w, 3000)
 ```
 
 <br>
@@ -129,7 +128,7 @@ const hello = ({ send }: Context) => send.json(420, {
     message: 'Enhance Your Calm ✌️'
 })
 const w = wezi(hello)
-listen(w(), 3000)
+listen(w, 3000)
 
 ```
 <br>
@@ -161,7 +160,7 @@ const locate = async ({ receive }: Context) => {
 }
 
 const w = wezi(locate)
-listen(w(), 3000)
+listen(w, 3000)
 
 ```
 
@@ -186,7 +185,7 @@ const greet = async ({ receive }: Context) => {
 }
 
 const w = wezi(greet)
-listen(w(), 3000)
+listen(w, 3000)
 
 ```
 
@@ -205,7 +204,7 @@ const greet = async ({ receive }: Context) => {
 }
 
 const w = wezi(greet)
-listen(w(), 3000)
+listen(w, 3000)
 ```
 
 <br>
@@ -236,7 +235,7 @@ const passName = ({ next }: Context) => next('John')
 const greet = (_c: Context, name: string) => `Hi ${name}!`
 
 const w = wezi(passName, greet)
-listen(w(), 3000)
+listen(w, 3000)
 ```
 
 <br>
@@ -261,7 +260,7 @@ const check = async ({ next, panic, receive }: Context) => {
 
 const locate = async (_c: Context, { type, location }: Bear) => `The ${type} bear lives in ${location}`
 const w = wezi(check, locate)
-listen(w(), 3000)
+listen(w, 3000)
 ```
 
 <br>
@@ -306,7 +305,7 @@ const handler = () => {
 }
 
 const w = wezi(handler)
-listen(w(), 3000)
+listen(w, 3000)
 ```
 
 <br>
@@ -320,7 +319,7 @@ import wezi, { listen } from 'wezi'
 
 const handler = () => Promise.reject(Error('Something wrong has happened'))
 const w = wezi(handler)
-listen(w(), 3000)
+listen(w, 3000)
 ```
 
 <br>
@@ -334,7 +333,7 @@ import wezi, { Context, listen } from 'wezi'
 
 const handler = ({ panic }: Context) => panic(new Error('Something wrong has happened'))
 const w = wezi(handler)
-listen(w(), 3000)
+listen(w, 3000)
 ```
 
 <br>
@@ -372,7 +371,7 @@ const errorHandler = ({ send }: Context, error: InternalError) => {
 }
 
 const w = wezi(greet)
-listen(w(errorHandler), 3000)
+listen((req, res) => w(req, res, errorHandler), 3000)
 ```
 
 ```bash

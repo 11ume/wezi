@@ -44,8 +44,8 @@ const createEnhancedContext = (context: Context): Context => {
     }
 }
 
-const run = (...handlers: Handler[]) => (errorHandler: Handler = defaultErrorHandler) => {
-    return (req: IncomingMessage, res: ServerResponse) => {
+const run = (...handlers: Handler[]) => {
+    return (req: IncomingMessage, res: ServerResponse, errorHandler: Handler = defaultErrorHandler) => {
         const dispatch = composer(true, ...handlers)
         const context = createContext(req, res, errorHandler)
         const enhancedContext = createEnhancedContext(context)
