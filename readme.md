@@ -74,7 +74,7 @@ npm install wezi
 
 <br>
 
-> Exists two ways to send messages.
+> Wezi have two ways to send responses.
 
 <br>
 
@@ -219,6 +219,31 @@ curl http://localhost:3000 -H "Content-Type: text/plain" --data "wezi"
 
 <br>
 
+### The context object
+
+<br>
+
+> The context object is an object that is passed as the first argument to each handler.
+
+Contains only the essential elements that each handler needs to handle the incoming request and his response.
+
+<br>
+
+```ts
+export interface Context {
+    readonly req: IncomingMessage // http server request.
+    readonly res: ServerResponse // http server response.
+    readonly next: Next // function to pass to next handler.
+    readonly panic: Panic // function to stop the handlers stack execution flow.
+    readonly send: Send // object with functional tools for the response.
+    readonly receive: Receive // object with functional tools for the request.
+    readonly actions: Actions // object with functional tools like, tools for make an redirection. 
+    readonly errorHandler: ErrorHandler // the default error handler
+}
+```
+
+<br>
+
 #### The data flow between handlers 
 
 <br>
@@ -317,7 +342,7 @@ listen(w, 3000)
 ```ts
 import wezi, { listen } from 'wezi'
 
-const handler = () => Promise.reject(Error('Something wrong has happened'))
+const handler = () => Promise.reject(new Error('Something wrong has happened'))
 const w = wezi(handler)
 listen(w, 3000)
 ```
@@ -348,6 +373,29 @@ curl http://localhost:3000 -v
 HTTP/1.1 500 Internal Server Error
 Content-Type: application/json charset=utf-8
 {"message":"Internal Server Error"}
+```
+
+<br>
+
+
+```ts
+import wezi, { Context, listen } from 'wezi'
+import { createError } from 'wezi-error'
+
+const handler = ({ panic }: Context) => panic(createError(400, 'You custom error message'))
+const w = wezi(handler)
+listen(w, 3000)
+```
+
+<br>
+
+
+```bash
+curl http://localhost:3000 -v
+
+HTTP/1.1 400 Bard Request
+Content-Type: application/json charset=utf-8
+{"message":"You custom error message"}
 ```
 
 <br>
