@@ -223,22 +223,23 @@ curl http://localhost:3000 -H "Content-Type: text/plain" --data "wezi"
 
 <br>
 
-> The context object is an object that is passed as the first argument to each handler.
-
+The [context](https://github.com/11ume/wezi/blob/main/packages/types/src/index.ts#L6) object is an object that is passed as the first argument to each handler.
 Contains only the essential elements that each handler needs to handle the incoming request and his response.
+
+
 
 <br>
 
 ```ts
-export interface Context {
+interface Context {
     readonly req: IncomingMessage // http server request.
     readonly res: ServerResponse // http server response.
     readonly next: Next // function to pass to next handler.
     readonly panic: Panic // function to stop the handlers stack execution flow.
     readonly send: Send // object with functional tools for the response.
     readonly receive: Receive // object with functional tools for the request.
-    readonly actions: Actions // object with functional tools like, tools for make an redirection. 
-    readonly errorHandler: ErrorHandler // the default error handler
+    readonly actions: Actions // object with functional tools like redirect. 
+    readonly errorHandler: ErrorHandler // the default error handler.
 }
 ```
 
