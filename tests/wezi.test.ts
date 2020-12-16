@@ -2,16 +2,31 @@ import test from 'ava'
 import fetch from 'node-fetch'
 import { Readable } from 'stream'
 import { Context } from 'wezi-types'
+import { InternalError, createError } from 'wezi-error'
 import wezi, { listen } from 'wezi'
 import { server } from './helpers'
 
 test('server listen, direct<string:200>', async (t) => {
     const w = wezi(() => 'hello')
-    await listen(w(), 3000)
+    await listen(w, 3000)
     const res = await fetch('http://localhost:3000')
     const r = await res.text()
 
     t.is(r, 'hello')
+})
+
+test('create custom error handler', async (t) => {
+    const w = wezi((c: Context) => c.panic(createError(400)), () => 'hello')
+    const errorHandler = (context: Context, error: Partial<InternalError>) => {
+        context.res.statusCode = error.statusCode ?? 500
+        context.res.end(error.message)
+    }
+    await listen((req, res) => w(req, res, errorHandler), 3001)
+    const res = await fetch('http://localhost:3001')
+    const r = await res.text()
+
+    t.is(res.status, 400)
+    t.is(r, 'Bad Request')
 })
 
 test('context redirect response', async (t) => {
@@ -23,8 +38,8 @@ test('context redirect response', async (t) => {
         c.actions.redirect('/redirect')
     })
 
-    await listen(w(), 3001)
-    const res = await fetch('http://localhost:3001')
+    await listen(w, 3002)
+    const res = await fetch('http://localhost:3002')
     t.true(res.redirected)
 })
 
