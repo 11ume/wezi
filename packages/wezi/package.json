@@ -1,6 +1,6 @@
 {
   "name": "wezi",
-  "version": "1.0.0-alpha.12",
+  "version": "1.0.0-alpha.13",
   "description": "",
   "main": "dist/index.js",
   "types": "index.ts",
@@ -19,12 +19,12 @@
     "wezi": "./bin/wezi.js"
   },
   "dependencies": {
-    "wezi-actions": "^1.0.0-alpha.12",
-    "wezi-composer": "^1.0.0-alpha.12",
-    "wezi-receive": "^1.0.0-alpha.12",
-    "wezi-send": "^1.0.0-alpha.12",
-    "wezi-types": "^1.0.0-alpha.12",
-    "wezi-error": "^1.0.0-alpha.11"
+    "wezi-actions": "^1.0.0-alpha.13",
+    "wezi-composer": "^1.0.0-alpha.13",
+    "wezi-error": "^1.0.0-alpha.11",
+    "wezi-receive": "^1.0.0-alpha.13",
+    "wezi-send": "^1.0.0-alpha.13",
+    "wezi-types": "^1.0.0-alpha.13"
   },
   "devDependencies": {
     "@types/node": "^14.14.10",
