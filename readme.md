@@ -228,14 +228,14 @@ The context object is property is passed as argument to each handler. Contains o
 
 <br>
 
-```bash
+```ts
 Context {
     req: IncomingMessage // http server request.
     res: ServerResponse // http server response.
     next: Next // function to pass to next handler.
     panic: Panic // function to stop the handlers stack execution flow.
-    send: Send // object with functional tools for the response.
-    receive: Receive // object with functional tools for the request.
+    send: Send // object with functions to manage the response.
+    receive: Receive // object with functions to manage the request data.
     actions: Actions // object with functional tools like redirect. 
     errorHandler: ErrorHandler // the default error handler.
 }
