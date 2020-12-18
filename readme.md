@@ -223,23 +223,21 @@ curl http://localhost:3000 -H "Content-Type: text/plain" --data "wezi"
 
 <br>
 
-The [context](https://github.com/11ume/wezi/blob/main/packages/types/src/index.ts#L6) object is an object that is passed as the first argument to each handler.
-Contains only the essential elements that each handler needs to handle the incoming request and his response.
-
+The context object is property is passed as argument to each handler. Contains only the essential elements that each handler needs to handle an incoming request and his response.
 
 
 <br>
 
-```ts
-interface Context {
-    readonly req: IncomingMessage // http server request.
-    readonly res: ServerResponse // http server response.
-    readonly next: Next // function to pass to next handler.
-    readonly panic: Panic // function to stop the handlers stack execution flow.
-    readonly send: Send // object with functional tools for the response.
-    readonly receive: Receive // object with functional tools for the request.
-    readonly actions: Actions // object with functional tools like redirect. 
-    readonly errorHandler: ErrorHandler // the default error handler.
+```bash
+Context {
+    req: IncomingMessage // http server request.
+    res: ServerResponse // http server response.
+    next: Next // function to pass to next handler.
+    panic: Panic // function to stop the handlers stack execution flow.
+    send: Send // object with functional tools for the response.
+    receive: Receive // object with functional tools for the request.
+    actions: Actions // object with functional tools like redirect. 
+    errorHandler: ErrorHandler // the default error handler.
 }
 ```
 
@@ -305,8 +303,6 @@ The **panic** function is used to stop the sequence of execution of the stack of
 
 When **panic** function is invoked, the **composer** immediately stops the sequence of handlers execution, and the system goes into a panic state 🔥, so the error passed into panic function will be controlled by the error handler function 🚒.
 
-
-<br>
 
 <br>
 
