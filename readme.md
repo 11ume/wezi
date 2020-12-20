@@ -72,9 +72,9 @@ npm install wezi
 </div>
 
 
-## Create
+## Get started
 
-Create an instance of wezi whit a handler and then start http server to listen requests on port 3000. 
+Create an instance of wezi whit one handler and then start http server to listen requests on port 3000. 
 
 
 ```ts
@@ -85,6 +85,7 @@ const w = wezi(greet)
 listen(w, 3000)
 ```
 
+<br>
 
 ## Send data
 
