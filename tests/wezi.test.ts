@@ -68,7 +68,7 @@ test('context receive buffer', async (t) => {
 
     const res = await fetch(url, {
         method: 'POST'
-        , body: '🐻'
+        , body: Buffer.from('🐻')
     })
 
     const body = await res.text()
