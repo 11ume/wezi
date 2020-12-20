@@ -18,8 +18,8 @@ export const text = (context: Context, options?: GetRawBodyOptions) => stringOrB
 
 export const createReceive = (context: Context): Receive => {
     return {
-        json: <T>(options?: GetRawBodyOptions) => json<T>(context, options)
-        , text: (options?: GetRawBodyOptions) => text(context, options)
+        text: (options?: GetRawBodyOptions) => text(context, options)
+        , json: <T>(options?: GetRawBodyOptions) => json<T>(context, options)
         , buffer: (options?: GetRawBodyOptions) => buffer(context, options)
     }
 }
