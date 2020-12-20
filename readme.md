@@ -71,6 +71,21 @@ npm install wezi
     <img src="https://github.com/11ume/wezi-assets/blob/main/hi2.png?raw=true" width="200" height="auto"/>
 </div>
 
+
+## Create
+
+Create an instance of wezi whit a handler and then start http server to listen requests on port 3000. 
+
+
+```ts
+import wezi, { listen } from 'wezi'
+
+const greet = () => 'Hi!'
+const w = wezi(greet)
+listen(w, 3000)
+```
+
+
 ## Send data
 
 You have two forms to send responses.
@@ -139,6 +154,7 @@ listen(w, 3000)
 <br>
 
 > Returns a JSON "{ "message": Bad Request }".
+
 > status code 400.
  
 ```ts
