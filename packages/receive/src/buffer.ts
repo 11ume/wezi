@@ -17,7 +17,7 @@ export const parseBody = ({
     , length
     , encoding
     , rawBodyCache
-}: ParseBody) => getRawBody(context.req, {
+}: ParseBody): Promise<Buffer | string> => getRawBody(context.req, {
     limit
     , length
     , encoding

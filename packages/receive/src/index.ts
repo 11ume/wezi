@@ -21,8 +21,8 @@ export const text = (context: Context, options?: GetRawBodyOptions) => buffer(co
 
 export function toBuffer() {
     // avoid to read multiple times same stream object
-    const rawBodyCache: WeakMap<IncomingMessage, string> = new WeakMap()
-    return (context: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}): Promise<string> => {
+    const rawBodyCache: WeakMap<IncomingMessage, Buffer> = new WeakMap()
+    return async (context: Context, { limit = '1mb', encoding }: GetRawBodyOptions = {}): Promise<Buffer> => {
         const body = rawBodyCache.get(context.req)
         const type = context.req.headers['content-type'] || 'text/plain'
         const length = context.req.headers['content-length']
@@ -30,22 +30,34 @@ export function toBuffer() {
         if (body) return Promise.resolve(body)
         if (encoding === undefined) {
             const parameters = contentType.parse(type)?.parameters
-            return parseBody({
+            const b = await parseBody({
                 context
                 , limit
                 , length
                 , encoding: parameters?.charset
                 , rawBodyCache
             })
+
+            if (Buffer.isBuffer(b)) {
+                return b
+            }
+
+            return null
         }
 
-        return parseBody({
+        const b = await parseBody({
             context
             , limit
             , length
             , encoding
             , rawBodyCache
         })
+
+        if (Buffer.isBuffer(b)) {
+            return b
+        }
+
+        return null
     }
 }
 
