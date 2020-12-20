@@ -315,11 +315,12 @@ Context {
 
 <br>
 
-## The data flow between handlers 
+## Sharing data between handlers 
 
 <br>
 
-> Each handler must do two things in his execution, return a value and end the request, or pass to next handler using the **next** function. Also through the **next** function you can pass some value to the next handler.
+> Each handler must do return a value and end the request, or pass to next handler using the **next** function. 
+With this function you can pass some value to the next handler.
 
 <br>
 
