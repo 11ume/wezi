@@ -1,9 +1,10 @@
+
 <br>
 
 <br>
 
 <div align="center">
-    <img src="https://github.com/11ume/wezi-assets/blob/main/logo.png" width="300" height="auto"/>
+    <img src="https://github.com/11ume/wezi-assets/blob/main/logo.png?raw=true" width="300" height="auto"/>
 </div>
 
 <br>
@@ -70,18 +71,30 @@ npm install wezi
     <img src="https://github.com/11ume/wezi-assets/blob/main/hi2.png?raw=true" width="200" height="auto"/>
 </div>
 
-#### Send
+## Send data
+
+You have two forms to send responses.
+The  frist and most simple and natural is send a direct return.
+
+<br>
+By default a direct return emits a status code:
+
+**200** succeeded, if you return a **[stringifyable](https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/JSON/stringify)**  value. 
+**204** No Content, if you return a **[null](https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/null)** value.
+**500** Internal Server Error, if an exception is thrown inside of the handler context.
 
 <br>
 
-> Wezi have two ways to send responses.
+### Direct returns
+
+##### Direct returns of stringifyables.
+  
+An stringifyables value is a value can be procesed by the method JSON.stringify.
 
 <br>
 
-*The most simple and natural way, is a direct return*.
-
-<br>
-
+> Return string value. 
+> Status code 200.
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -90,12 +103,53 @@ const hello = () => 'Hi, im a small polar bear!'
 const w = wezi(hello)
 listen(w, 3000)
 ```
-
 <br>
 
-> Direct return of promises.  
+> Returns empty body.
+> Status code 204.
 
+```ts
+import wezi, { listen } from 'wezi'
+
+const empty = () => null
+const w = wezi(empty)
+listen(w, 3000)
+```
 <br>
+
+> Returns a JSON "{ "message": Something wrong has happened }".
+> status code 500.
+ 
+```ts
+import wezi, { listen } from 'wezi'
+
+const error = () => {
+	throw Error('Something wrong has happened')
+}
+const w = wezi(error)
+listen(w, 3000)
+```
+<br>
+
+> Returns a JSON "{ "message": Bad Request }".
+> status code 400.
+ 
+```ts
+import wezi, { listen } from 'wezi'
+import { createError } from 'wezi-error'
+
+const errorWhitStatusCode = () => {
+	throw createError(400)
+}
+const w = wezi(errorWhitStatusCode)
+listen(w, 3000)
+```
+<br>
+
+
+##### Direct returns of promises  
+
+You can directly return promises and they will be executed in a secure context.
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -103,7 +157,7 @@ import wezi, { listen } from 'wezi'
 const delay = (time: number) => new Promise((r) => setTimeout(r, time))
 const hello = async () => {
     await delay(2000)
-    return 'Hi, im a small polar bear!'
+    return 'Hi, im a polar bear!'
 }
 
 const w = wezi(hello)
@@ -112,11 +166,10 @@ listen(w, 3000)
 
 <br>
 
-**Note**: By default a direct return, emit a status code 200 or 204 if you return a **null** value, and only support objects that can be interpreted by **JSON.stringify**, to send other data types like buffers or streams, you must use special methods of the **send** package.
+### Functional returns
 
-<br>
-
-*The second way is through the **send** function, which allows you to define a status code*.
+The second way to send responses is through the **send** object of **context**.
+This object has functions to send more specific data types like streams and buffers.
 
 <br>
 
@@ -124,27 +177,24 @@ listen(w, 3000)
 ```ts
 import wezi, { Context, listen } from 'wezi'
 
-const hello = ({ send }: Context) => send.json(420, {
-    message: 'Enhance Your Calm ✌️'
-})
-const w = wezi(hello)
+const  enhanceYourCalm   = ({ send }:  Context) => send.buffer(420, Buffer.from('Enhance Your Calm ✌️'))
+const w = wezi(enhanceYourCalm)
 listen(w, 3000)
 
 ```
-<br>
-
-#### Receive
-
 
 <br>
+
+## Receive
+
 
 > The payload of each messages is parsed in explicit form, this makes wezi really fast, since the type is not inferred in each request that is made.
 
 <br>
 
-> Receive JSON
+### Receive JSON
 
-<br>
+Calling the receive.json function will perform a JSON.parse of the raw body of the incoming request.
 
 ```ts
 import wezi, { Context, listen } from 'wezi'
@@ -163,7 +213,6 @@ const w = wezi(locate)
 listen(w, 3000)
 
 ```
-
 <br>
 
 ```bash
@@ -172,7 +221,29 @@ curl -X POST -H "Content-Type: application/json" -d '{ "type": "Polar", "locatio
 
 <br>
 
-> Receive Text
+### Receive Buffer
+Maybe for performance reasons you want to work directly with buffers whiout make a high cost parsing.
+
+```ts
+import wezi, { Context, listen } from 'wezi'
+
+const locate = async ({ receive }: Context) => {
+    const location = await receive.buffer()    
+    return `Bear location ${location}`
+}
+
+const w = wezi(locate)
+listen(w, 3000)
+```
+<br>
+
+```bash
+curl http://localhost:3000 -d 'North Pole'
+```
+
+<br>
+
+### Receive Text
 
 <br>
 
@@ -221,25 +292,21 @@ curl http://localhost:3000 -H "Content-Type: text/plain" --data "wezi"
 
 ### The context object
 
-<br>
-
-The [context](https://github.com/11ume/wezi/blob/main/packages/types/src/index.ts#L6) object is an object that is passed as the first argument to each handler.
-Contains only the essential elements that each handler needs to handle the incoming request and his response.
-
+The context object is property is passed as argument to each handler. Contains only the essential elements that each handler needs to handle an incoming request and his response.
 
 
 <br>
 
 ```ts
-interface Context {
-    readonly req: IncomingMessage // http server request.
-    readonly res: ServerResponse // http server response.
-    readonly next: Next // function to pass to next handler.
-    readonly panic: Panic // function to stop the handlers stack execution flow.
-    readonly send: Send // object with functional tools for the response.
-    readonly receive: Receive // object with functional tools for the request.
-    readonly actions: Actions // object with functional tools like redirect. 
-    readonly errorHandler: ErrorHandler // the default error handler.
+Context {
+    req: IncomingMessage // http server request.
+    res: ServerResponse // http server response.
+    next: Next // function to pass to next handler.
+    panic: Panic // function to stop the handlers stack execution flow.
+    send: Send // object with functions to manage the response.
+    receive: Receive // object with functions to manage the request data.
+    actions: Actions // object with functional tools like redirect. 
+    errorHandler: ErrorHandler // the default error handler.
 }
 ```
 
@@ -295,18 +362,13 @@ listen(w, 3000)
 
 <br>
 
-
 ### Let's stop for a moment.
-
-<br>
 
 The **next** function is used to pass from current handler to next, and it can also pass parameters.
 The **panic** function is used to stop the sequence of execution of the stack of handlers.
 
 When **panic** function is invoked, the **composer** immediately stops the sequence of handlers execution, and the system goes into a panic state 🔥, so the error passed into panic function will be controlled by the error handler function 🚒.
 
-
-<br>
 
 <br>
 
