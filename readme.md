@@ -254,7 +254,7 @@ Maybe for performance reasons you want to work directly with buffers whiout make
 import wezi, { Context, listen } from 'wezi'
 
 const locate = async ({ receive }: Context) => {
-    const location = await receive.buffer()    
+    const location = await receive.buffer() // Buffer(17) [123, 34, 116, 121, 112, 101, 34, 58, 32, 34, 112, 111, 108, 97, 114, 34, 125]   
     return `Bear location ${location}`
 }
 
@@ -264,7 +264,7 @@ listen(w, 3000)
 <br>
 
 ```bash
-curl http://localhost:3000 -d 'North Pole'
+curl http://localhost:3000 --data-binary 'North Pole'
 ```
 
 <br>
