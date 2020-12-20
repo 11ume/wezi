@@ -1,14 +1,43 @@
 import { IncomingMessage } from 'http'
 import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
-import getRawBody, { RawBodyError } from 'raw-body'
+import getRawBody, { RawBodyError, Encoding as GetRawBodyEncoding } from 'raw-body'
 
-type ParseBody = {
+type ParseBodyOptions = {
     context: Context
     , limit: string | number
     , length: string
     , encoding: getRawBody.Encoding
     , rawBodyCache: WeakMap<IncomingMessage, unknown>
+}
+
+type ParseBufferOptions = {
+    context: Context
+    limit: string | number
+    length: string
+    encoding: GetRawBodyEncoding
+    rawBodyCache: RawBodyCacheMapBuffer
+}
+
+export type RawBodyCacheMapBuffer = WeakMap<IncomingMessage, Buffer>
+
+export const getRawBodyBuffer = async ({
+    context
+    , limit
+    , length
+    , encoding
+    , rawBodyCache
+}: ParseBufferOptions): Promise<Buffer> => {
+    const body = await parseBody({
+        context
+        , limit
+        , length
+        , encoding
+        , rawBodyCache
+    })
+
+    if (Buffer.isBuffer(body)) return body
+    throw createError(500, 'Body must be typeof Buffer')
 }
 
 export const parseBody = ({
@@ -17,7 +46,7 @@ export const parseBody = ({
     , length
     , encoding
     , rawBodyCache
-}: ParseBody): Promise<Buffer | string> => getRawBody(context.req, {
+}: ParseBodyOptions): Promise<Buffer | string> => getRawBody(context.req, {
     limit
     , length
     , encoding
