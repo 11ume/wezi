@@ -22,7 +22,7 @@ export const parseBody = ({
     , length
     , encoding
 })
-    .then((rawBody) => {
+    .then((rawBody: Buffer | string) => {
         rawBodyCache.set(context.req, rawBody)
         return rawBody
     })

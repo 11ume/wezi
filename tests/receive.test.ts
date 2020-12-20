@@ -61,11 +61,25 @@ test('receive buffer', async (t) => {
 
     const res = await fetch(url, {
         method: 'POST'
-        , body: '🐻'
+        , body: Buffer.from('🐻')
     })
 
     const body = await res.text()
     t.is(body, '🐻')
+})
+
+test('receive non buffer', async (t) => {
+    const fn = async (c: Context) => {
+        const err = await t.throwsAsync(() => buffer(c))
+        t.is(err.message, 'Body must be typeof Buffer')
+        return err
+    }
+    const url = await server(fn)
+    const res = await fetch(url, {
+        method: 'POST'
+        , body: '🐻'
+    })
+    t.is(res.status, 500)
 })
 
 test('receive text', async (t) => {
