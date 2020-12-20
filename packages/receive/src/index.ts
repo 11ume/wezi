@@ -9,11 +9,11 @@ type CacheJsonMap = WeakMap<IncomingMessage, unknown>
 type RawBodyCacheMap<T> = WeakMap<IncomingMessage, T>
 type GetRawBodyFunction<T> = (options: GetRawBodyFunctionOptions<T>) => Promise<T>
 
-type ResolveRawBodyOptions = {
+type ResolveRawBodyOptions<T> = {
     limit: string | number
     context: Context
     encoding: RawBodyEncoding
-    rawBodyCache: WeakMap<IncomingMessage, any>
+    rawBodyCache: WeakMap<IncomingMessage, T>
     defaultContentType: string
 }
 
@@ -31,7 +31,7 @@ const resolveRawBody = <T> (fn: GetRawBodyFunction<T>, {
     , encoding
     , rawBodyCache
     , defaultContentType
-}: ResolveRawBodyOptions): Promise<T> => {
+}: ResolveRawBodyOptions<T>): Promise<T> => {
     const body = rawBodyCache.get(context.req)
     const type = context.req.headers['content-type'] ?? defaultContentType
     const length = context.req.headers['content-length']
