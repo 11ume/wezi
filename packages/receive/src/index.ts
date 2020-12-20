@@ -25,29 +25,13 @@ type GetRawBodyFunctionOptions<T> = {
     rawBodyCache: WeakMap<IncomingMessage, T>
 }
 
-const defaultBodySizeLimit = '1mb'
-const stringOrBuffer = toStringOrBuffer()
-
-export const json = toJson()
-export const buffer = toBuffer()
-export const text = (context: Context, options?: GetRawBodyOptions) => stringOrBuffer(context, options)
-    .then((body) => body.toString())
-
-export function createReceive (context: Context): Receive {
-    return {
-        text: (options?: GetRawBodyOptions) => text(context, options)
-        , json: <T>(options?: GetRawBodyOptions) => json<T>(context, options)
-        , buffer: (options?: GetRawBodyOptions) => buffer(context, options)
-    }
-}
-
-function resolveRawBody <T>(fn: GetRawBodyFunction<T>, {
+const resolveRawBody = <T> (fn: GetRawBodyFunction<T>, {
     context
     , limit
     , encoding
     , rawBodyCache
     , defaultContentType
-}: ResolveRawBodyOptions): Promise<T> {
+}: ResolveRawBodyOptions): Promise<T> => {
     const body = rawBodyCache.get(context.req)
     const type = context.req.headers['content-type'] ?? defaultContentType
     const length = context.req.headers['content-length']
@@ -74,7 +58,9 @@ function resolveRawBody <T>(fn: GetRawBodyFunction<T>, {
     })
 }
 
-function toStringOrBuffer() {
+const defaultBodySizeLimit = '1mb'
+
+const toStringOrBuffer = () => {
     // avoid to read multiple times same stream object
     const rawBodyCache: RawBodyCacheMap<Buffer | string> = new WeakMap()
     return (context: Context, { limit = defaultBodySizeLimit, encoding }: GetRawBodyOptions = {}): Promise<Buffer | string> => {
@@ -89,7 +75,9 @@ function toStringOrBuffer() {
     }
 }
 
-function toBuffer() {
+const stringOrBuffer = toStringOrBuffer()
+
+const toBuffer = () => {
     // avoid to read multiple times same stream object
     const rawBodyCache: RawBodyCacheMap<Buffer> = new WeakMap()
     return (context: Context, { limit = defaultBodySizeLimit, encoding }: GetRawBodyOptions = {}): Promise<Buffer> => {
@@ -104,7 +92,7 @@ function toBuffer() {
     }
 }
 
-function toJson() {
+const toJson = () => {
     // avoid re-interpreting json
     const cacheJsonMap: CacheJsonMap = new WeakMap()
     return <T>(context: Context, options?: GetRawBodyOptions): Promise<T> => stringOrBuffer(context, options)
@@ -119,3 +107,15 @@ function toJson() {
         })
 }
 
+export const json = toJson()
+export const buffer = toBuffer()
+export const text = (context: Context, options?: GetRawBodyOptions) => stringOrBuffer(context, options)
+    .then((body) => body.toString())
+
+export const createReceive = (context: Context): Receive => {
+    return {
+        text: (options?: GetRawBodyOptions) => text(context, options)
+        , json: <T>(options?: GetRawBodyOptions) => json<T>(context, options)
+        , buffer: (options?: GetRawBodyOptions) => buffer(context, options)
+    }
+}
