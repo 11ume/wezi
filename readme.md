@@ -193,7 +193,7 @@ listen(w, 3000)
 ### Functional returns
 
 The second way to send responses is through the **send** object of **context**.
-This object has functions to send more specific data types like streams and buffers.
+This object has functions to send data with a specific status code and for send more specific data types like readable streams or buffers.
 
 <br>
 
@@ -201,7 +201,7 @@ This object has functions to send more specific data types like streams and buff
 ```ts
 import wezi, { Context, listen } from 'wezi'
 
-const  enhanceYourCalm   = ({ send }:  Context) => send.buffer(420, Buffer.from('Enhance Your Calm ✌️'))
+const enhanceYourCalm = ({ send }: Context) => send.buffer(420, Buffer.from('Enhance Your Calm ✌️'))
 const w = wezi(enhanceYourCalm)
 listen(w, 3000)
 
