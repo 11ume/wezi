@@ -1,12 +1,29 @@
 import { IncomingMessage } from 'http'
 import { Context, Receive } from 'wezi-types'
 import { parseJSON } from './utils'
-import { parseBody, getRawBodyBuffer, RawBodyCacheMapBuffer } from './buffer'
-import { Options as GetRawBodyOptions } from 'raw-body'
+import { getRawBody, getRawBodyBuffer } from './buffer'
+import { Options as GetRawBodyOptions, Encoding as RawBodyEncoding } from 'raw-body'
 import contentType from 'content-type'
 
 type CacheJsonMap = WeakMap<IncomingMessage, unknown>
-type RawBodyCacheMapString = WeakMap<IncomingMessage, string>
+type RawBodyCacheMap<T> = WeakMap<IncomingMessage, T>
+type GetRawBodyFunction <T> = (options: GetRawBodyFunctionOptions<T>) => Promise<T>
+
+type ResolveRawBodyOptions = {
+    limit: string | number
+    context: Context
+    encoding: RawBodyEncoding
+    rawBodyCache: WeakMap<IncomingMessage, any>
+    defaultContentType: string
+}
+
+type GetRawBodyFunctionOptions<T> = {
+    context: Context
+    encoding: RawBodyEncoding
+    limit: string | number
+    length: string
+    rawBodyCache: WeakMap<IncomingMessage, T>
+}
 
 const defaultBodySizeLimit = '1mb'
 const stringOrBuffer = toStringOrBuffer()
@@ -16,7 +33,7 @@ export const buffer = toBuffer()
 export const text = (context: Context, options?: GetRawBodyOptions) => stringOrBuffer(context, options)
     .then((body) => body.toString())
 
-export const createReceive = (context: Context): Receive => {
+export function createReceive (context: Context): Receive {
     return {
         text: (options?: GetRawBodyOptions) => text(context, options)
         , json: <T>(options?: GetRawBodyOptions) => json<T>(context, options)
@@ -24,67 +41,70 @@ export const createReceive = (context: Context): Receive => {
     }
 }
 
-export function toStringOrBuffer() {
+function resolveRawBody <T>(fn: GetRawBodyFunction<T>, {
+    context
+    , limit
+    , encoding
+    , rawBodyCache
+    , defaultContentType
+}: ResolveRawBodyOptions): Promise<T> {
+    const body = rawBodyCache.get(context.req)
+    const type = context.req.headers['content-type'] ?? defaultContentType
+    const length = context.req.headers['content-length']
+
+    if (body) return Promise.resolve(body)
+    if (encoding === undefined) {
+        const parameters = contentType.parse(type)?.parameters
+        const charset = parameters?.charset
+        return fn({
+            context
+            , limit
+            , length
+            , encoding: charset
+            , rawBodyCache
+        })
+    }
+
+    return fn({
+        context
+        , limit
+        , length
+        , encoding
+        , rawBodyCache
+    })
+}
+
+function toStringOrBuffer() {
     // avoid to read multiple times same stream object
-    const rawBodyCache: RawBodyCacheMapString = new WeakMap()
+    const rawBodyCache: RawBodyCacheMap<Buffer | string> = new WeakMap()
     return (context: Context, { limit = defaultBodySizeLimit, encoding }: GetRawBodyOptions = {}): Promise<Buffer | string> => {
-        const body = rawBodyCache.get(context.req)
-        const type = context.req.headers['content-type'] ?? 'text/plain'
-        const length = context.req.headers['content-length']
-
-        if (body) return Promise.resolve(body)
-        if (encoding === undefined) {
-            const parameters = contentType.parse(type)?.parameters
-            return parseBody({
-                context
-                , limit
-                , length
-                , encoding: parameters?.charset
-                , rawBodyCache
-            })
-        }
-
-        return parseBody({
+        const defaultContentType = 'text/plain'
+        return resolveRawBody(getRawBody, {
             context
             , limit
-            , length
             , encoding
             , rawBodyCache
+            , defaultContentType
         })
     }
 }
 
-export function toBuffer() {
+function toBuffer() {
     // avoid to read multiple times same stream object
-    const rawBodyCache: RawBodyCacheMapBuffer = new WeakMap()
+    const rawBodyCache: RawBodyCacheMap<Buffer> = new WeakMap()
     return (context: Context, { limit = defaultBodySizeLimit, encoding }: GetRawBodyOptions = {}): Promise<Buffer> => {
-        const body = rawBodyCache.get(context.req)
-        const type = context.req.headers['content-type'] ?? 'application/octet-stream'
-        const length = context.req.headers['content-length']
-
-        if (body) return Promise.resolve(body)
-        if (encoding === undefined) {
-            const parameters = contentType.parse(type)?.parameters
-            return getRawBodyBuffer({
-                context
-                , limit
-                , length
-                , encoding: parameters?.charset
-                , rawBodyCache
-            })
-        }
-
-        return getRawBodyBuffer({
+        const defaultContentType = 'application/octet-stream'
+        return resolveRawBody(getRawBodyBuffer, {
             context
             , limit
-            , length
             , encoding
             , rawBodyCache
+            , defaultContentType
         })
     }
 }
 
-export function toJson() {
+function toJson() {
     // avoid re-interpreting json
     const cacheJsonMap: CacheJsonMap = new WeakMap()
     return <T>(context: Context, options?: GetRawBodyOptions): Promise<T> => stringOrBuffer(context, options)
