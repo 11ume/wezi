@@ -7,7 +7,7 @@ import contentType from 'content-type'
 
 type CacheJsonMap = WeakMap<IncomingMessage, unknown>
 type RawBodyCacheMap<T> = WeakMap<IncomingMessage, T>
-type GetRawBodyFunction <T> = (options: GetRawBodyFunctionOptions<T>) => Promise<T>
+type GetRawBodyFunction<T> = (options: GetRawBodyFunctionOptions<T>) => Promise<T>
 
 type ResolveRawBodyOptions = {
     limit: string | number
