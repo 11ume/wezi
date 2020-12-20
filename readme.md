@@ -292,6 +292,8 @@ curl http://localhost:3000 -H "Content-Type: text/plain" --data "wezi"
 
 ### The context object
 
+<br>
+
 The context object is property is passed as argument to each handler. Contains only the essential elements that each handler needs to handle an incoming request and his response.
 
 
