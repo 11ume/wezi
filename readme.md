@@ -77,10 +77,13 @@ You have two forms to send responses.
 The  frist and most simple and natural is send a direct return.
 
 <br>
+
 By default a direct return emits a status code:
 
 **200** succeeded, if you return a **[stringifyable](https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/JSON/stringify)**  value. 
+
 **204** No Content, if you return a **[null](https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Objetos_globales/null)** value.
+
 **500** Internal Server Error, if an exception is thrown inside of the handler context.
 
 <br>
@@ -94,6 +97,7 @@ An stringifyables value is a value can be procesed by the method JSON.stringify.
 <br>
 
 > Return string value. 
+
 > Status code 200.
 
 ```ts
@@ -106,6 +110,7 @@ listen(w, 3000)
 <br>
 
 > Returns empty body.
+
 > Status code 204.
 
 ```ts
@@ -117,15 +122,17 @@ listen(w, 3000)
 ```
 <br>
 
-> Returns a JSON "{ "message": Something wrong has happened }".
+> Returns a JSON "{ "message": "Something wrong has happened" }".
+
 > status code 500.
  
 ```ts
 import wezi, { listen } from 'wezi'
 
 const error = () => {
-	throw Error('Something wrong has happened')
+    throw Error('Something wrong has happened')
 }
+
 const w = wezi(error)
 listen(w, 3000)
 ```
@@ -139,8 +146,9 @@ import wezi, { listen } from 'wezi'
 import { createError } from 'wezi-error'
 
 const errorWhitStatusCode = () => {
-	throw createError(400)
+   throw createError(400)
 }
+
 const w = wezi(errorWhitStatusCode)
 listen(w, 3000)
 ```
@@ -215,6 +223,7 @@ listen(w, 3000)
 ```
 <br>
 
+
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{ "type": "Polar", "location": "North Pole" }' http://localhost:3000
 ```
@@ -262,35 +271,11 @@ listen(w, 3000)
 
 <br>
 
-> Receive Buffer
-
-<br>
-
-```ts
-import wezi, { Context, listen } from 'wezi'
-
-const greet = async ({ receive }: Context) => {
-    const name = await receive.buffer() // Buffer(7) [104, 111, 114, 97, 99, 105, 111]
-    return `Hi ${name}!`
-}
-
-const w = wezi(greet)
-listen(w, 3000)
-```
-
-<br>
-
-```bash
-curl http://localhost:3000 -H "Content-Type: text/plain" --data "wezi" 
-```
-
-<br>
-
 **Note**: By default the wezi does not discriminate between HTTP methods, to achieve this you must use the **router** package.
 
 <br>
 
-### The context object
+## The context object
 
 <br>
 
@@ -314,7 +299,7 @@ Context {
 
 <br>
 
-#### The data flow between handlers 
+## The data flow between handlers 
 
 <br>
 
@@ -374,7 +359,7 @@ When **panic** function is invoked, the **composer** immediately stops the seque
 
 <br>
 
-#### Error handling
+## Error handling
 
 <br>
 
