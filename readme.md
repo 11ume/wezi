@@ -74,8 +74,7 @@ npm install wezi
 
 ## Get started
 
-Create an instance of wezi whit one handler and then start http server to listen requests on port 3000. 
-
+<br>
 
 ```ts
 import wezi, { listen } from 'wezi'
