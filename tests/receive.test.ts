@@ -58,7 +58,6 @@ test('json parse error', async (t) => {
 test('receive buffer', async (t) => {
     const fn = async (c: Context) => buffer(c)
     const url = await server(fn)
-
     const res = await fetch(url, {
         method: 'POST'
         , body: Buffer.from('🐻')
@@ -85,7 +84,6 @@ test('receive non buffer', async (t) => {
 test('receive text', async (t) => {
     const fn = async (c: Context) => text(c)
     const url = await server(fn)
-
     const res = await fetch(url, {
         method: 'POST'
         , body: '🐻 im a small polar bear'
@@ -134,12 +132,28 @@ test('json should throw 400 on empty body with no headers', async (t) => {
     t.is(res.status, 400)
 })
 
+test('text should throw 400 on invalid encoding', async (t) => {
+    const fn = async (c: Context) => json(c, {
+        encoding: 'lol'
+    })
+
+    const url = await server(fn)
+    const res = await fetch(url, {
+        method: 'POST'
+        , body: 'foo'
+    })
+
+    const body: ErrorPayload = await res.json()
+
+    t.is(body.message, 'Invalid body')
+    t.is(res.status, 400)
+})
+
 test('buffer should throw 400 on invalid encoding', async (t) => {
     const fn = async (c: Context) => buffer(c, {
         encoding: 'lol'
     })
     const url = await server(fn)
-
     const res = await fetch(url, {
         method: 'POST'
         , body: 'foo'
