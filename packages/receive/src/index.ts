@@ -1,5 +1,5 @@
 import { IncomingMessage } from 'http'
-import { Context, Receive } from 'wezi-types'
+import { Context, Body } from 'wezi-types'
 import { parseJSON } from './utils'
 import { getRawBody, getRawBodyBuffer } from './rawBody'
 import { Options as GetRawBodyOptions, Encoding as RawBodyEncoding } from 'raw-body'
@@ -112,7 +112,7 @@ export const buffer = toBuffer()
 export const text = (context: Context, options?: GetRawBodyOptions) => stringOrBuffer(context, options)
     .then((body) => body.toString())
 
-export const createReceive = (context: Context): Receive => {
+export const body = (context: Context): Body => {
     return {
         text: (options?: GetRawBodyOptions) => text(context, options)
         , json: <T>(options?: GetRawBodyOptions) => json<T>(context, options)

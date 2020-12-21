@@ -21,6 +21,12 @@
       "wezi-receive": [
         "packages/receive"
       ],
+      "wezi-shared": [
+        "packages/shared"
+      ],
+      "wezi-actions": [
+        "packages/actions"
+      ],
       "wezi-router": [
         "packages/router"
       ],
