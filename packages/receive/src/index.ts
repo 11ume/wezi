@@ -25,7 +25,7 @@ type GetRawBodyFunctionOptions<T> = {
     rawBodyCache: WeakMap<IncomingMessage, T>
 }
 
-const resolveRawBody = <T> (fn: GetRawBodyFunction<T>, {
+const resolveRawBody = <T>(fn: GetRawBodyFunction<T>, {
     context
     , limit
     , encoding
@@ -38,8 +38,8 @@ const resolveRawBody = <T> (fn: GetRawBodyFunction<T>, {
 
     if (body) return Promise.resolve(body)
     if (encoding === undefined) {
-        const parameters = contentType.parse(type)?.parameters
-        const charset = parameters?.charset
+        const { parameters } = contentType.parse(type)
+        const charset = parameters.charset
         return fn({
             context
             , limit

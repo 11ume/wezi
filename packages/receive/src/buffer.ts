@@ -19,24 +19,8 @@ type ParseBufferOptions = {
     rawBodyCache: WeakMap<IncomingMessage, Buffer>
 }
 
-export const getRawBodyBuffer = async ({
-    context
-    , limit
-    , length
-    , encoding
-    , rawBodyCache
-}: ParseBufferOptions): Promise<Buffer> => {
-    const body = await getRawBody({
-        context
-        , limit
-        , length
-        , encoding
-        , rawBodyCache
-    })
-
-    if (Buffer.isBuffer(body)) return body
-    throw createError(500, 'Body must be typeof Buffer')
-}
+// raw body return a string encoded when charset param is defined in the Content-type header or when encoding option is passed.
+const forceToBuffer = (body: string | Buffer) => Buffer.isBuffer(body) ? body : Buffer.from(body)
 
 export const getRawBody = ({
     context
@@ -60,3 +44,20 @@ export const getRawBody = ({
         throw createError(400, 'Invalid body', err)
     })
 
+export const getRawBodyBuffer = async ({
+    context
+    , limit
+    , length
+    , encoding
+    , rawBodyCache
+}: ParseBufferOptions): Promise<Buffer> => {
+    const body = await getRawBody({
+        context
+        , limit
+        , length
+        , encoding
+        , rawBodyCache
+    })
+
+    return forceToBuffer(body)
+}
