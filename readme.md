@@ -14,7 +14,7 @@
 <p align="center"> 
     Wezi is a simple, small and expressive library
     <br>
-    to create e̶l̶e̶g̶a̶n̶t̶ ̶m̶o̶n̶o̶l̶i̶t̶h̶s robust web applications and microservices like polar bears!. 
+    to create robust web applications and microservices like polar bears!. 
 <p>
 
 <br>
@@ -39,7 +39,7 @@
 <br>
 
 * **Small** To be easy and fast to learn.
-* **Simple** Only includes the essential [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle.
+* **Simple** Only includes the essential, and respect the [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle.
 * **Fast** High performance (even JSON parsing is opt-in, fast router).  
 * **Async** Implements an enhanced async control of handlers execution.
 * **Safe** Designed to avoid failures.
@@ -63,15 +63,14 @@ npm install wezi
     <img src="https://github.com/11ume/wezi-assets/blob/main/hi2.png?raw=true" width="200" height="auto"/>
 </div>
 
-
 ## Get started
 
 <br>
 
 ```ts
-import wezi, { listen } from 'wezi'
+import wezi, { Context, listen } from 'wezi'
 
 const greet = () => 'Hi!'
-const w = wezi(greet)
-listen(w, 3000)
+listen(wezi(greet), 3000)
 ```
+
