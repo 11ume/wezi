@@ -30,7 +30,7 @@
     
 <br>
 
-> ⚠️ Wezi is currently under development.
+> ⚠️ Wezi is currently under development, the documentation is coming!.
 
 <br>
 
