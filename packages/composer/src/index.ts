@@ -13,7 +13,7 @@ const end = (context: Context) => {
 }
 
 const execute = async (context: Context, handler: Handler, payload: unknown) => {
-    if (context.res.writableEnded) return
+    if (context.res.writableEnded) return // prevent res.end whit multi next
     try {
         const val = await handler(context, payload)
         if (val === null) {
