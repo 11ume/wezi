@@ -56,7 +56,11 @@ test('json parse error', async (t) => {
 })
 
 test('receive buffer', async (t) => {
-    const fn = async (c: Context) => buffer(c)
+    const fn = async (c: Context) => {
+        const body = await buffer(c)
+        t.true(Buffer.isBuffer(body))
+        return body
+    }
     const url = await server(fn)
     const res = await fetch(url, {
         method: 'POST'
@@ -67,18 +71,41 @@ test('receive buffer', async (t) => {
     t.is(body, '🐻')
 })
 
-test('receive non buffer', async (t) => {
+test('receive buffer whit charset header encoding', async (t) => {
     const fn = async (c: Context) => {
-        const err = await t.throwsAsync(() => buffer(c))
-        t.is(err.message, 'Body must be typeof Buffer')
-        return err
+        const body = await buffer(c)
+        t.true(Buffer.isBuffer(body))
+        return body
     }
     const url = await server(fn)
     const res = await fetch(url, {
         method: 'POST'
-        , body: '🐻'
+        , body: Buffer.from('🐻 im a grizzly bear')
+        , headers: {
+            'contet-type': 'application/octet-stream; charset=utf-8'
+        }
     })
-    t.is(res.status, 500)
+
+    const body = await res.text()
+    t.is(body, '🐻 im a grizzly bear')
+})
+
+test('receive buffer whit encoding option', async (t) => {
+    const fn = async (c: Context) => {
+        const body = await buffer(c, {
+            encoding: 'utf-8'
+        })
+        t.true(Buffer.isBuffer(body))
+        return body
+    }
+    const url = await server(fn)
+    const res = await fetch(url, {
+        method: 'POST'
+        , body: '🐻 im a grizzly bear'
+    })
+
+    const body = await res.text()
+    t.is(body, '🐻 im a grizzly bear')
 })
 
 test('receive text', async (t) => {
@@ -86,11 +113,11 @@ test('receive text', async (t) => {
     const url = await server(fn)
     const res = await fetch(url, {
         method: 'POST'
-        , body: '🐻 im a small polar bear'
+        , body: '🐻 im a grizzly bear'
     })
 
     const body = await res.text()
-    t.is(body, '🐻 im a small polar bear')
+    t.is(body, '🐻 im a grizzly bear')
 })
 
 test('json from rawBodyMap works', async (t) => {
