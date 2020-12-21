@@ -1,7 +1,7 @@
 import { IncomingMessage } from 'http'
 import { Context, Receive } from 'wezi-types'
 import { parseJSON } from './utils'
-import { getRawBody, getRawBodyBuffer } from './buffer'
+import { getRawBody, getRawBodyBuffer } from './rawBody'
 import { Options as GetRawBodyOptions, Encoding as RawBodyEncoding } from 'raw-body'
 import contentType from 'content-type'
 
