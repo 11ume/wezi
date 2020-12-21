@@ -1,17 +1,14 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { Send } from './send'
-import { Receive } from './receive'
+import { Body } from './receive'
 import { Actions } from './actions'
 
 export interface Context {
     readonly req: IncomingMessage
     readonly res: ServerResponse
+    readonly body: Body
     readonly next: Next
     readonly panic: Panic
-    readonly send: Send
-    readonly receive: Receive
     readonly actions: Actions
-    readonly errorHandler: ErrorHandler
 }
 
 export type Next = <T>(payload?: T) => void

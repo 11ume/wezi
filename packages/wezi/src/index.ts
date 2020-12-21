@@ -1,54 +1,51 @@
 import http, { RequestListener, IncomingMessage, ServerResponse } from 'http'
 import composer from 'wezi-composer'
 import { Context, Handler } from 'wezi-types'
+import { shareable } from 'wezi-shared'
 import { InternalError } from 'wezi-error'
-import { createReceive } from 'wezi-receive'
-import { createSend } from 'wezi-send'
-import { createActions } from 'wezi-actions'
+import { body } from 'wezi-receive'
+import { empty, json } from 'wezi-send'
+import { actions } from 'wezi-actions'
 import { isProd } from './utils'
 
-const defaultErrorHandler = ({ send }: Context, error: InternalError) => {
+const defaultErrorHandler = (context: Context, error: InternalError) => {
     const status = error.statusCode ?? 500
     const message = error.message || 'unknown'
     const payload = {
         message
     }
     if (isProd()) {
-        send.empty(status)
+        empty(context, status)
         return
     }
-    send.json(status, payload)
+    json(context, payload, status)
 }
 
-const createContext = (req: IncomingMessage
-    , res: ServerResponse
-    , errorHandler: Handler): Context => {
+const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
         req
         , res
+        , body: null
         , next: null
         , panic: null
-        , send: null
-        , receive: null
         , actions: null
-        , errorHandler
     }
 }
 
 const createEnhancedContext = (context: Context): Context => {
     return {
         ...context
-        , send: createSend(context)
-        , receive: createReceive(context)
-        , actions: createActions(context)
+        , body: body(context)
+        , actions: actions(context)
     }
 }
 
 const run = (...handlers: Handler[]) => {
     return (req: IncomingMessage, res: ServerResponse, errorHandler: Handler = defaultErrorHandler) => {
         const dispatch = composer(true, ...handlers)
-        const context = createContext(req, res, errorHandler)
+        const context = createContext(req, res)
         const enhancedContext = createEnhancedContext(context)
+        shareable.errorHandler = shareable.errorHandler ?? errorHandler
         dispatch(enhancedContext)
     }
 }

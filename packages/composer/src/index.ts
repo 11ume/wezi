@@ -1,6 +1,7 @@
 import { Context, Handler } from 'wezi-types'
 import { createError } from 'wezi-error'
 import { send } from 'wezi-send'
+import { shareable } from 'wezi-shared'
 
 type Dispatch = (context: Context, payload?: unknown) => void
 
@@ -44,11 +45,11 @@ const createNext = (context: Context, dispatch: Dispatch) => {
 const createPanic = (context: Context) => {
     return function panic(error?: Error): void {
         if (error instanceof Error) {
-            context.errorHandler(context, error)
+            shareable.errorHandler(context, error)
             return
         }
 
-        context.errorHandler(context, createError(500, 'panic payload must be instance of Error'))
+        shareable.errorHandler(context, createError(500, 'panic payload must be instance of Error'))
     }
 }
 

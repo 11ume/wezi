@@ -1,5 +1,5 @@
 import { Stream, Readable } from 'stream'
-import { Context, Send } from 'wezi-types'
+import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
 import { isEmpty, isJsonable, noContentType } from './utils'
 
@@ -74,15 +74,4 @@ export const send = (context: Context, statusCode?: number, payload?: any) => {
     }
 
     return text(context, payload, statusCode)
-}
-
-export const createSend = (context: Context): Send => {
-    return {
-        ok: () => ok(context)
-        , empty: (statusCode?: number) => empty(context, statusCode)
-        , json: <T>(statusCode: number, payload: T) => json(context, payload, statusCode)
-        , text: (statusCode: number, payload: string | number) => text(context, payload, statusCode)
-        , buffer: (statusCode: number, payload: Buffer) => buffer(context, statusCode, payload)
-        , stream: (statusCode: number, payload: Readable) => stream(context, statusCode, payload)
-    }
 }

@@ -1,34 +1,8 @@
 import test from 'ava'
-import http, { IncomingMessage, ServerResponse } from 'http'
-import listen from 'test-listen'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
-import { createError, InternalError } from 'wezi-error'
+import { server, createContext } from './helpers'
 import composer from '..'
-
-const server = (fn: (req: IncomingMessage, res: ServerResponse) => void) => {
-    return listen(http.createServer((req, res) => fn(req, res)))
-}
-
-const createContext = ({
-    req
-    , res
-    , next = null
-    , panic = null
-    , send = null
-    , receive = null
-    , actions = null
-    , errorHandler = null
-}): Context => ({
-    req
-    , res
-    , next
-    , panic
-    , send
-    , receive
-    , actions
-    , errorHandler
-})
 
 test('main composer single handler, direct<string:200>', async (t) => {
     const url = await server((req, res) => {
@@ -188,84 +162,6 @@ test('main composer multi handler async, direct promise return in second handler
     t.is(r, 'hello')
 })
 
-test('main composer multi handler async, direct promise error return in first handler, next<Error:400>', async (t) => {
-    const url = await server((req, res) => {
-        const check = (c: Context) => c.panic(createError(400))
-        const never = () => Promise.resolve('hello')
-        const errorHandler = (context: Context, error: Partial<InternalError>) => {
-            context.res.statusCode = error.statusCode ?? 500
-            context.res.end(error.message)
-        }
-        const dispatch = composer(true, check, never)
-        const context = createContext({
-            req
-            , res
-            , errorHandler
-        })
-
-        dispatch(context)
-    })
-
-    const res = await fetch(url)
-    const body: string = await res.text()
-
-    t.is(res.status, 400)
-    t.is(body, 'Bad Request')
-})
-
-test('main composer multi handler async, direct promise error return in second handler, next<empty>, direct<Promise<Error>:400>', async (t) => {
-    const url = await server((req, res) => {
-        const next = (c: Context) => c.next()
-        const greet = () => Promise.reject(createError(400))
-        const errorHandler = (context: Context, error: Partial<InternalError>) => {
-            context.res.statusCode = error.statusCode || 500
-            context.res.end(error.message)
-        }
-
-        const dispatch = composer(true, next, greet)
-        const context = createContext({
-            req
-            , res
-            , errorHandler
-        })
-
-        dispatch(context)
-    })
-
-    const res = await fetch(url)
-    const body: string = await res.text()
-
-    t.is(res.status, 400)
-    t.is(body, 'Bad Request')
-})
-
-test('main composer multi handler, throw error inside first handler, <Error>', async (t) => {
-    const url = await server((req, res) => {
-        const err = () => {
-            throw new Error('Something wrong is happened')
-        }
-        const never = () => 'hello'
-        const errorHandler = (context: Context, error: Partial<InternalError>) => {
-            context.res.statusCode = 500
-            context.res.end(error.message)
-        }
-        const dispatch = composer(true, err, never)
-        const context = createContext({
-            req
-            , res
-            , errorHandler
-        })
-
-        dispatch(context)
-    })
-
-    const res = await fetch(url)
-    const body: string = await res.text()
-
-    t.is(body, 'Something wrong is happened')
-    t.is(res.status, 500)
-})
-
 test('main composer multi handlers, pass parameters whit next, next<string>, direct<Promise<string:200>>', async (t) => {
     const url = await server((req, res) => {
         const next = (c: Context) => c.next('hello')
@@ -326,29 +222,4 @@ test('main composer end the response if higher-order handlers are executed and n
 
     const res = await fetch(url)
     t.is(res.status, 404)
-})
-
-test('main composer call panic whiout pass an error, panic<not error type>', async (t) => {
-    const url = await server((req, res) => {
-        const dispatch = composer(true, (c: Context) => c.panic({
-            foo: 'foo'
-        } as any))
-        const errorHandler = (context: Context, error: Partial<InternalError>) => {
-            context.res.statusCode = error.statusCode || 500
-            context.res.end(error.message)
-        }
-        const context = createContext({
-            req
-            , res
-            , errorHandler
-        })
-
-        dispatch(context)
-    })
-
-    const res = await fetch(url)
-    const body: string = await res.text()
-
-    t.is(body, 'panic payload must be instance of Error')
-    t.is(res.status, 500)
 })
