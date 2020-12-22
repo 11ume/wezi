@@ -39,7 +39,7 @@
 <br>
 
 * **Small** To be easy and fast to learn.
-* **Simple** Only includes the essential, and respect the [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle.
+* **Simple** Focused on simplicity, hides the complexity and respect the [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle.
 * **Fast** High performance (even JSON parsing is opt-in, fast router).  
 * **Async** Implements an enhanced async control of handlers execution.
 * **Safe** Designed to avoid failures.
