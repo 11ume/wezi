@@ -65,6 +65,7 @@ export const ok = (context: Context) => {
 }
 
 export const send = (context: Context, statusCode?: number, payload?: any) => {
+    if (context.res.writableEnded) return
     if (isEmpty(payload)) {
         return empty(context, statusCode)
     }
