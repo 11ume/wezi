@@ -1,4 +1,4 @@
-import run from './src'
+import wezi from './src'
 export { listen } from './src'
 export { Context, Handler } from 'wezi-types'
-export default run
+export default wezi

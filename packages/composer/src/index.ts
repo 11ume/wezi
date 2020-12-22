@@ -1,20 +1,23 @@
-import { Context, Handler } from 'wezi-types'
-import { createError } from 'wezi-error'
 import { send } from 'wezi-send'
 import { shareable } from 'wezi-shared'
+import { createError } from 'wezi-error'
+import { Context, Handler } from 'wezi-types'
 
 type Dispatch = (context: Context, payload?: unknown) => void
 
 const createContext = <T>(context: Context, obj: T) => Object.assign(context, obj)
 
-// end response if all higher-order handlers are executed, and none of them have ended the response
+// prevent unnecessary or dangerous of some handler invocation
+const isWritableEnded = (context: Context) => context.res.writableEnded
+
+// end response if all higher-order handlers are executed, and none of them has ended the response
 const end = (context: Context) => {
     context.res.statusCode = 404
     context.res.end()
 }
 
 const execute = async (context: Context, handler: Handler, payload: unknown) => {
-    if (context.res.writableEnded) return
+    if (isWritableEnded(context)) return
     try {
         const val = await handler(context, payload)
         if (val === null) {

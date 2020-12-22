@@ -1,8 +1,19 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
+import { shareable } from 'wezi-shared'
+import { InternalError } from 'wezi-error'
 import { server, createContext } from './helpers'
 import composer from '..'
+
+test.before('main composer prepare context', (t) => {
+    const errorHandler = (context: Context, error: Partial<InternalError>) => {
+        context.res.statusCode = error.statusCode ?? 500
+        context.res.end(error.message)
+    }
+    shareable.errorHandler = errorHandler
+    t.pass()
+})
 
 test('main composer single handler, direct<string:200>', async (t) => {
     const url = await server((req, res) => {
@@ -223,3 +234,31 @@ test('main composer end the response if higher-order handlers are executed and n
     const res = await fetch(url)
     t.is(res.status, 404)
 })
+
+test('main composer stop the execution sequence of handler stack when next function is called multiple times in a same handler, (next<empty>, next<empty>), next<string>, next<string>', async (t) => {
+    const url = await server((req, res) => {
+        const multiNext = (c: Context) => {
+            c.next()
+            c.next()
+        }
+        const stop = () => 'stop'
+        const never = () => {
+            t.true(false)
+            return 'never'
+        }
+        const dispatch = composer(true, multiNext, stop, never)
+        const context = createContext({
+            req
+            , res
+        })
+
+        dispatch(context)
+    })
+
+    const res = await fetch(url)
+    const body = await res.text()
+
+    t.is(body, 'stop')
+    t.is(res.status, 200)
+})
+
