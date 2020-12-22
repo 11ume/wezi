@@ -6,6 +6,15 @@ import { createError, InternalError } from 'wezi-error'
 import { server, createContext } from './helpers'
 import composer from '..'
 
+test.before('main composer prepare context', (t) => {
+    const errorHandler = (context: Context, error: Partial<InternalError>) => {
+        context.res.statusCode = error.statusCode ?? 500
+        context.res.end(error.message)
+    }
+    shareable.errorHandler = errorHandler
+    t.pass()
+})
+
 test('main composer multi handler async, direct promise error return in first handler, next<Error:400>', async (t) => {
     const url = await server((req, res) => {
         const check = (c: Context) => c.panic(createError(400))
