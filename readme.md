@@ -68,7 +68,7 @@ npm install wezi
 <br>
 
 ```ts
-import wezi, { Context, listen } from 'wezi'
+import wezi, { listen } from 'wezi'
 
 const greet = () => 'Hi!'
 listen(wezi(greet), 3000)
