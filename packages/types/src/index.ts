@@ -8,9 +8,11 @@ export interface Context {
     readonly body: Body
     readonly next: Next
     readonly panic: Panic
+    readonly status: Status
     readonly actions: Actions
 }
 
+export type Status = (code: number) => void
 export type Next = <T>(payload?: T) => void
 export type Panic = (error: Error) => void
 export type Handler = (context: Context, payload?: any) => any
