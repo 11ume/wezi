@@ -10,8 +10,9 @@ test('create custom error handler', async (t) => {
         context.res.statusCode = error.statusCode ?? 500
         context.res.end(error.message)
     }
-    await listen((req, res) => w(req, res, errorHandler), 3001)
-    const res = await fetch('http://localhost:3001')
+
+    await listen((req, res) => w(req, res, errorHandler), 3000)
+    const res = await fetch('http://localhost:3000')
     const r = await res.text()
 
     t.is(res.status, 400)

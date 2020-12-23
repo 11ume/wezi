@@ -4,13 +4,14 @@ import { Context } from 'wezi-types'
 import wezi, { listen } from 'wezi'
 import { server } from './helpers'
 
-test('server listen, direct', async (t) => {
+test('server listen', async (t) => {
     const w = wezi(() => 'hello')
     await listen(w, 3000)
-    const res = await fetch('http://localhost:3000')
-    const r = await res.text()
 
-    t.is(r, 'hello')
+    const res = await fetch('http://localhost:3000')
+    const body = await res.text()
+
+    t.is(body, 'hello')
 })
 
 test('context redirect response', async (t) => {
@@ -24,6 +25,7 @@ test('context redirect response', async (t) => {
 
     await listen(w, 3002)
     const res = await fetch('http://localhost:3002')
+
     t.true(res.redirected)
 })
 
@@ -32,50 +34,56 @@ test('context body parse json', async (t) => {
         name: string
     }
 
-    const fn = async ({ body }: Context): Promise<Character> => body.json()
-    const url = await server(fn)
+    const handler = async ({ body }: Context): Promise<Character> => body.json()
+
+    const url = await server(handler)
     const res = await fetch(url, {
         method: 'POST'
         , body: JSON.stringify({
             name: 't800'
         })
     })
-
     const body: Character = await res.json()
+
     t.is(res.headers.get('content-type'), 'application/json charset=utf-8')
     t.is(body.name, 't800')
 })
 
 test('context body parse buffer', async (t) => {
-    const fn = async ({ body }: Context) => body.buffer()
-    const url = await server(fn)
+    const handler = async ({ body }: Context) => body.buffer()
+
+    const url = await server(handler)
     const res = await fetch(url, {
         method: 'POST'
         , body: Buffer.from('🐻')
     })
 
     const body = await res.text()
+
     t.is(body, '🐻')
 })
 
 test('context body parse text', async (t) => {
-    const fn = async ({ body }: Context) => body.text()
-    const url = await server(fn)
+    const handler = async ({ body }: Context) => body.text()
+
+    const url = await server(handler)
     const res = await fetch(url, {
         method: 'POST'
         , body: '🐻 im a small polar bear'
     })
 
     const body = await res.text()
+
     t.is(body, '🐻 im a small polar bear')
 })
 
 test('context set response status code', async (t) => {
-    const fn = async ({ res, status }: Context) => {
+    const handler = async ({ res, status }: Context) => {
         status(420)
         res.end()
     }
-    const url = await server(fn)
+
+    const url = await server(handler)
     const res = await fetch(url)
 
     t.is(res.status, 420)
