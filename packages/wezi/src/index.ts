@@ -22,6 +22,10 @@ const defaultErrorHandler = (context: Context, error: InternalError) => {
     send.json(context, payload, status)
 }
 
+const status = (context: Context) => (code: number) => {
+    context.res.statusCode = code
+}
+
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
         req
@@ -29,6 +33,7 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
         , body: null
         , next: null
         , panic: null
+        , status: null
         , actions: null
     }
 }
@@ -37,6 +42,7 @@ const createEnhancedContext = (context: Context): Context => {
     return {
         ...context
         , body: body(context)
+        , status: status(context)
         , actions: actions(context)
     }
 }

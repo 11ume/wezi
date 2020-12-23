@@ -70,3 +70,14 @@ test('context body parse text', async (t) => {
     t.is(body, '🐻 im a small polar bear')
 })
 
+test('context set response status code', async (t) => {
+    const fn = async ({ res, status }: Context) => {
+        status(420)
+        res.end()
+    }
+    const url = await server(fn)
+    const res = await fetch(url)
+
+    t.is(res.status, 420)
+})
+
