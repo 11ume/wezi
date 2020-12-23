@@ -6,29 +6,27 @@ import { server } from './helpers'
 
 test('server listen', async (t) => {
     const w = wezi(() => 'hello')
-    const serv = await listen(w, 3000)
 
+    await listen(w, 3000)
     const res = await fetch('http://localhost:3000')
     const body = await res.text()
 
     t.is(body, 'hello')
-    serv.close()
 })
 
 test('context redirect response', async (t) => {
-    const w = wezi(({ req, res, actions }: Context) => {
+    const handler = ({ req, res, actions }: Context) => {
         if (req.url === '/redirect') {
             res.end()
             return
         }
         actions.redirect('/redirect')
-    })
+    }
 
-    const serv = await listen(w, 3002)
-    const res = await fetch('http://localhost:3002')
+    const url = await server(handler)
+    const res = await fetch(url)
 
     t.true(res.redirected)
-    serv.close()
 })
 
 test('context body parse json', async (t) => {
