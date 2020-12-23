@@ -12,12 +12,14 @@ export const createContext = ({
     , body = null
     , next = null
     , panic = null
+    , status = null
     , actions = null
 }): Context => ({
     req
     , res
+    , body
     , next
     , panic
-    , body
+    , status
     , actions
 })
