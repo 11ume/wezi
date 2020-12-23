@@ -6,12 +6,13 @@ import { server } from './helpers'
 
 test('server listen', async (t) => {
     const w = wezi(() => 'hello')
-    await listen(w, 3000)
+    const serv = await listen(w, 3000)
 
     const res = await fetch('http://localhost:3000')
     const body = await res.text()
 
     t.is(body, 'hello')
+    serv.close()
 })
 
 test('context redirect response', async (t) => {
@@ -23,10 +24,11 @@ test('context redirect response', async (t) => {
         actions.redirect('/redirect')
     })
 
-    await listen(w, 3002)
+    const serv = await listen(w, 3002)
     const res = await fetch('http://localhost:3002')
 
     t.true(res.redirected)
+    serv.close()
 })
 
 test('context body parse json', async (t) => {

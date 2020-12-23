@@ -11,10 +11,11 @@ test('create custom error handler', async (t) => {
         context.res.end(error.message)
     }
 
-    await listen((req, res) => w(req, res, errorHandler), 3000)
+    const serv = await listen((req, res) => w(req, res, errorHandler), 3001)
     const res = await fetch('http://localhost:3000')
     const r = await res.text()
 
     t.is(res.status, 400)
     t.is(r, 'Bad Request')
+    serv.close()
 })
