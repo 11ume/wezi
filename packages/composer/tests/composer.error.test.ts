@@ -19,11 +19,6 @@ test('main composer multi handler async, direct promise error return in first ha
     const url = await server((req, res) => {
         const check = (c: Context) => c.panic(createError(400))
         const never = () => Promise.resolve('hello')
-        const errorHandler = (context: Context, error: Partial<InternalError>) => {
-            context.res.statusCode = error.statusCode ?? 500
-            context.res.end(error.message)
-        }
-        shareable.errorHandler = errorHandler
         const dispatch = composer(true, check, never)
         const context = createContext({
             req
@@ -44,12 +39,6 @@ test('main composer multi handler async, direct promise error return in second h
     const url = await server((req, res) => {
         const next = (c: Context) => c.next()
         const greet = () => Promise.reject(createError(400))
-        const errorHandler = (context: Context, error: Partial<InternalError>) => {
-            context.res.statusCode = error.statusCode || 500
-            context.res.end(error.message)
-        }
-
-        shareable.errorHandler = errorHandler
         const dispatch = composer(true, next, greet)
         const context = createContext({
             req
@@ -72,11 +61,6 @@ test('main composer multi handler, throw error inside first handler, <Error>', a
             throw new Error('Something wrong is happened')
         }
         const never = () => 'hello'
-        const errorHandler = (context: Context, error: Partial<InternalError>) => {
-            context.res.statusCode = 500
-            context.res.end(error.message)
-        }
-        shareable.errorHandler = errorHandler
         const dispatch = composer(true, err, never)
         const context = createContext({
             req
@@ -98,11 +82,6 @@ test('main composer call panic whiout pass an error, panic<not error type>', asy
         const dispatch = composer(true, (c: Context) => c.panic({
             foo: 'foo'
         } as any))
-        const errorHandler = (context: Context, error: Partial<InternalError>) => {
-            context.res.statusCode = error.statusCode || 500
-            context.res.end(error.message)
-        }
-        shareable.errorHandler = errorHandler
         const context = createContext({
             req
             , res
