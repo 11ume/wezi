@@ -93,7 +93,7 @@ test('main composer call panic whiout pass an error, panic<not error type>', asy
     const res = await fetch(url)
     const body: string = await res.text()
 
-    t.is(body, 'panic payload must be instance of Error')
+    t.is(body, 'panic error param, must be instance of Error')
     t.is(res.status, 500)
 })
 
