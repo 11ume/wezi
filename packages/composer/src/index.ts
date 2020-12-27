@@ -7,16 +7,16 @@ type Dispatch = (context: Context, payload?: unknown) => void
 
 const createContext = <T>(context: Context, obj: T) => Object.assign(context, obj)
 
-// prevent unnecessary or dangerous of some handler invocation
-const isWritableEnded = (context: Context) => context.res.writableEnded
+// prevent unnecessary or dangerous handler invocation
+const isWritableEnded = (context: Context): boolean => context.res.writableEnded
 
 // end response if all higher-order handlers are executed, and none of them has ended the response
-const end = (context: Context) => {
+const end = (context: Context): void => {
     context.res.statusCode = 404
     context.res.end()
 }
 
-const execute = async (context: Context, handler: Handler, payload: unknown) => {
+const execute = async (context: Context, handler: Handler, payload: unknown): Promise<void> => {
     if (isWritableEnded(context)) return
     try {
         const val = await handler(context, payload)
@@ -52,7 +52,7 @@ const createPanic = (context: Context) => {
             return
         }
 
-        shareable.errorHandler(context, createError(500, 'panic payload must be instance of Error'))
+        shareable.errorHandler(context, createError(500, 'panic error param, must be instance of Error'))
     }
 }
 
