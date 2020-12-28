@@ -52,7 +52,7 @@ const wezi = (...handlers: Handler[]) => {
         const dispatch = composer(true, ...handlers)
         const context = createContext(req, res)
         const enhancedContext = createEnhancedContext(context)
-        shareable.errorHandler = shareable.errorHandler ? errorHandler : errorHandler
+        shareable.errorHandler ??= errorHandler
         dispatch(enhancedContext)
     }
 }
