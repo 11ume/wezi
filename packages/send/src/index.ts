@@ -59,11 +59,6 @@ export const empty = (context: Context, statusCode?: number) => {
     context.res.end()
 }
 
-export const ok = (context: Context) => {
-    context.res.statusCode = 200
-    context.res.end()
-}
-
 export const send = (context: Context, statusCode?: number, payload?: any) => {
     if (isEmpty(payload)) {
         return empty(context, statusCode)
