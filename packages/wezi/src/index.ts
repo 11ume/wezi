@@ -57,12 +57,10 @@ const wezi = (...handlers: Handler[]) => {
     }
 }
 
-export const listen = (handler: RequestListener, port: number): Promise<http.Server> => new Promise((resolve, reject) => {
+export const listen = (handler: RequestListener, port: number) => {
     const server = http.createServer((req, res) => handler(req, res))
-    server.on('listening', resolve)
-    server.on('error', reject)
     server.listen(port)
     return server
-})
+}
 
 export default wezi
