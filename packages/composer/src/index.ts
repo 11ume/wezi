@@ -1,22 +1,22 @@
 import { send } from 'wezi-send'
 import { shareable } from 'wezi-shared'
 import { createError } from 'wezi-error'
-import { Context, Handler } from 'wezi-types'
+import {
+    Context
+    , Handler
+    , Next
+    , Panic
+} from 'wezi-types'
+import { createContext, isWritableEnded } from './utils'
 
 type Dispatch = (context: Context, payload?: unknown) => void
 
-const createContext = <T>(context: Context, obj: T) => Object.assign(context, obj)
-
-// prevent unnecessary or dangerous handler invocation
-const isWritableEnded = (context: Context): boolean => context.res.writableEnded
-
-// end response if all higher-order handlers are executed, and none of them has ended the response
-const end = (context: Context): void => {
+const endResponse = (context: Context) => {
     context.res.statusCode = 404
     context.res.end()
 }
 
-const execute = async (context: Context, handler: Handler, payload: unknown): Promise<void> => {
+const executeHandler = async (context: Context, handler: Handler, payload: unknown): Promise<void> => {
     if (isWritableEnded(context)) return
     try {
         const val = await handler(context, payload)
@@ -34,7 +34,7 @@ const execute = async (context: Context, handler: Handler, payload: unknown): Pr
     }
 }
 
-const createNext = (context: Context, dispatch: Dispatch) => {
+const createNext = (context: Context, dispatch: Dispatch): Next => {
     return function next(payload?: unknown): void {
         if (payload === undefined) {
             dispatch(context)
@@ -45,7 +45,7 @@ const createNext = (context: Context, dispatch: Dispatch) => {
     }
 }
 
-const createPanic = (context: Context) => {
+const createPanic = (context: Context): Panic => {
     return function panic(error?: Error): void {
         if (error instanceof Error) {
             shareable.errorHandler(context, error)
@@ -56,7 +56,7 @@ const createPanic = (context: Context) => {
     }
 }
 
-export const composer = (main: boolean, ...handlers: Handler[]) => {
+export const composer = (main: boolean, ...handlers: Handler[]): Dispatch => {
     let i = 0
     return function dispatch(context: Context, payload?: unknown): void {
         if (i < handlers.length) {
@@ -68,10 +68,11 @@ export const composer = (main: boolean, ...handlers: Handler[]) => {
                 , panic
             })
 
-            setImmediate(execute, newContext, handler, payload)
+            setImmediate(executeHandler, newContext, handler, payload)
             return
         }
 
-        main && setImmediate(end, context)
+        // end response if all higher-order handlers are executed, and none of them has ended the response.
+        main && setImmediate(endResponse, context)
     }
 }

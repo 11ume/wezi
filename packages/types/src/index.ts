@@ -12,8 +12,8 @@ export interface Context {
     readonly actions: Actions
 }
 
-export type Status = (code: number) => void
 export type Next = <T>(payload?: T) => void
 export type Panic = (error: Error) => void
+export type Status = (code: number) => void
 export type Handler = (context: Context, payload?: any) => any
 export type ErrorHandler = (context: Context, error: Error) => void

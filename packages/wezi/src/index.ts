@@ -4,10 +4,9 @@ import { body } from 'wezi-receive'
 import { actions } from 'wezi-actions'
 import { shareable } from 'wezi-shared'
 import { InternalError } from 'wezi-error'
-import { Context, Handler } from 'wezi-types'
+import { Context, Handler, Status } from 'wezi-types'
 import * as send from 'wezi-send'
-
-const isProduction = () => process.env.NODE_ENV === 'production'
+import { isProduction } from './utils'
 
 const defaultErrorHandler = (context: Context, error: InternalError) => {
     const status = error.statusCode ?? 500
@@ -22,7 +21,7 @@ const defaultErrorHandler = (context: Context, error: InternalError) => {
     send.json(context, payload, status)
 }
 
-const status = (context: Context) => (code: number) => {
+const status = (context: Context): Status => (code: number) => {
     context.res.statusCode = code
 }
 
