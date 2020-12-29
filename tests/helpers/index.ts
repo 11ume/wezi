@@ -6,10 +6,10 @@ import { ErrorHandler } from 'wezi-types'
 
 export const server = (...fn: Handler[]) => {
     const w = wezi(...fn)
-    return listen(http.createServer(w))
+    return listen(http.createServer(w()))
 }
 
 export const serverError = (errorHandler: ErrorHandler, ...fn: Handler[]) => {
     const w = wezi(...fn)
-    return listen(http.createServer((req, res) => w(req, res, errorHandler)))
+    return listen(http.createServer(w(null, errorHandler)))
 }
