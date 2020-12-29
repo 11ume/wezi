@@ -7,7 +7,7 @@ import { server } from './helpers'
 test('server listen', async (t) => {
     const w = wezi(() => 'hello')
 
-    await listen(w, 3000)
+    await listen(w(), 3000)
     const res = await fetch('http://localhost:3000')
     const body = await res.text()
 

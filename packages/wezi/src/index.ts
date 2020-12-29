@@ -25,10 +25,11 @@ const status = (context: Context): Status => (code: number) => {
     context.res.statusCode = code
 }
 
-const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
+const createContext = (req: IncomingMessage, res: ServerResponse, shared: unknown): Context => {
     return {
         req
         , res
+        , shared
         , body: null
         , next: null
         , panic: null
@@ -46,15 +47,17 @@ const createEnhancedContext = (context: Context): Context => {
     }
 }
 
-const wezi = (...handlers: Handler[]) => {
-    return (req: IncomingMessage, res: ServerResponse, errorHandler: Handler = defaultErrorHandler) => {
-        const dispatch = composer(true, ...handlers)
-        const context = createContext(req, res)
-        const enhancedContext = createEnhancedContext(context)
+const wezi = <S = any>(...handlers: Handler[]) =>
+    (initialShared: S = null, errorHandler: Handler = defaultErrorHandler) => {
         shareable.errorHandler ??= errorHandler
-        dispatch(enhancedContext)
+        const shared = initialShared ?? {}
+        return (req: IncomingMessage, res: ServerResponse) => {
+            const dispatch = composer(true, ...handlers)
+            const context = createContext(req, res, shared)
+            const enhancedContext = createEnhancedContext(context)
+            dispatch(enhancedContext)
+        }
     }
-}
 
 export const listen = (handler: RequestListener, port: number) => {
     const server = http.createServer((req, res) => handler(req, res))
