@@ -2,7 +2,7 @@ import { IncomingMessage, ServerResponse } from 'http'
 import { Body } from './receive'
 import { Actions } from './actions'
 
-export interface Context {
+export interface Context<T = any> {
     readonly req: IncomingMessage
     readonly res: ServerResponse
     readonly body: Body
@@ -10,6 +10,7 @@ export interface Context {
     readonly panic: Panic
     readonly status: Status
     readonly actions: Actions
+    readonly shared: T
 }
 
 export type Next = <T>(payload?: T) => void

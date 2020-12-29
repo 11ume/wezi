@@ -16,7 +16,7 @@ test('panic whit custom error handler', async (t) => {
     }
 
     const w = wezi(r(get('/foo', foo), get('/bar', bar)), notFound)
-    await listen((req, res) => w(req, res, errorHandler), 3000)
+    await listen(w(null, errorHandler), 3000)
     const res = await fetch('http://localhost:3000/baz')
     const body = await res.text()
 
