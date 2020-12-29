@@ -27,7 +27,6 @@ const executeHandler = async (context: Context, handler: Handler, payload: unkno
 
         if (val !== undefined) {
             send(context, context.res.statusCode, val)
-            return
         }
     } catch (err) {
         context.panic(err)
