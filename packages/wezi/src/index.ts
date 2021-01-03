@@ -1,4 +1,4 @@
-import http, { RequestListener, IncomingMessage, ServerResponse } from 'http'
+import http, { IncomingMessage, ServerResponse } from 'http'
 import composer from 'wezi-composer'
 import { body } from 'wezi-receive'
 import { actions } from 'wezi-actions'
@@ -49,9 +49,11 @@ const createEnhancedContext = (context: Context): Context => {
     }
 }
 
+type Wezi<S = any> = (initialShared?: S, errorHandler?: Handler) => (req: IncomingMessage, res: ServerResponse) => void
+
 const wezi = <S = any>(...handlers: Handler[]) => (initialShared: S = null, errorHandler: Handler = defaultErrorHandler) => {
-    shareable.errorHandler ??= errorHandler
     const shared = initialShared ?? {}
+    shareable.errorHandler ??= errorHandler
     return (req: IncomingMessage, res: ServerResponse) => {
         const dispatch = composer(true, ...handlers)
         const context = createContext(req, res, shared)
@@ -60,7 +62,8 @@ const wezi = <S = any>(...handlers: Handler[]) => (initialShared: S = null, erro
     }
 }
 
-export const listen = (handler: RequestListener, port: number) => {
+export const listen = <S = any>(w: Wezi<S>, port: number, initialShared?: S, errorHandler?: Handler) => {
+    const handler = w(initialShared, errorHandler)
     const server = http.createServer((req, res) => handler(req, res))
     server.listen(port)
     return server
