@@ -70,22 +70,5 @@ npm install wezi
 import wezi, { listen } from 'wezi'
 
 const greet = () => 'Hi!'
-listen(wezi(greet)(), 3000)
+listen(wezi(greet), 3000)
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
