@@ -1,5 +1,4 @@
 import codes from './codes'
-
 export class InternalError extends Error {
     constructor(
         public readonly message: string
