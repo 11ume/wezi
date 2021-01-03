@@ -30,6 +30,8 @@ const createContext = (req: IncomingMessage, res: ServerResponse, shared: unknow
         req
         , res
         , shared
+        , query: {}
+        , params: {}
         , body: null
         , next: null
         , panic: null
@@ -47,17 +49,16 @@ const createEnhancedContext = (context: Context): Context => {
     }
 }
 
-const wezi = <S = any>(...handlers: Handler[]) =>
-    (initialShared: S = null, errorHandler: Handler = defaultErrorHandler) => {
-        shareable.errorHandler ??= errorHandler
-        const shared = initialShared ?? {}
-        return (req: IncomingMessage, res: ServerResponse) => {
-            const dispatch = composer(true, ...handlers)
-            const context = createContext(req, res, shared)
-            const enhancedContext = createEnhancedContext(context)
-            dispatch(enhancedContext)
-        }
+const wezi = <S = any>(...handlers: Handler[]) => (initialShared: S = null, errorHandler: Handler = defaultErrorHandler) => {
+    shareable.errorHandler ??= errorHandler
+    const shared = initialShared ?? {}
+    return (req: IncomingMessage, res: ServerResponse) => {
+        const dispatch = composer(true, ...handlers)
+        const context = createContext(req, res, shared)
+        const enhancedContext = createEnhancedContext(context)
+        dispatch(enhancedContext)
     }
+}
 
 export const listen = (handler: RequestListener, port: number) => {
     const server = http.createServer((req, res) => handler(req, res))

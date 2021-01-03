@@ -4,13 +4,13 @@ import composer from 'wezi-composer'
 import { getUrlQuery, getUrlParams } from './extractors'
 import regexparam from './regexparam'
 
-export interface ContextRoute<P = void, Q = void> extends Context {
-    readonly params?: P
-    readonly query?: Q
+export interface ContextRouter<P = any, Q = any> extends Context {
+    readonly query: Q
+    readonly params: P
 }
 
-export interface ContextRouteWild extends Context {
-    params?: {
+export interface ContextParamsWild<T = any> extends Context<T> {
+    params: {
         wild: string
     }
 }
@@ -34,12 +34,12 @@ const notMethodMatch = (method: string, entityMethod: string) => method !== enti
 
 const exetPatternMatch = (path: string, entity: RouteEntity) => entity.route.pattern.exec(path)
 
-const createRouteContext = (context: ContextRoute, query: ParsedUrlQuery, params: unknown) => Object.assign(context, {
+const createRouteContext = (context: Context, query: ParsedUrlQuery, params: unknown) => Object.assign(context, {
     query
     , params
 })
 
-const dispatchRoute = (context: ContextRoute
+const dispatchRoute = (context: Context
     , entity: RouteEntity
     , match: RegExpExecArray
     , query: ParsedUrlQuery) => {
@@ -54,7 +54,7 @@ const dispatchRoute = (context: ContextRoute
     dispatch(routeContext)
 }
 
-const findRouteMatch = (stack: RouteEntity[]) => (context: ContextRoute) => {
+const findRouteMatch = (stack: RouteEntity[]) => (context: Context) => {
     for (const entity of stack) {
         if (notMethodMatch(context.req.method, entity.method)) continue
         const { query, pathname } = getUrlQuery(context.req.url)

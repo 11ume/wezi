@@ -2,14 +2,14 @@ import test from 'ava'
 import fetch from 'node-fetch'
 import wezi, { Context, listen } from 'wezi'
 import { InternalError } from 'wezi-error'
-import router, { ContextRoute, get } from '../packages/router'
+import router, { ContextRouter, get } from '../packages/router'
 import { createError } from '../packages/error'
 
 test('panic whit custom error handler', async (t) => {
     const foo = () => 'foo'
     const bar = () => 'bar'
     const r = router()
-    const notFound = (c: ContextRoute) => c.panic(createError(404))
+    const notFound = (c: ContextRouter) => c.panic(createError(404))
     const errorHandler = (context: Context, error: Partial<InternalError>) => {
         context.res.statusCode = error.statusCode ?? 500
         context.res.end(error.message)
