@@ -11,6 +11,8 @@ export interface Context<T = any> {
     readonly status: Status
     readonly actions: Actions
     readonly shared: T
+    readonly query: any
+    readonly params: any
 }
 
 export type Next = <T>(payload?: T) => void

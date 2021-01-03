@@ -9,6 +9,8 @@ export const server = (fn: (req: IncomingMessage, res: ServerResponse) => void) 
 export const createContext = ({
     req
     , res
+    , query = {}
+    , params = {}
     , body = null
     , next = null
     , panic = null
@@ -18,6 +20,8 @@ export const createContext = ({
 }): Context => ({
     req
     , res
+    , query
+    , params
     , body
     , next
     , panic
