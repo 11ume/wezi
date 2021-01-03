@@ -1,7 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { Body } from './receive'
 import { Actions } from './actions'
-
 export interface Context<T = any> {
     readonly req: IncomingMessage
     readonly res: ServerResponse
