@@ -1,8 +1,8 @@
+import regexparam from 'regexparam'
 import { ParsedUrlQuery } from 'querystring'
 import { Context, Handler } from 'wezi-types'
 import composer from 'wezi-composer'
 import { getUrlQuery, getUrlParams } from './extractors'
-import regexparam from './regexparam'
 
 export interface ContextRouter<P = any, Q = any> extends Context {
     readonly query: Q
