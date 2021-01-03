@@ -1,6 +1,6 @@
 {
   "name": "wezi-receive",
-  "version": "1.0.0-alpha.13",
+  "version": "1.0.0-alpha.14",
   "description": "",
   "main": "dist/index.js",
   "types": "index.ts",
@@ -18,8 +18,8 @@
   "dependencies": {
     "content-type": "^1.0.4",
     "raw-body": "^2.4.1",
-    "wezi-error": "^1.0.0-alpha.13",
-    "wezi-types": "^1.0.0-alpha.13"
+    "wezi-error": "^1.0.0-alpha.14",
+    "wezi-types": "^1.0.0-alpha.14"
   },
   "devDependencies": {
     "@types/content-type": "^1.1.3",
