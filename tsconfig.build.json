@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
         "target": "ES2019",
-        "module": "CommonJS",
+        "module": "ESNext",
+        "declaration": false,
         "moduleResolution": "node",
         "sourceMap": true,
         "incremental": true,
@@ -14,10 +15,12 @@
         "noUnusedLocals": true,
         "noEmitOnError": true,
         "skipLibCheck": true,
-        "removeComments": true
+        "removeComments": true,
+        "forceConsistentCasingInFileNames": true,
     },
     "exclude": [
         "test",
+        "dist",
         "node_modules"
     ]
 }

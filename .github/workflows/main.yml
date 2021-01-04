@@ -39,6 +39,7 @@ jobs:
         with:
           path: "."
           key: ${{ github.sha }}
+      - run: yarn clean
       - run: yarn test
 
   coverage:
@@ -50,6 +51,7 @@ jobs:
         with:
           path: "."
           key: ${{ github.sha }}
+      - run: yarn clean
       - run: yarn test:coverage
       - uses: codecov/codecov-action@v1
         with:

@@ -10,13 +10,15 @@
     "packages/*"
   ],
   "scripts": {
-    "pub": "lerna publish",
+    "pub": "yarn run es6:add && lerna publish && yarn run es6:remove",
     "clean": "lerna run clean",
     "build": "lerna run build",
     "test": "node node_modules/.bin/ava",
     "lint": "node node_modules/.bin/eslint .",
     "test:coverage": "nyc --reporter=json ava",
-    "clean:coverage": "rm -rf .nyc_output coverage"
+    "clean:coverage": "rm -rf .nyc_output coverage",
+    "es6:add": "node build/es6-resolver --add",
+    "es6:remove": "node build/es6-resolver --remove"
   },
   "nyc": {
     "extension": [
@@ -24,12 +26,12 @@
     ]
   },
   "devDependencies": {
-    "@ava/babel": "^1.0.1",
     "@types/node": "^14.14.0",
     "@types/node-fetch": "^2.5.7",
     "@types/test-listen": "^1.1.0",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
+    "@ava/babel": "^1.0.1",
     "ava": "^3.13.0",
     "eslint": "^7.14.0",
     "eslint-config-standard": "^16.0.2",
@@ -39,8 +41,10 @@
     "lerna": "^3.22.1",
     "node-fetch": "^2.6.1",
     "nyc": "^15.1.0",
+    "rollup": "^2.35.1",
+    "rollup-plugin-typescript2": "^0.29.0",
     "test-listen": "^1.1.0",
-    "ts-node": "^9.0.0",
+    "ts-node": "9.1.1",
     "typescript": "^4.0.3"
   }
 }
