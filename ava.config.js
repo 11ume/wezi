@@ -7,7 +7,6 @@ export default {
     }
     , files: [
         '!dev'
-        , '!dist'
     ]
     , require: ['ts-node/register']
     , extensions: ['ts']

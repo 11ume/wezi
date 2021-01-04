@@ -1,20 +1,8 @@
 {
+  "extends": "./tsconfig.build.json",
   "compilerOptions": {
     "target": "ES2019",
     "module": "CommonJS",
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "incremental": true,
-    "esModuleInterop": true,
-    "noImplicitAny": false,
-    "preserveConstEnums": true,
-    "strictFunctionTypes": true,
-    "noImplicitReturns": true,
-    "noUnusedParameters": true,
-    "noUnusedLocals": true,
-    "noEmitOnError": true,
-    "skipLibCheck": true,
-    "removeComments": true,
     "baseUrl": ".",
     "paths": {
       "wezi-actions": [
@@ -48,10 +36,5 @@
         "packages/wezi"
       ]
     }
-  },
-  "exclude": [
-    "test",
-    "dist",
-    "node_modules"
-  ]
+  }
 }
