@@ -43,6 +43,7 @@
 * **Async** Implements an enhanced async control of handlers execution.
 * **Safe** Designed to avoid failures.
 * **Middlwares** Implements a middleware logic.
+* **Native ESM support** Native ESM modules syntax support.
 
 <br>
 
