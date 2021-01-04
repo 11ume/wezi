@@ -1,6 +1,6 @@
 {
     "name": "wezi-actions",
-    "version": "1.0.0-alpha.14",
+    "version": "1.0.0-alpha.15",
     "description": "",
     "main": "dist/index.js",
     "types": "index.ts",
@@ -16,7 +16,7 @@
         "prepublishOnly": "yarn run build"
     },
     "dependencies": {
-        "wezi-types": "^1.0.0-alpha.14"
+        "wezi-types": "^1.0.0-alpha.15"
     },
     "type": "module"
 }

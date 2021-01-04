@@ -1,6 +1,6 @@
 {
     "name": "wezi-composer",
-    "version": "1.0.0-alpha.14",
+    "version": "1.0.0-alpha.15",
     "description": "",
     "main": "dist/index.js",
     "types": "index.ts",
@@ -16,10 +16,10 @@
         "prepublishOnly": "yarn run build"
     },
     "dependencies": {
-        "wezi-error": "^1.0.0-alpha.14",
-        "wezi-send": "^1.0.0-alpha.14",
-        "wezi-shared": "^1.0.0-alpha.14",
-        "wezi-types": "^1.0.0-alpha.14"
+        "wezi-error": "^1.0.0-alpha.15",
+        "wezi-send": "^1.0.0-alpha.15",
+        "wezi-shared": "^1.0.0-alpha.15",
+        "wezi-types": "^1.0.0-alpha.15"
     },
     "type": "module"
 }

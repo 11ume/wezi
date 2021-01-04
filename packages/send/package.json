@@ -1,6 +1,6 @@
 {
     "name": "wezi-send",
-    "version": "1.0.0-alpha.14",
+    "version": "1.0.0-alpha.15",
     "description": "",
     "main": "dist/index.js",
     "types": "index.ts",
@@ -17,8 +17,8 @@
     },
     "dependencies": {
         "is-plain-obj": "^3.0.0",
-        "wezi-types": "^1.0.0-alpha.14",
-        "wezi-error": "^1.0.0-alpha.14"
+        "wezi-error": "^1.0.0-alpha.15",
+        "wezi-types": "^1.0.0-alpha.15"
     },
     "type": "module"
 }
