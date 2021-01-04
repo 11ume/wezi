@@ -1,7 +1,7 @@
 import { IncomingMessage } from 'http'
+import rawBody, { RawBodyError, Encoding as GetRawBodyEncoding } from 'raw-body'
 import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
-import rawBody, { RawBodyError, Encoding as GetRawBodyEncoding } from 'raw-body'
 
 type ParseBodyOptions = {
     context: Context

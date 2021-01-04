@@ -1,9 +1,9 @@
 import { IncomingMessage } from 'http'
-import { Context, Body } from 'wezi-types'
-import { parseJSON } from './utils'
-import { getRawBody, getRawBodyBuffer } from './rawBody'
 import { Options as GetRawBodyOptions, Encoding as RawBodyEncoding } from 'raw-body'
 import contentType from 'content-type'
+import { Context, Body } from 'wezi-types'
+import { getRawBody, getRawBodyBuffer } from './rawBody'
+import { parseJSON } from './utils'
 
 type CacheJsonMap = WeakMap<IncomingMessage, unknown>
 type RawBodyCacheMap<T> = WeakMap<IncomingMessage, T>
