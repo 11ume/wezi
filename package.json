@@ -39,8 +39,10 @@
     "lerna": "^3.22.1",
     "node-fetch": "^2.6.1",
     "nyc": "^15.1.0",
+    "rollup": "^2.35.1",
+    "rollup-plugin-typescript2": "^0.29.0",
     "test-listen": "^1.1.0",
-    "ts-node": "^9.0.0",
+    "ts-node": "9.1.1",
     "typescript": "^4.0.3"
   }
 }

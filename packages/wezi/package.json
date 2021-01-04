@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "types": "index.ts",
+  "type": "module",
   "license": "MIT",
   "author": {
     "name": "Horacio Rivero",
@@ -12,7 +13,7 @@
   "scripts": {
     "build": "yarn run clean && yarn run compile",
     "clean": "rm -rf ./dist",
-    "compile": "tsc -p tsconfig.build.json",
+    "compile": "rollup -c",
     "prepublishOnly": "yarn run build"
   },
   "bin": {
@@ -23,6 +24,7 @@
     "wezi-composer": "^1.0.0-alpha.14",
     "wezi-error": "^1.0.0-alpha.14",
     "wezi-send": "^1.0.0-alpha.14",
+    "wezi-receive": "^1.0.0-alpha.14",
     "wezi-shared": "^1.0.0-alpha.14",
     "wezi-types": "^1.0.0-alpha.14"
   }

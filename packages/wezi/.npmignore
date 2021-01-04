@@ -1,5 +1,7 @@
 *.build.tsbuildinfo
 .eslintrc
 tsconfig.build.json
+tsconfig.dev.json
 tsconfig.json
 test
+dev
