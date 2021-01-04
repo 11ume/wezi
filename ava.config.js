@@ -1,7 +1,7 @@
 export default {
     cache: false
     , timeout: '1m'
-    , concurrency: 4
+    , concurrency: 6
     , babel: {
         compileEnhancements: false
     }

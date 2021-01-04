@@ -1,12 +1,24 @@
 {
-  "extends": "./tsconfig.build.json",
   "compilerOptions": {
     "target": "ES2019",
     "module": "CommonJS",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "preserveConstEnums": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "noEmitOnError": true,
+    "skipLibCheck": true,
+    "removeComments": true,
     "baseUrl": ".",
     "paths": {
-      "wezi": [
-        "packages/wezi"
+      "wezi-actions": [
+        "packages/actions"
       ],
       "wezi-composer": [
         "packages/composer"
@@ -17,24 +29,29 @@
       "wezi-error": [
         "packages/error"
       ],
-      "wezi-send": [
-        "packages/send"
-      ],
       "wezi-receive": [
         "packages/receive"
-      ],
-      "wezi-shared": [
-        "packages/shared"
-      ],
-      "wezi-actions": [
-        "packages/actions"
       ],
       "wezi-router": [
         "packages/router"
       ],
+      "wezi-send": [
+        "packages/send"
+      ],
+      "wezi-shared": [
+        "packages/shared"
+      ],
       "wezi-types": [
         "packages/types"
+      ],
+      "wezi": [
+        "packages/wezi"
       ]
     }
-  }
+  },
+  "exclude": [
+    "test",
+    "dist",
+    "node_modules"
+  ]
 }
