@@ -1,25 +1,24 @@
 {
-  "name": "wezi-composer",
-  "version": "1.0.0-alpha.14",
-  "description": "",
-  "main": "dist/index.js",
-  "types": "index.ts",
-  "type": "module",
-  "license": "MIT",
-  "author": {
-    "name": "Horacio Rivero",
-    "email": "horacioriverods@gmail.com"
-  },
-  "scripts": {
-    "build": "yarn run clean && yarn run compile",
-    "clean": "rm -rf ./dist",
-    "compile": "rollup -c",
-    "prepublishOnly": "yarn run build"
-  },
-  "dependencies": {
-    "wezi-error": "^1.0.0-alpha.14",
-    "wezi-send": "^1.0.0-alpha.14",
-    "wezi-shared": "^1.0.0-alpha.14",
-    "wezi-types": "^1.0.0-alpha.14"
-  }
+    "name": "wezi-composer",
+    "version": "1.0.0-alpha.14",
+    "description": "",
+    "main": "dist/index.js",
+    "types": "index.ts",
+    "license": "MIT",
+    "author": {
+        "name": "Horacio Rivero",
+        "email": "horacioriverods@gmail.com"
+    },
+    "scripts": {
+        "build": "yarn run clean && yarn run compile",
+        "clean": "rm -rf ./dist",
+        "compile": "rollup -c",
+        "prepublishOnly": "yarn run build"
+    },
+    "dependencies": {
+        "wezi-error": "^1.0.0-alpha.14",
+        "wezi-send": "^1.0.0-alpha.14",
+        "wezi-shared": "^1.0.0-alpha.14",
+        "wezi-types": "^1.0.0-alpha.14"
+    }
 }

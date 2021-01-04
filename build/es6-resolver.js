@@ -17,10 +17,11 @@ const remove = (pkg) => {
     return JSON.stringify(obj, null, 4)
 }
 
-const writePackages = (path) => (fn) => {
+const writePackages = (fn) => (path) => {
     const pkg = require(path)
     fs.writeFile(path, fn(pkg), (err) => {
         if (err) throw err
+        console.log(`success ${fn.name} prop type from`, path)
     })
 }
 
