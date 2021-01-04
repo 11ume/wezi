@@ -11,7 +11,7 @@
     },
     "scripts": {
         "build": "yarn run clean && yarn run compile",
-        "clean": "rm -rf ./dist",
+        "clean": "rm -rf ./dist && rm -rf ./node_modules/.cache",
         "compile": "rollup -c",
         "prepublishOnly": "yarn run build"
     },

@@ -11,12 +11,13 @@
     },
     "scripts": {
         "build": "yarn run clean && yarn run compile",
-        "clean": "rm -rf ./dist",
+        "clean": "rm -rf ./dist && rm -rf ./node_modules/.cache",
         "compile": "rollup -c",
         "prepublishOnly": "yarn run build"
     },
     "dependencies": {
         "regexparam": "^1.3.0",
+        "querystring": "^0.2.0",
         "wezi-composer": "^1.0.0-alpha.15",
         "wezi-error": "^1.0.0-alpha.15",
         "wezi-types": "^1.0.0-alpha.15"

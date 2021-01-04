@@ -9,12 +9,6 @@
         "name": "Horacio Rivero",
         "email": "horacioriverods@gmail.com"
     },
-    "scripts": {
-        "build": "yarn run clean && yarn run compile",
-        "clean": "rm -rf ./dist",
-        "compile": "rollup -c",
-        "prepublishOnly": "yarn run build"
-    },
     "dependencies": {
         "raw-body": "^2.4.1"
     },
