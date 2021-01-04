@@ -39,9 +39,6 @@ jobs:
         with:
           path: "."
           key: ${{ github.sha }}
-      - name: set ava envs
-        env:
-          TS_NODE_PROJECT: "tsconfig.dev.json"
       - run: yarn test
 
   coverage:
@@ -53,9 +50,6 @@ jobs:
         with:
           path: "."
           key: ${{ github.sha }}
-      - name: set ava envs
-        env:
-          TS_NODE_PROJECT: "tsconfig.dev.json"
       - run: yarn test:coverage
       - uses: codecov/codecov-action@v1
         with:

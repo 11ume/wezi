@@ -10,7 +10,4 @@ export default {
     ]
     , require: ['ts-node/register']
     , extensions: ['ts']
-    , environmentVariables: {
-        TS_NODE_PROJECT: 'tsconfig.dev.json'
-    }
 }
