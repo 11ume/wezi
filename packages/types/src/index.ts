@@ -19,3 +19,4 @@ export type Panic = (error: Error) => void
 export type Status = (code: number) => void
 export type Handler = (context: Context, payload?: any) => any
 export type ErrorHandler = (context: Context, error: Error) => void
+export type Wezi<S = any> = (initialShared?: S, errorHandler?: Handler) => (req: IncomingMessage, res: ServerResponse) => void

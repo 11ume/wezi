@@ -4,7 +4,12 @@ import { body } from 'wezi-receive'
 import { actions } from 'wezi-actions'
 import { shareable } from 'wezi-shared'
 import { InternalError } from 'wezi-error'
-import { Context, Handler, Status } from 'wezi-types'
+import {
+    Wezi
+    , Context
+    , Handler
+    , Status
+} from 'wezi-types'
 import * as send from 'wezi-send'
 import { isProduction } from './utils'
 
@@ -48,8 +53,6 @@ const createEnhancedContext = (context: Context): Context => {
         , actions: actions(context)
     }
 }
-
-type Wezi<S = any> = (initialShared?: S, errorHandler?: Handler) => (req: IncomingMessage, res: ServerResponse) => void
 
 const wezi = <S = any>(...handlers: Handler[]) => (initialShared: S = null, errorHandler: Handler = defaultErrorHandler) => {
     const shared = initialShared ?? {}
