@@ -14,5 +14,6 @@
         "clean": "rm -rf ./dist",
         "compile": "rollup -c",
         "prepublishOnly": "yarn run build"
-    }
+    },
+    "type": "module"
 }

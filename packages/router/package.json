@@ -20,5 +20,6 @@
         "wezi-composer": "^1.0.0-alpha.14",
         "wezi-error": "^1.0.0-alpha.14",
         "wezi-types": "^1.0.0-alpha.14"
-    }
+    },
+    "type": "module"
 }
