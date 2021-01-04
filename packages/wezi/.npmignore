@@ -1,7 +1,7 @@
 *.build.tsbuildinfo
 .eslintrc
+.vscode
 tsconfig.build.json
-tsconfig.dev.json
 tsconfig.json
 test
 dev

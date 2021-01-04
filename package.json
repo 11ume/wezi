@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "pub": "yarn run es6:add && lerna publish",
+    "pub": "yarn run es6:add && lerna publish && yarn run es6:remove",
     "clean": "lerna run clean",
     "build": "lerna run build",
     "test": "node node_modules/.bin/ava",
@@ -18,8 +18,7 @@
     "test:coverage": "nyc --reporter=json ava",
     "clean:coverage": "rm -rf .nyc_output coverage",
     "es6:add": "node build/es6-resolver --add",
-    "es6:remove": "node build/es6-resolver --remove",
-    "postpublish": "yarn run es6:remove"
+    "es6:remove": "node build/es6-resolver --remove"
   },
   "nyc": {
     "extension": [
