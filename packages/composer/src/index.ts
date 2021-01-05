@@ -3,13 +3,12 @@ import { shareable } from 'wezi-shared'
 import { createError } from 'wezi-error'
 import {
     Context
+    , Dispatch
     , Handler
     , Next
     , Panic
 } from 'wezi-types'
 import { createContext, isWritableEnded } from './utils'
-
-type Dispatch = (context: Context, payload?: unknown) => void
 
 const endResponse = (context: Context) => {
     context.res.statusCode = 404
@@ -55,7 +54,7 @@ const createPanic = (context: Context): Panic => {
     }
 }
 
-export const composer = (main: boolean, ...handlers: Handler[]): Dispatch => {
+export const composer = (main: boolean, ...handlers: Handler[]) => {
     let i = 0
     return function dispatch(context: Context, payload?: unknown): void {
         if (i < handlers.length) {

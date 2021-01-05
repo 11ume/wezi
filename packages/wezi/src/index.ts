@@ -5,13 +5,18 @@ import { actions } from 'wezi-actions'
 import { shareable } from 'wezi-shared'
 import { InternalError } from 'wezi-error'
 import {
-    Wezi
-    , Context
+    Context
     , Handler
     , Status
 } from 'wezi-types'
 import * as send from 'wezi-send'
 import { isProduction } from './utils'
+interface WeziOptions<S> {
+    readonly errorHandler?: Handler
+    readonly initialShared?: S
+}
+
+type Wezi<S = any> = (options: WeziOptions<S>) => (req: IncomingMessage, res: ServerResponse) => void
 
 const defaultErrorHandler = (context: Context, error: InternalError) => {
     const status = error.statusCode ?? 500
@@ -30,7 +35,9 @@ const status = (context: Context): Status => (code: number) => {
     context.res.statusCode = code
 }
 
-const createContext = (req: IncomingMessage, res: ServerResponse, shared: unknown): Context => {
+const createContext = (req: IncomingMessage
+    , res: ServerResponse
+    , shared: unknown): Context => {
     return {
         req
         , res
@@ -54,7 +61,8 @@ const createEnhancedContext = (context: Context): Context => {
     }
 }
 
-const wezi = <S = any>(...handlers: Handler[]) => (initialShared: S = null, errorHandler: Handler = defaultErrorHandler) => {
+const wezi = <S = any>(...handlers: Handler[]) => (options: WeziOptions<S> = {}) => {
+    const { initialShared = null, errorHandler = defaultErrorHandler } = options
     const shared = initialShared ?? {}
     shareable.errorHandler ??= errorHandler
     return (req: IncomingMessage, res: ServerResponse) => {
@@ -65,8 +73,8 @@ const wezi = <S = any>(...handlers: Handler[]) => (initialShared: S = null, erro
     }
 }
 
-export const listen = <S = any>(w: Wezi<S>, port: number, initialShared?: S, errorHandler?: Handler) => {
-    const handler = w(initialShared, errorHandler)
+export const listen = <S = any>(w: Wezi<S>, port: number, options?: WeziOptions<S>) => {
+    const handler = w(options)
     const server = http.createServer((req, res) => handler(req, res))
     server.listen(port)
     return server

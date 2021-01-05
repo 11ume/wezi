@@ -11,5 +11,7 @@ export const server = (...fn: Handler[]) => {
 
 export const serverError = (errorHandler: ErrorHandler, ...fn: Handler[]) => {
     const w = wezi(...fn)
-    return listen(http.createServer(w(null, errorHandler)))
+    return listen(http.createServer(w({
+        errorHandler
+    })))
 }
