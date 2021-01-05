@@ -65,11 +65,13 @@ npm install wezi
 
 ## Get started
 
-
-
 ```ts
 import wezi, { listen } from 'wezi'
 
 const greet = () => 'Hi!'
 listen(wezi(greet), 3000)
 ```
+
+<br>
+
+> Note: If u are using **Javascript** remember enable ESM support in you package.json. [esm_enabling](https://nodejs.org/api/esm.html#esm_enabling)
