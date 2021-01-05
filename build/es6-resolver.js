@@ -1,5 +1,6 @@
-const fs = require('fs') 
-const path = require('path') 
+/* eslint-disable @typescript-eslint/no-var-requires */
+const fs = require('fs')
+const path = require('path')
 
 const [,, cmd] = process.argv
 
@@ -7,19 +8,19 @@ const add = (pkg) => {
     const obj = Object.assign(pkg, {
         type: 'module'
     })
-  
+
     return JSON.stringify(obj, null, 4)
 }
 
 const remove = (pkg) => {
     const obj = Object.assign({}, pkg)
-    delete obj.type 
+    delete obj.type
     return JSON.stringify(obj, null, 4)
 }
 
-const writePackages = (fn) => (path) => {
-    const pkg = require(path)
-    fs.writeFile(path, fn(pkg), (err) => {
+const writePackages = (fn) => (packagePath) => {
+    const package = require(packagePath)
+    fs.writeFile(path, fn(package), (err) => {
         if (err) throw err
         console.log(`success ${fn.name} prop type from`, path)
     })

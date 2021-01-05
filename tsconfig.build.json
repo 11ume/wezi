@@ -16,7 +16,7 @@
         "noEmitOnError": true,
         "skipLibCheck": true,
         "removeComments": true,
-        "forceConsistentCasingInFileNames": true,
+        "forceConsistentCasingInFileNames": true
     },
     "exclude": [
         "test",
