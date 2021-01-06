@@ -1,19 +1,8 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
-import { shareable } from 'wezi-shared'
-import { InternalError } from 'wezi-error'
 import { server, createContext } from './helpers'
 import composer from '..'
-
-test.before('main composer prepare context', (t) => {
-    const errorHandler = (context: Context, error: Partial<InternalError>) => {
-        context.res.statusCode = error.statusCode ?? 500
-        context.res.end(error.message)
-    }
-    shareable.errorHandler = errorHandler
-    t.pass()
-})
 
 test('main composer single handler, direct<string:200>', async (t) => {
     const url = await server((req, res) => {

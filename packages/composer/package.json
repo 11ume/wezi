@@ -18,7 +18,6 @@
     "dependencies": {
         "wezi-error": "^1.0.0-alpha.15",
         "wezi-send": "^1.0.0-alpha.15",
-        "wezi-shared": "^1.0.0-alpha.15",
         "wezi-types": "^1.0.0-alpha.15"
     },
     "type": "module"
