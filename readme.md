@@ -41,7 +41,7 @@
 * **Simple** Focused on simplicity, hides the complexity and respect the [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle.
 * **Fast** High performance (even JSON parsing is opt-in, fast router).  
 * **Async** Implements an enhanced async control of handlers execution.
-* **Safe** Designed to avoid failures.
+* **CoC** Convention over configuration.
 * **Middlwares** Implements a middleware logic.
 * **ES6 modules** Native ESM modules syntax support.
 
@@ -69,9 +69,14 @@ npm install wezi
 import wezi, { listen } from 'wezi'
 
 const greet = () => 'Hi!'
-listen(wezi(greet), 3000)
+listen(wezi(greet))
 ```
 
 <br>
+
+
+```ts
+curl http://localhost:3000
+```
 
 > Note: If u are using **Javascript** remember enable ESM support in you package.json. [esm_enabling](https://nodejs.org/api/esm.html#esm_enabling)
