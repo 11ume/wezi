@@ -41,7 +41,7 @@ const wezi = (...handlers: Handler[]) => {
     }
 }
 
-export const listen = (handler: RequestListener, port: number) => {
+export const listen = (handler: RequestListener, port = 3000) => {
     const server = http.createServer(handler)
     server.listen(port)
     return server
