@@ -1,6 +1,5 @@
-import { send } from 'wezi-send'
-import { shareable } from 'wezi-shared'
-import { createError } from 'wezi-error'
+import { send, empty, json } from 'wezi-send'
+import { createError, InternalError } from 'wezi-error'
 import {
     Context
     , Dispatch
@@ -8,7 +7,20 @@ import {
     , Next
     , Panic
 } from 'wezi-types'
-import { createContext, isWritableEnded } from './utils'
+import { createContext, isWritableEnded, isProduction } from './utils'
+
+const errorHandler = (context: Context, error: InternalError) => {
+    const status = error.statusCode ?? 500
+    const message = error.message || 'unknown'
+    const payload = {
+        message
+    }
+    if (isProduction()) {
+        empty(context, status)
+        return
+    }
+    json(context, payload, status)
+}
 
 const endResponse = (context: Context) => {
     context.res.statusCode = 404
@@ -46,11 +58,11 @@ const createNext = (context: Context, dispatch: Dispatch): Next => {
 const createPanic = (context: Context): Panic => {
     return function panic(error?: Error): void {
         if (error instanceof Error) {
-            shareable.errorHandler(context, error)
+            errorHandler(context, error)
             return
         }
 
-        shareable.errorHandler(context, createError(500, 'panic error param, must be instance of Error'))
+        errorHandler(context, createError(500, 'panic error param, must be instance of Error'))
     }
 }
 

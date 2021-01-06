@@ -1,19 +1,9 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
-import { shareable } from 'wezi-shared'
-import { createError, InternalError } from 'wezi-error'
+import { createError } from 'wezi-error'
 import { server, createContext } from './helpers'
 import composer from '..'
-
-test.before('main composer prepare context', (t) => {
-    const errorHandler = (context: Context, error: Partial<InternalError>) => {
-        context.res.statusCode = error.statusCode ?? 500
-        context.res.end(error.message)
-    }
-    shareable.errorHandler = errorHandler
-    t.pass()
-})
 
 test('main composer multi handler async, direct promise error return in first handler, next<Error:400>', async (t) => {
     const url = await server((req, res) => {
@@ -29,10 +19,12 @@ test('main composer multi handler async, direct promise error return in first ha
     })
 
     const res = await fetch(url)
-    const body: string = await res.text()
+    const body: { message: string } = await res.json()
 
     t.is(res.status, 400)
-    t.is(body, 'Bad Request')
+    t.deepEqual(body, {
+        message: 'Bad Request'
+    })
 })
 
 test('main composer multi handler async, direct promise error return in second handler, next<empty>, direct<Promise<Error>:400>', async (t) => {
@@ -49,10 +41,12 @@ test('main composer multi handler async, direct promise error return in second h
     })
 
     const res = await fetch(url)
-    const body: string = await res.text()
+    const body: { message: string } = await res.json()
 
     t.is(res.status, 400)
-    t.is(body, 'Bad Request')
+    t.deepEqual(body, {
+        message: 'Bad Request'
+    })
 })
 
 test('main composer multi handler, throw error inside first handler, <Error>', async (t) => {
@@ -71,10 +65,12 @@ test('main composer multi handler, throw error inside first handler, <Error>', a
     })
 
     const res = await fetch(url)
-    const body: string = await res.text()
+    const body: { message: string } = await res.json()
 
-    t.is(body, 'Something wrong is happened')
     t.is(res.status, 500)
+    t.deepEqual(body, {
+        message: 'Something wrong is happened'
+    })
 })
 
 test('main composer call panic whiout pass an error, panic<not error type>', async (t) => {
@@ -91,9 +87,11 @@ test('main composer call panic whiout pass an error, panic<not error type>', asy
     })
 
     const res = await fetch(url)
-    const body: string = await res.text()
+    const body: { message: string } = await res.json()
 
-    t.is(body, 'panic error param, must be instance of Error')
     t.is(res.status, 500)
+    t.deepEqual(body, {
+        message: 'panic error param, must be instance of Error'
+    })
 })
 

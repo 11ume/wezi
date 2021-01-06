@@ -20,9 +20,9 @@ const remove = (pkg) => {
 
 const writePackages = (fn) => (packagePath) => {
     const package = require(packagePath)
-    fs.writeFile(path, fn(package), (err) => {
+    fs.writeFile(packagePath, fn(package), (err) => {
         if (err) throw err
-        console.log(`success ${fn.name} prop type from`, path)
+        console.log(`success ${fn.name} prop type from`, packagePath)
     })
 }
 

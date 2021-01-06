@@ -1,9 +1,9 @@
-import http, { IncomingMessage, ServerResponse } from 'http'
+import http, { RequestListener } from 'http'
 import listen from 'test-listen'
 import { Context } from 'wezi-types'
 
-export const server = (fn: (req: IncomingMessage, res: ServerResponse) => void) => {
-    return listen(http.createServer((req, res) => fn(req, res)))
+export const server = (handler: RequestListener) => {
+    return listen(http.createServer(handler))
 }
 
 export const createContext = ({

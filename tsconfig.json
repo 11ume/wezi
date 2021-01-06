@@ -26,9 +26,6 @@
       "wezi-send": [
         "packages/send"
       ],
-      "wezi-shared": [
-        "packages/shared"
-      ],
       "wezi-types": [
         "packages/types"
       ],
