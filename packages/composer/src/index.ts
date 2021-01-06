@@ -22,7 +22,7 @@ const errorHandler = (context: Context, error: InternalError) => {
     json(context, payload, status)
 }
 
-const endResponse = (context: Context) => {
+const endHandler = (context: Context) => {
     context.res.statusCode = 404
     context.res.end()
 }
@@ -83,6 +83,6 @@ export const composer = (main: boolean, ...handlers: Handler[]) => {
         }
 
         // end response if all higher-order handlers are executed, and none of them has ended the response.
-        main && setImmediate(endResponse, context)
+        main && setImmediate(endHandler, context)
     }
 }
