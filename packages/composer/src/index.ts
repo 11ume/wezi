@@ -9,6 +9,11 @@ import {
 } from 'wezi-types'
 import { createContext, isWritableEnded, isProduction } from './utils'
 
+const endHandler = (context: Context) => {
+    context.res.statusCode = 404
+    context.res.end()
+}
+
 const errorHandler = (context: Context, error: InternalError) => {
     const status = error.statusCode ?? 500
     const message = error.message || 'unknown'
@@ -20,11 +25,6 @@ const errorHandler = (context: Context, error: InternalError) => {
         return
     }
     json(context, payload, status)
-}
-
-const endResponse = (context: Context) => {
-    context.res.statusCode = 404
-    context.res.end()
 }
 
 const executeHandler = async (context: Context, handler: Handler, payload: unknown): Promise<void> => {
@@ -83,6 +83,6 @@ export const composer = (main: boolean, ...handlers: Handler[]) => {
         }
 
         // end response if all higher-order handlers are executed, and none of them has ended the response.
-        main && setImmediate(endResponse, context)
+        main && setImmediate(endHandler, context)
     }
 }
