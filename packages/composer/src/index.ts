@@ -80,7 +80,6 @@ export const composer = (main: boolean, ...handlers: Handler[]): Dispatch => {
             return
         }
 
-        // end response if all higher-order handlers are executed, and none of them has ended the response.
         main && setImmediate(endHandler, context)
     }
 }

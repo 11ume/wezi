@@ -5,6 +5,28 @@ import { createError } from 'wezi-error'
 import { server, createContext } from './helpers'
 import composer from '..'
 
+test('main composer end response if all higher are executed, and none of them has ended the response, errorHandler<Error:400>', async (t) => {
+    const foo = (c: Context) => c.next()
+    const bar = (c: Context) => c.next()
+    const url = await server((req, res) => {
+        const context = createContext({
+            req
+            , res
+        })
+
+        const dispatch = composer(true, foo, bar)
+        dispatch(context)
+    })
+
+    const res = await fetch(url)
+    const body: { message: string } = await res.json()
+
+    t.is(res.status, 404)
+    t.deepEqual(body, {
+        message: 'Not Found'
+    })
+})
+
 test('main composer multi handler async, direct promise error return in first handler, next<Error:400>', async (t) => {
     const url = await server((req, res) => {
         const check = (c: Context) => c.panic(createError(400))
