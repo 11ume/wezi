@@ -7,12 +7,7 @@ import {
     , Next
     , Panic
 } from 'wezi-types'
-import { createContext, isWritableEnded, isProduction } from './utils'
-
-const endHandler = (context: Context) => {
-    context.res.statusCode = 404
-    context.res.end()
-}
+import { createContext, isProduction } from './utils'
 
 const errorHandler = (context: Context, error: InternalError) => {
     const status = error.statusCode ?? 500
@@ -27,8 +22,12 @@ const errorHandler = (context: Context, error: InternalError) => {
     json(context, payload, status)
 }
 
+const endHandler = (context: Context) => {
+    const err = createError(404)
+    errorHandler(context, err)
+}
+
 const executeHandler = async (context: Context, handler: Handler, payload: unknown): Promise<void> => {
-    if (isWritableEnded(context)) return
     try {
         const val = await handler(context, payload)
         if (val === null) {
@@ -47,11 +46,11 @@ const executeHandler = async (context: Context, handler: Handler, payload: unkno
 const createNext = (context: Context, dispatch: Dispatch, inc: number): Next => {
     return function next(payload?: unknown): void {
         if (payload === undefined) {
-            setImmediate(dispatch, context, inc)
+            dispatch(context, inc)
             return
         }
 
-        setImmediate(dispatch, context, inc, payload)
+        dispatch(context, inc, payload)
     }
 }
 
@@ -76,7 +75,7 @@ export const composer = (main: boolean, ...handlers: Handler[]): Dispatch => {
                 , panic: createPanic(context)
             })
 
-            executeHandler(newContext, handler, payload)
+            setImmediate(executeHandler, newContext, handler, payload)
             return
         }
 
