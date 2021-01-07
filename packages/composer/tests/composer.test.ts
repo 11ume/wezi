@@ -224,30 +224,3 @@ test('main composer end the response if higher-order handlers are executed and n
     t.is(res.status, 404)
 })
 
-test('main composer stop the execution sequence of handler stack when next function is called multiple times in a same handler, (next<empty>, next<empty>), next<string>, next<string>', async (t) => {
-    const url = await server((req, res) => {
-        const multiNext = (c: Context) => {
-            c.next()
-            c.next()
-        }
-        const stop = () => 'stop'
-        const never = () => {
-            t.true(false)
-            return 'never'
-        }
-        const dispatch = composer(true, multiNext, stop, never)
-        const context = createContext({
-            req
-            , res
-        })
-
-        dispatch(context)
-    })
-
-    const res = await fetch(url)
-    const body = await res.text()
-
-    t.is(body, 'stop')
-    t.is(res.status, 200)
-})
-
