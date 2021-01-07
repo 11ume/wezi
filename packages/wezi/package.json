@@ -21,5 +21,6 @@
         "wezi-error": "^1.0.0-alpha.16",
         "wezi-receive": "^1.0.0-alpha.16",
         "wezi-types": "^1.0.0-alpha.16"
-    }
+    },
+    "type": "module"
 }
