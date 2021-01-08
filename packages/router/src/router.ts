@@ -30,10 +30,6 @@ export type RouteEntity = {
 
 const isHead = (context: Context) => context.req.method === 'HEAD'
 
-const notMethodMatch = (method: string, entityMethod: string) => method !== entityMethod
-
-const execPatternMatch = (path: string, entity: RouteEntity) => entity.route.pattern.exec(path)
-
 const createRouteContext = (context: Context, query: ParsedUrlQuery, params: unknown) => Object.assign(context, {
     query
     , params
@@ -54,19 +50,18 @@ const dispatchRoute = (context: Context
     dispatch(routeContext)
 }
 
-const findRouteMatch = (stack: RouteEntity[]) => (context: Context) => {
-    for (const entity of stack) {
-        if (notMethodMatch(context.req.method, entity.method)) continue
-        const { query, pathname } = getUrlQuery(context.req.url)
-        const path = pathname ?? context.req.url
-        const match = execPatternMatch(path, entity)
+const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context) => {
+    const urlQuery = getUrlQuery(context.req.url)
+    const path = urlQuery.pathname ?? context.req.url
+    for (const entity of routerEntities) {
+        if (context.req.method !== entity.method) continue
+        const match = entity.route.pattern.exec(path)
         if (match) {
-            dispatchRoute(context, entity, match, query)
+            dispatchRoute(context, entity, match, urlQuery.query)
             return
         }
     }
 
-    // no route has matched
     context.next()
 }
 
