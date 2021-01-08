@@ -4,7 +4,7 @@ import { createError } from '../packages/error'
 import * as receive from '../packages/receive'
 import router, {
     ContextRouter
-    , ContextParamsWild
+    , ContextParamsWildcard
     , routes
     , get
     , head
@@ -133,18 +133,6 @@ test('different routes whit return null', async (t) => {
 
     t.is(res.status, 204)
     t.falsy(body)
-})
-
-test('routes with params and query', async (t) => {
-    const greet = (context: ContextRouter<{ msg: string }, { time: number }>) => `Hello ${context.params.msg} ${context.query.time}`
-    const r = router()
-    const url = await server(r(
-        get('/hello/:msg', greet)
-    ))
-    const res = await fetch(`${url}/hello/world?time=now`)
-    const body = await res.text()
-
-    t.is(body, 'Hello world now')
 })
 
 test('routes with multi params', async (t) => {
@@ -307,7 +295,7 @@ test('match head, match route and return empty body', async (t) => {
 })
 
 test('multiple matching routes match whit wildcards', async (t) => {
-    const getChar = (context: ContextParamsWild) => context.params.wild
+    const getChar = (context: ContextParamsWildcard) => context.params.wild
     const r = router()
     const url = await server(r(
         get('/character/*', getChar)
