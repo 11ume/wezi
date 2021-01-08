@@ -1,7 +1,7 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
-// import { createError } from 'wezi-error'
+import { createError } from 'wezi-error'
 import { server, createContext } from './helpers'
 import composer from '..'
 
@@ -27,93 +27,93 @@ test('main composer end response if all higher are executed, and none of them ha
     })
 })
 
-// test('main composer multi handler async, direct promise error return in first handler, next<Error:400>', async (t) => {
-//     const url = await server((req, res) => {
-//         const check = (c: Context) => c.panic(createError(400))
-//         const never = () => Promise.resolve('hello')
-//         const dispatch = composer(true, check, never)
-//         const context = createContext({
-//             req
-//             , res
-//         })
+test('main composer multi handler async, direct promise error return in first handler, next<Error:400>', async (t) => {
+    const url = await server((req, res) => {
+        const check = (c: Context) => c.panic(createError(400))
+        const never = () => Promise.resolve('hello')
+        const dispatch = composer(true, check, never)
+        const context = createContext({
+            req
+            , res
+        })
 
-//         dispatch(context)
-//     })
+        dispatch(context)
+    })
 
-//     const res = await fetch(url)
-//     const body: { message: string } = await res.json()
+    const res = await fetch(url)
+    const body: { message: string } = await res.json()
 
-//     t.is(res.status, 400)
-//     t.deepEqual(body, {
-//         message: 'Bad Request'
-//     })
-// })
+    t.is(res.status, 400)
+    t.deepEqual(body, {
+        message: 'Bad Request'
+    })
+})
 
-// test('main composer multi handler async, direct promise error return in second handler, next<empty>, direct<Promise<Error>:400>', async (t) => {
-//     const url = await server((req, res) => {
-//         const next = (c: Context) => c.next()
-//         const greet = () => Promise.reject(createError(400))
-//         const dispatch = composer(true, next, greet)
-//         const context = createContext({
-//             req
-//             , res
-//         })
+test('main composer multi handler async, direct promise error return in second handler, next<empty>, direct<Promise<Error>:400>', async (t) => {
+    const url = await server((req, res) => {
+        const next = (c: Context) => c.next()
+        const greet = () => Promise.reject(createError(400))
+        const dispatch = composer(true, next, greet)
+        const context = createContext({
+            req
+            , res
+        })
 
-//         dispatch(context)
-//     })
+        dispatch(context)
+    })
 
-//     const res = await fetch(url)
-//     const body: { message: string } = await res.json()
+    const res = await fetch(url)
+    const body: { message: string } = await res.json()
 
-//     t.is(res.status, 400)
-//     t.deepEqual(body, {
-//         message: 'Bad Request'
-//     })
-// })
+    t.is(res.status, 400)
+    t.deepEqual(body, {
+        message: 'Bad Request'
+    })
+})
 
-// test('main composer multi handler, throw error inside first handler, <Error>', async (t) => {
-//     const url = await server((req, res) => {
-//         const err = () => {
-//             throw new Error('Something wrong is happened')
-//         }
-//         const never = () => 'hello'
-//         const dispatch = composer(true, err, never)
-//         const context = createContext({
-//             req
-//             , res
-//         })
+test('main composer multi handler, throw error inside first handler, <Error>', async (t) => {
+    const url = await server((req, res) => {
+        const err = () => {
+            throw new Error('Something wrong is happened')
+        }
+        const never = () => 'hello'
+        const dispatch = composer(true, err, never)
+        const context = createContext({
+            req
+            , res
+        })
 
-//         dispatch(context)
-//     })
+        dispatch(context)
+    })
 
-//     const res = await fetch(url)
-//     const body: { message: string } = await res.json()
+    const res = await fetch(url)
+    const body: { message: string } = await res.json()
 
-//     t.is(res.status, 500)
-//     t.deepEqual(body, {
-//         message: 'Something wrong is happened'
-//     })
-// })
+    t.is(res.status, 500)
+    t.deepEqual(body, {
+        message: 'Something wrong is happened'
+    })
+})
 
-// test('main composer call panic whiout pass an error, panic<not error type>', async (t) => {
-//     const url = await server((req, res) => {
-//         const dispatch = composer(true, (c: Context) => c.panic({
-//             foo: 'foo'
-//         } as any))
-//         const context = createContext({
-//             req
-//             , res
-//         })
+test('main composer call panic whiout pass an error, panic<not error type>', async (t) => {
+    const url = await server((req, res) => {
+        const dispatch = composer(true, (c: Context) => c.panic({
+            foo: 'foo'
+        } as any))
+        const context = createContext({
+            req
+            , res
+        })
 
-//         dispatch(context)
-//     })
+        dispatch(context)
+    })
 
-//     const res = await fetch(url)
-//     const body: { message: string } = await res.json()
+    const res = await fetch(url)
+    const body: { message: string } = await res.json()
 
-//     t.is(res.status, 500)
-//     t.deepEqual(body, {
-//         message: 'panic error param, must be instance of Error'
-//     })
-// })
+    t.is(res.status, 500)
+    t.deepEqual(body, {
+        message: 'panic error param, must be instance of Error'
+    })
+})
 
