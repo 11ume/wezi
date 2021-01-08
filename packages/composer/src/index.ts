@@ -85,7 +85,7 @@ export const composer = (main: boolean, ...handlers: Handler[]): Dispatch => {
     }
 }
 
-export const composerTiny = (handler: Handler): Dispatch => {
+export const composerSingleHandler = (handler: Handler): Dispatch => {
     return function dispatch(context: Context, payload?: unknown): void {
         const newContext = createContext(context, {
             next: createNext(context, dispatch)

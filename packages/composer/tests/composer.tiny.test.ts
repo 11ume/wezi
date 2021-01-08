@@ -1,12 +1,12 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import { server, createContext } from './helpers'
-import { composerTiny } from '..'
+import { composerSingleHandler } from '..'
 
-test('main composer tiny single handler, direct<string:200>', async (t) => {
+test('main composer single handler, direct<string:200>', async (t) => {
     const url = await server((req, res) => {
         const greet = () => 'hello'
-        const dispatch = composerTiny(greet)
+        const dispatch = composerSingleHandler(greet)
         const context = createContext({
             req
             , res
