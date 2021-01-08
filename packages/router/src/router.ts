@@ -1,6 +1,6 @@
 import regexparam from 'regexparam'
 import { Context, Handler } from 'wezi-types'
-import composer from 'wezi-composer'
+import composer, { composerTiny } from 'wezi-composer'
 import { getUrlParams } from './extractors'
 
 export interface ContextRouter<P = any> extends Context {
@@ -40,14 +40,22 @@ const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecA
 
     const params = getUrlParams(entity, match)
     const routeContext = createRouteContext(context, params)
-    const dispatch = composer(false, ...entity.handlers)
+    if (entity.handlers.length) {
+        const dispatch = composer(false, ...entity.handlers)
+        dispatch(routeContext)
+        return
+    }
+
+    const handler = entity.handlers[0]
+    const dispatch = composerTiny(handler)
     dispatch(routeContext)
 }
 
 const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context) => {
     for (const entity of routerEntities) {
         if (context.req.method !== entity.method) continue
-        const match = entity.route.pattern.exec(context.req.url)
+        const route = entity.route
+        const match = route.pattern.exec(context.req.url)
         if (match) {
             dispatchRoute(context, entity, match)
             return

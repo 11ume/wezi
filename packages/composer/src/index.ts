@@ -44,14 +44,14 @@ const executeHandler = async (context: Context, handler: Handler, payload: unkno
     }
 }
 
-const createNext = (context: Context, dispatch: Dispatch, inc: number): Next => {
+const createNext = (context: Context, dispatch: Dispatch): Next => {
     return function next(payload?: unknown): void {
         if (payload === undefined) {
-            dispatch(context, inc)
+            dispatch(context)
             return
         }
 
-        dispatch(context, inc, payload)
+        dispatch(context, payload)
     }
 }
 
@@ -68,11 +68,12 @@ const createPanic = (context: Context): Panic => {
 
 export const composer = (main: boolean, ...handlers: Handler[]): Dispatch => {
     const len = handlers.length
-    return function dispatch(context: Context, inc = 0, payload?: unknown): void {
+    let inc = 0
+    return function dispatch(context: Context, payload?: unknown): void {
         if (inc < len) {
-            const handler = handlers[inc]
+            const handler = handlers[inc++]
             const newContext = createContext(context, {
-                next: createNext(context, dispatch, inc + 1)
+                next: createNext(context, dispatch)
                 , panic: createPanic(context)
             })
 
@@ -81,5 +82,16 @@ export const composer = (main: boolean, ...handlers: Handler[]): Dispatch => {
         }
 
         main && setImmediate(endHandler, context)
+    }
+}
+
+export const composerTiny = (handler: Handler): Dispatch => {
+    return function dispatch(context: Context, payload?: unknown): void {
+        const newContext = createContext(context, {
+            next: createNext(context, dispatch)
+            , panic: createPanic(context)
+        })
+
+        setImmediate(executeHandler, newContext, handler, payload)
     }
 }
