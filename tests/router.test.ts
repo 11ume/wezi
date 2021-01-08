@@ -28,13 +28,14 @@ test('not found', async (t) => {
     const foo = () => 'foo'
     const bar = () => 'bar'
     const r = router()
+    const rh = r(get('/foo', foo), get('/bar', bar))
     const notFound = (c: ContextRouter) => c.panic(createError(404))
-    const url = await server(r(get('/foo', foo), get('/bar', bar)), notFound)
+    const url = await server(rh, notFound)
     const res = await fetch(url)
     const body: { message: string } = await res.json()
 
-    t.is(body.message, 'Not Found')
     t.is(res.status, 404)
+    t.is(body.message, 'Not Found')
 })
 
 test('pattern match /(.*)', async (t) => {
@@ -48,6 +49,7 @@ test('pattern match /(.*)', async (t) => {
 
     t.is(res.status, 200)
     t.is(body, 'hello')
+
     t.is(resTwo.status, 200)
     t.is(bodyTwo, 'hello')
 })
@@ -113,13 +115,16 @@ test('different routes whit static paths, method get', async (t) => {
             name: 'bar'
         }))
     ))
-    const fooGet = await fetch(`${url}/foo`)
-    const barGet = await fetch(`${url}/bar`)
+    const resFoo = await fetch(`${url}/foo`)
+    const resBar = await fetch(`${url}/bar`)
 
-    const bodyFoo = await fooGet.json()
-    const bodyBar = await barGet.json()
+    const bodyFoo = await resFoo.json()
+    const bodyBar = await resBar.json()
 
+    t.is(resFoo.status, 200)
     t.is(bodyFoo.name, 'foo')
+
+    t.is(resBar.status, 200)
     t.is(bodyBar.name, 'bar')
 })
 
@@ -144,6 +149,7 @@ test('routes with multi params', async (t) => {
     const res = await fetch(`${url}/hello/foo/bar`)
     const body = await res.text()
 
+    t.is(res.status, 200)
     t.is(body, 'foo bar')
 })
 
@@ -158,7 +164,10 @@ test('routes with matching optional param', async (t) => {
     const body = await res.text()
     const bodyOptional = await resOptional.text()
 
+    t.is(res.status, 200)
     t.is(body, 'Hello ')
+
+    t.is(resOptional.status, 200)
     t.is(bodyOptional, 'Hello world')
 })
 
@@ -181,8 +190,13 @@ test('routes with matching double optional params', async (t) => {
     const bodyOptional = await resOptional.text()
     const bodyOptionalWhitTwo = await resOptionalWhitTwo.text()
 
+    t.is(res.status, 200)
     t.is(body, 'Hello')
+
+    t.is(resOptional.status, 200)
     t.is(bodyOptional, 'Hello john')
+
+    t.is(resOptionalWhitTwo.status, 200)
     t.is(bodyOptionalWhitTwo, 'Hello john connor')
 })
 
@@ -202,7 +216,10 @@ test('routes with matching params last optional only', async (t) => {
     const bodyOptional = await resOptional.text()
     const bodyOptionalWhitLast = await resOptionalWhitLast.text()
 
+    t.is(resOptional.status, 200)
     t.is(bodyOptional, 'Hello john')
+
+    t.is(resOptionalWhitLast.status, 200)
     t.is(bodyOptionalWhitLast, 'Hello john connor')
 })
 
@@ -217,15 +234,20 @@ test('routes with matching params first optional only', async (t) => {
         get('/path/:foo?/:bar', greet)
     ))
     const resOptional = await fetch(`${url}/path/john`)
-    const resOptionalFirst = await fetch(`${url}/path/connor`)
     const resOptionalAll = await fetch(`${url}/path/john/connor`)
+    const resOptionalFirst = await fetch(`${url}/path/connor`)
 
     const bodyOptional = await resOptional.text()
     const bodyOptionalAll = await resOptionalAll.text()
     const bodyOptionalFirst = await resOptionalFirst.text()
 
+    t.is(resOptional.status, 200)
     t.is(bodyOptional, 'Hello john')
+
+    t.is(resOptionalAll.status, 200)
     t.is(bodyOptionalAll, 'Hello john connor')
+
+    t.is(resOptionalFirst.status, 200)
     t.is(bodyOptionalFirst, 'Hello connor')
 })
 
@@ -241,6 +263,7 @@ test('multiple matching routes', async (t) => {
     const res = await fetch(`${url}/path`)
     const body = await res.text()
 
+    t.is(res.status, 200)
     t.is(body, 'Hello world')
 })
 
@@ -250,22 +273,25 @@ test('with main namespace', async (t) => {
     const v2 = router('/v2')
 
     const url = await server(v1(handler), v2(handler))
-    const v1Get = await fetch(`${url}/v1/path`)
-    const v2Get = await fetch(`${url}/v2/path`)
-    const bodyV1 = await v1Get.text()
-    const bodyV2 = await v2Get.text()
+    const res1 = await fetch(`${url}/v1/path`)
+    const res2 = await fetch(`${url}/v2/path`)
+    const body1 = await res1.text()
+    const body2 = await res2.text()
 
-    t.is(bodyV1, 'foo')
-    t.is(bodyV2, 'foo')
+    t.is(res1.status, 200)
+    t.is(body1, 'foo')
+    t.is(res2.status, 200)
+    t.is(body2, 'foo')
 })
 
 test('compose routes with routes function', async (t) => {
     const route = routes()(get('/foo', () => 'foo'))
     const r = router()
     const url = await server(r(route))
-    const foo = await fetch(`${url}/foo`)
-    const body = await foo.text()
+    const res = await fetch(`${url}/foo`)
+    const body = await res.text()
 
+    t.is(res.status, 200)
     t.is(body, 'foo')
 })
 
@@ -273,9 +299,10 @@ test('with sub namespace', async (t) => {
     const route = routes('/path')(get('/foo', () => 'foo'))
     const r = router()
     const url = await server(r(route))
-    const foo = await fetch(`${url}/path/foo`)
-    const body = await foo.text()
+    const res = await fetch(`${url}/path/foo`)
+    const body = await res.text()
 
+    t.is(res.status, 200)
     t.is(body, 'foo')
 })
 
@@ -290,8 +317,8 @@ test('match head, match route and return empty body', async (t) => {
     })
     const body = await res.blob()
 
-    t.is(body.size, 0)
     t.is(res.status, 200)
+    t.is(body.size, 0)
 })
 
 test('multiple matching routes match whit wildcards', async (t) => {
@@ -303,6 +330,7 @@ test('multiple matching routes match whit wildcards', async (t) => {
     const res = await fetch(`${url}/character/john/connor`)
     const body = await res.text()
 
+    t.is(res.status, 200)
     t.is(body, 'john/connor')
 })
 
@@ -319,6 +347,7 @@ test('multiple routes handlers', async (t) => {
     const res = await fetch(`${url}/character/john`)
     const body = await res.text()
 
+    t.is(res.status, 200)
     t.is(body, 'john')
 })
 
