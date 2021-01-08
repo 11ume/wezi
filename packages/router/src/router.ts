@@ -1,15 +1,13 @@
 import regexparam from 'regexparam'
-import { ParsedUrlQuery } from 'querystring'
 import { Context, Handler } from 'wezi-types'
-import composer from 'wezi-composer'
-import { getUrlQuery, getUrlParams } from './extractors'
+import composer, { composerSingleHandler } from 'wezi-composer'
+import { getUrlParams } from './extractors'
 
-export interface ContextRouter<P = any, Q = any> extends Context {
-    readonly query: Q
+export interface ContextRouter<P = any> extends Context {
     readonly params: P
 }
 
-export interface ContextParamsWild<T = any> extends Context<T> {
+export interface ContextParamsWildcard<T = any> extends Context<T> {
     params: {
         wild: string
     }
@@ -30,43 +28,40 @@ export type RouteEntity = {
 
 const isHead = (context: Context) => context.req.method === 'HEAD'
 
-const notMethodMatch = (method: string, entityMethod: string) => method !== entityMethod
-
-const execPatternMatch = (path: string, entity: RouteEntity) => entity.route.pattern.exec(path)
-
-const createRouteContext = (context: Context, query: ParsedUrlQuery, params: unknown) => Object.assign(context, {
-    query
-    , params
+const createRouteContext = (context: Context, params: unknown) => Object.assign(context, {
+    params
 })
 
-const dispatchRoute = (context: Context
-    , entity: RouteEntity
-    , match: RegExpExecArray
-    , query: ParsedUrlQuery) => {
+const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecArray) => {
     if (isHead(context)) {
         context.res.end()
         return
     }
 
     const params = getUrlParams(entity, match)
-    const routeContext = createRouteContext(context, query, params)
-    const dispatch = composer(false, ...entity.handlers)
+    const routeContext = createRouteContext(context, params)
+    if (entity.handlers.length > 1) {
+        const dispatch = composer(false, ...entity.handlers)
+        dispatch(routeContext)
+        return
+    }
+
+    const handler = entity.handlers[0]
+    const dispatch = composerSingleHandler(handler)
     dispatch(routeContext)
 }
 
-const findRouteMatch = (stack: RouteEntity[]) => (context: Context) => {
-    for (const entity of stack) {
-        if (notMethodMatch(context.req.method, entity.method)) continue
-        const { query, pathname } = getUrlQuery(context.req.url)
-        const path = pathname ?? context.req.url
-        const match = execPatternMatch(path, entity)
+const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context) => {
+    for (const entity of routerEntities) {
+        if (context.req.method !== entity.method) continue
+        const route = entity.route
+        const match = route.pattern.exec(context.req.url)
         if (match) {
-            dispatchRoute(context, entity, match, query)
+            dispatchRoute(context, entity, match)
             return
         }
     }
 
-    // no route has matched
     context.next()
 }
 

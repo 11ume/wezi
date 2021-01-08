@@ -10,7 +10,6 @@ export interface Context<T = any> {
     readonly status: Status
     readonly actions: Actions
     readonly shared: T
-    readonly query: any
     readonly params: any
 }
 
@@ -19,4 +18,4 @@ export type Panic = (error: Error) => void
 export type Status = (code: number) => void
 export type Handler = (context: Context, payload?: any) => any
 export type ErrorHandler = (context: Context, error: Error) => void
-export type Dispatch = (context: Context, inc?:number, payload?: unknown) => void
+export type Dispatch = (context: Context, payload?: unknown) => void
