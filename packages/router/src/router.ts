@@ -34,7 +34,7 @@ const createRouteContext = (context: Context, params: unknown) => Object.assign(
 
 const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecArray) => {
     if (isHead(context)) {
-        context.res.end()
+        context.res.end(null, null, null)
         return
     }
 

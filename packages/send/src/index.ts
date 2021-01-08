@@ -11,7 +11,7 @@ export const buffer = (context: Context, statusCode: number, payload: Buffer) =>
         }
 
         context.res.setHeader('Content-Length', payload.length)
-        context.res.end(payload)
+        context.res.end(payload, null, null)
         return
     }
 
@@ -40,7 +40,7 @@ export const json = <T = void>(context: Context, payload: T, statusCode?: number
     }
 
     context.res.setHeader('Content-Length', Buffer.byteLength(payloadStr))
-    context.res.end(payloadStr)
+    context.res.end(payloadStr, null, null)
 }
 
 export const text = (context: Context, payload: string | number, statusCode?: number) => {
@@ -51,12 +51,12 @@ export const text = (context: Context, payload: string | number, statusCode?: nu
     }
 
     context.res.setHeader('Content-Length', Buffer.byteLength(payloadStr))
-    context.res.end(payloadStr)
+    context.res.end(payloadStr, null, null)
 }
 
 export const empty = (context: Context, statusCode?: number) => {
     context.res.statusCode = statusCode ?? 204
-    context.res.end()
+    context.res.end(null, null, null)
 }
 
 export const send = (context: Context, statusCode?: number, payload?: any) => {
