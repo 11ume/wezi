@@ -1,16 +1,16 @@
 import { Stream, Readable } from 'stream'
 import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
-import { isEmpty, isJsonable, noContentType } from './utils'
+import { isEmpty, isJsonable } from './utils'
 
-export const buffer = (context: Context, statusCode: number, payload: Buffer) => {
-    context.res.statusCode = statusCode ?? 200
+export const buffer = (context: Context, statusCode = 200, payload: Buffer) => {
+    const contentType = context.res.getHeader('Content-Type')
     if (Buffer.isBuffer(payload)) {
-        if (noContentType(context)) {
-            context.res.setHeader('Content-Type', 'application/octet-stream')
-        }
+        context.res.writeHead(statusCode, {
+            'Content-Type': contentType || 'application/octet-stream'
+            , 'Content-Length': payload.length
+        })
 
-        context.res.setHeader('Content-Length', payload.length)
         context.res.end(payload, null, null)
         return
     }
@@ -18,13 +18,13 @@ export const buffer = (context: Context, statusCode: number, payload: Buffer) =>
     context.panic(createError(500, 'buffer payload must be a instance of Buffer'))
 }
 
-export const stream = (context: Context, statusCode: number, payload: Readable) => {
-    context.res.statusCode = statusCode ?? 200
+export const stream = (context: Context, statusCode = 200, payload: Readable) => {
+    context.res.statusCode = statusCode
+    const contentType = context.res.getHeader('Content-Type')
     if (payload instanceof Stream) {
-        if (noContentType(context)) {
-            context.res.setHeader('Content-Type', 'application/octet-stream')
-        }
-
+        context.res.writeHead(statusCode, {
+            'Content-Type': contentType || 'application/octet-stream'
+        })
         payload.pipe(context.res)
         return
     }
@@ -32,30 +32,28 @@ export const stream = (context: Context, statusCode: number, payload: Readable) 
     context.panic(createError(500, 'stream payload must be a instance of Stream'))
 }
 
-export const json = <T = void>(context: Context, payload: T, statusCode?: number) => {
+export const json = <T = void>(context: Context, payload: T, statusCode = 200) => {
     const payloadStr = JSON.stringify(payload)
-    context.res.statusCode = statusCode ?? 200
-    if (noContentType(context)) {
-        context.res.setHeader('Content-Type', 'application/json charset=utf-8')
-    }
-
-    context.res.setHeader('Content-Length', Buffer.byteLength(payloadStr))
+    const contentType = context.res.getHeader('Content-Type')
+    context.res.writeHead(statusCode, {
+        'Content-Type': contentType || 'application/json charset=utf-8'
+        , 'Content-Length': Buffer.byteLength(payloadStr)
+    })
     context.res.end(payloadStr, null, null)
 }
 
-export const text = (context: Context, payload: string | number, statusCode?: number) => {
+export const text = (context: Context, payload: string | number, statusCode = 200) => {
     const payloadStr = typeof payload === 'number' ? payload.toString() : payload
-    context.res.statusCode = statusCode ?? 200
-    if (noContentType(context)) {
-        context.res.setHeader('Content-Type', 'text/plain charset=utf-8')
-    }
-
-    context.res.setHeader('Content-Length', Buffer.byteLength(payloadStr))
+    const contentType = context.res.getHeader('Content-Type')
+    context.res.writeHead(statusCode, {
+        'Content-Type': contentType || 'text/plain charset=utf-8'
+        , 'Content-Length': Buffer.byteLength(payloadStr)
+    })
     context.res.end(payloadStr, null, null)
 }
 
-export const empty = (context: Context, statusCode?: number) => {
-    context.res.statusCode = statusCode ?? 204
+export const empty = (context: Context, statusCode = 204) => {
+    context.res.writeHead(statusCode)
     context.res.end(null, null, null)
 }
 
