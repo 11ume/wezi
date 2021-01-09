@@ -27,7 +27,7 @@ const endHandler = (context: Context) => {
     errorHandler(context, err)
 }
 
-const resolveHandler = (context: Context, value: any) => {
+const reply = (context: Context, value: unknown) => {
     if (value === null) {
         send(context, 204, value)
         return
@@ -38,31 +38,20 @@ const resolveHandler = (context: Context, value: any) => {
     }
 }
 
-const executeFnPromiseHandler = async (context: Context, handler: Handler, payload: unknown) => {
-    try {
-        const value = await handler(context, payload)
-        resolveHandler(context, value)
-    } catch (err) {
-        context.panic(err)
-    }
-}
-
-const executeFnHandler = (context: Context, handler: Handler, payload: unknown) => {
+const executeHandler = (context: Context, handler: Handler, payload: unknown) => {
     try {
         const value = handler(context, payload)
-        resolveHandler(context, value)
+        if (isPromise(value)) {
+            value
+                .then((val: unknown) => reply(context, val))
+                .catch(context.panic)
+            return
+        }
+
+        reply(context, value)
     } catch (err) {
         context.panic(err)
     }
-}
-
-const executeHandler = (context: Context, handler: Handler, payload: unknown) => {
-    if (isPromise(handler)) {
-        executeFnPromiseHandler(context, handler, payload)
-        return
-    }
-
-    executeFnHandler(context, handler, payload)
 }
 
 const createNext = (context: Context, dispatch: Dispatch): Next => {
