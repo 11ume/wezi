@@ -31,13 +31,11 @@ const createEnhancedContext = (context: Context): Context => {
     }
 }
 
-const wezi = (...handlers: Handler[]) => {
-    return (req: IncomingMessage, res: ServerResponse) => {
-        const dispatch = composer(true, ...handlers)
-        const context = createContext(req, res)
-        const enhancedContext = createEnhancedContext(context)
-        dispatch(enhancedContext)
-    }
+const wezi = (...handlers: Handler[]) => function run(req: IncomingMessage, res: ServerResponse) {
+    const dispatch = composer(true, ...handlers)
+    const context = createContext(req, res)
+    const enhancedContext = createEnhancedContext(context)
+    dispatch(enhancedContext)
 }
 
 export const listen = (handler: RequestListener, port = 3000) => {

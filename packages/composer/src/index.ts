@@ -7,7 +7,7 @@ import {
     , Next
     , Panic
 } from 'wezi-types'
-import { createContext, isWritableEnded, isProduction } from './utils'
+import { createContext, isProduction, isPromise } from './utils'
 
 const errorHandler = (context: Context, error: InternalError) => {
     const status = error.statusCode ?? 500
@@ -27,21 +27,42 @@ const endHandler = (context: Context) => {
     errorHandler(context, err)
 }
 
-const executeHandler = async (context: Context, handler: Handler, payload: unknown): Promise<void> => {
-    if (isWritableEnded(context)) return
-    try {
-        const val = await handler(context, payload)
-        if (val === null) {
-            send(context, 204, val)
-            return
-        }
+const resolveHandler = (context: Context, value: any) => {
+    if (value === null) {
+        send(context, 204, value)
+        return
+    }
 
-        if (val !== undefined) {
-            send(context, context.res.statusCode, val)
-        }
+    if (value !== undefined) {
+        send(context, context.res.statusCode, value)
+    }
+}
+
+const executeFnPromiseHandler = async (context: Context, handler: Handler, payload: unknown) => {
+    try {
+        const value = await handler(context, payload)
+        resolveHandler(context, value)
     } catch (err) {
         context.panic(err)
     }
+}
+
+const executeFnHandler = (context: Context, handler: Handler, payload: unknown) => {
+    try {
+        const value = handler(context, payload)
+        resolveHandler(context, value)
+    } catch (err) {
+        context.panic(err)
+    }
+}
+
+const executeHandler = (context: Context, handler: Handler, payload: unknown) => {
+    if (isPromise(handler)) {
+        executeFnPromiseHandler(context, handler, payload)
+        return
+    }
+
+    executeFnHandler(context, handler, payload)
 }
 
 const createNext = (context: Context, dispatch: Dispatch): Next => {

@@ -51,7 +51,7 @@ const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecA
     dispatch(routeContext)
 }
 
-const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context) => {
+const findRouteMatch = (routerEntities: RouteEntity[]) => function routerMatch(context: Context) {
     for (const entity of routerEntities) {
         if (context.req.method !== entity.method) continue
         const route = entity.route
