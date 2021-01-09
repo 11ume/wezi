@@ -7,7 +7,7 @@ import {
     , Next
     , Panic
 } from 'wezi-types'
-import { createContext, isWritableEnded, isProduction } from './utils'
+import { createContext, isProduction, isPromise } from './utils'
 
 const errorHandler = (context: Context, error: InternalError) => {
     const status = error.statusCode ?? 500
@@ -27,18 +27,28 @@ const endHandler = (context: Context) => {
     errorHandler(context, err)
 }
 
-const executeHandler = async (context: Context, handler: Handler, payload: unknown): Promise<void> => {
-    if (isWritableEnded(context)) return
+const reply = (context: Context, value: unknown) => {
+    if (value === null) {
+        send(context, 204, value)
+        return
+    }
+
+    if (value !== undefined) {
+        send(context, context.res.statusCode, value)
+    }
+}
+
+const executeHandler = (context: Context, handler: Handler, payload: unknown) => {
     try {
-        const val = await handler(context, payload)
-        if (val === null) {
-            send(context, 204, val)
+        const value = handler(context, payload)
+        if (isPromise(value)) {
+            value
+                .then((val: unknown) => reply(context, val))
+                .catch(context.panic)
             return
         }
 
-        if (val !== undefined) {
-            send(context, context.res.statusCode, val)
-        }
+        reply(context, value)
     } catch (err) {
         context.panic(err)
     }

@@ -7,5 +7,6 @@ coverage
 *.log
 *.lerna_backup
 *.build.tsbuildinfo
+*.prof
 dist
 dev
