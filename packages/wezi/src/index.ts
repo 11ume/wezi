@@ -12,7 +12,6 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
         req
         , res
-        , shared: {}
         , params: {}
         , body: null
         , next: null
