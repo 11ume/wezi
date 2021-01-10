@@ -38,15 +38,15 @@ const reply = (context: Context, value: unknown) => {
     }
 }
 
-const handlePromiseReply = (context: Context, value: Promise<unknown>) => value
+const replyPromise = (context: Context, value: Promise<unknown>) => value
     .then((val: unknown) => reply(context, val))
     .catch(context.panic)
 
-const executeHandler = (context: Context, handler: Handler, payload: unknown) => {
+const executeHandler = (context: Context, handler: Handler, payload: unknown): void => {
     try {
         const value = handler(context, payload)
         if (isPromise(value)) {
-            handlePromiseReply(context, value)
+            replyPromise(context, value)
             return
         }
 
