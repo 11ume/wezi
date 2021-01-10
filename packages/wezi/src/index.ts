@@ -4,8 +4,9 @@ import { body } from 'wezi-receive'
 import { actions } from 'wezi-actions'
 import { Context, Handler, Status } from 'wezi-types'
 
-const status = (context: Context): Status => (code: number) => {
+const status = (context: Context): Status => (code: number, message?: string) => {
     context.res.statusCode = code
+    context.res.statusMessage = message
 }
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {

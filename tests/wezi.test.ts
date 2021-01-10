@@ -34,7 +34,7 @@ test('context body parse json', async (t) => {
         name: string
     }
 
-    const handler = async ({ body }: Context): Promise<Character> => body.json()
+    const handler = ({ body }: Context): Promise<Character> => body.json()
 
     const url = await server(handler)
     const res = await fetch(url, {
@@ -50,7 +50,7 @@ test('context body parse json', async (t) => {
 })
 
 test('context body parse buffer', async (t) => {
-    const handler = async ({ body }: Context) => body.buffer()
+    const handler = ({ body }: Context) => body.buffer()
 
     const url = await server(handler)
     const res = await fetch(url, {
@@ -64,7 +64,7 @@ test('context body parse buffer', async (t) => {
 })
 
 test('context body parse text', async (t) => {
-    const handler = async ({ body }: Context) => body.text()
+    const handler = ({ body }: Context) => body.text()
 
     const url = await server(handler)
     const res = await fetch(url, {
@@ -78,7 +78,7 @@ test('context body parse text', async (t) => {
 })
 
 test('context set response status code', async (t) => {
-    const handler = async ({ res, status }: Context) => {
+    const handler = ({ res, status }: Context) => {
         status(420)
         res.end()
     }
@@ -87,5 +87,18 @@ test('context set response status code', async (t) => {
     const res = await fetch(url)
 
     t.is(res.status, 420)
+})
+
+test('context set response status code whit message', async (t) => {
+    const handler = ({ res, status }: Context) => {
+        status(420, 'Enhance your calm')
+        res.end()
+    }
+
+    const url = await server(handler)
+    const res = await fetch(url)
+
+    t.is(res.status, 420)
+    t.is(res.statusText, 'Enhance your calm')
 })
 
