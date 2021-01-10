@@ -102,3 +102,16 @@ test('context set response status code whit message', async (t) => {
     t.is(res.statusText, 'Enhance your calm')
 })
 
+test('context set response status code whitout message', async (t) => {
+    const handler = ({ res, status }: Context) => {
+        status(420)
+        res.end()
+    }
+
+    const url = await server(handler)
+    const res = await fetch(url)
+
+    t.is(res.status, 420)
+    // node-fetch return 'unknown', but Fetch API reply whit a empty string.
+    t.is(res.statusText, 'unknown')
+})

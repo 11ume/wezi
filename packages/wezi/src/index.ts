@@ -6,7 +6,9 @@ import { Context, Handler, Status } from 'wezi-types'
 
 const status = (context: Context): Status => (code: number, message?: string) => {
     context.res.statusCode = code
-    context.res.statusMessage = message
+    if (message) {
+        context.res.statusMessage = message
+    }
 }
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
