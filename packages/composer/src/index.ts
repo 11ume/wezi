@@ -1,13 +1,13 @@
-import { send, empty, json } from 'wezi-send'
+import * as send from 'wezi-send'
 import { createError, InternalError } from 'wezi-error'
 import {
-    Context
-    , Dispatch
-    , Handler
-    , Next
+    Next
     , Panic
+    , Context
+    , Handler
+    , Dispatch
 } from 'wezi-types'
-import { createContext, isProduction, isPromise } from './utils'
+import { isPromise, isProduction } from './utils'
 
 const errorHandler = (context: Context, error: InternalError) => {
     const status = error.statusCode ?? 500
@@ -16,10 +16,10 @@ const errorHandler = (context: Context, error: InternalError) => {
         message
     }
     if (isProduction()) {
-        empty(context, status)
+        send.empty(context, status)
         return
     }
-    json(context, payload, status)
+    send.json(context, payload, status)
 }
 
 const endHandler = (context: Context) => {
@@ -29,22 +29,24 @@ const endHandler = (context: Context) => {
 
 const reply = (context: Context, value: unknown) => {
     if (value === null) {
-        send(context, 204, value)
+        send.empty(context, 204)
         return
     }
 
     if (value !== undefined) {
-        send(context, context.res.statusCode, value)
+        send.send(context, context.res.statusCode, value)
     }
 }
+
+const handlePromiseReply = (context: Context, value: Promise<unknown>) => value
+    .then((val: unknown) => reply(context, val))
+    .catch(context.panic)
 
 const executeHandler = (context: Context, handler: Handler, payload: unknown) => {
     try {
         const value = handler(context, payload)
         if (isPromise(value)) {
-            value
-                .then((val: unknown) => reply(context, val))
-                .catch(context.panic)
+            handlePromiseReply(context, value)
             return
         }
 
@@ -76,17 +78,20 @@ const createPanic = (context: Context): Panic => {
     }
 }
 
+const createContext = (context: Context, dispatch: Dispatch) => {
+    return Object.assign(context, {
+        next: createNext(context, dispatch)
+        , panic: createPanic(context)
+    })
+}
+
 export const composer = (main: boolean, ...handlers: Handler[]): Dispatch => {
     const len = handlers.length
     let inc = 0
     return function dispatch(context: Context, payload?: unknown): void {
         if (inc < len) {
             const handler = handlers[inc++]
-            const newContext = createContext(context, {
-                next: createNext(context, dispatch)
-                , panic: createPanic(context)
-            })
-
+            const newContext = createContext(context, dispatch)
             setImmediate(executeHandler, newContext, handler, payload)
             return
         }
@@ -97,11 +102,7 @@ export const composer = (main: boolean, ...handlers: Handler[]): Dispatch => {
 
 export const composerSingleHandler = (handler: Handler): Dispatch => {
     return function dispatch(context: Context, payload?: unknown): void {
-        const newContext = createContext(context, {
-            next: createNext(context, dispatch)
-            , panic: createPanic(context)
-        })
-
+        const newContext = createContext(context, dispatch)
         setImmediate(executeHandler, newContext, handler, payload)
     }
 }
