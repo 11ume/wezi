@@ -7,7 +7,7 @@ export interface ContextRouter<P = any> extends Context {
     readonly params: P
 }
 
-export interface ContextParamsWildcard<T = any> extends Context<T> {
+export interface ContextParamsWildcard extends Context {
     params: {
         wild: string
     }
@@ -77,7 +77,6 @@ const creteRouteEntity = (entity: RouteEntity, namespace: string) => {
 
 const prepareRouteStack = (entities: RouteEntity[], namespace = ''): RouteEntity[] => entities.map((entity) => creteRouteEntity(entity, namespace))
 
-// make pre built of all route handlers
 const prepareRoutes = (entities: RouteEntity[]) => {
     const stack = prepareRouteStack(entities)
     return findRouteMatch(stack)
