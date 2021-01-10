@@ -38,9 +38,9 @@ const wezi = (...handlers: Handler[]) => function run(req: IncomingMessage, res:
     dispatch(enhancedContext)
 }
 
-export const listen = (handler: RequestListener, port = 3000) => {
+export const listen = (handler: RequestListener, port = 3000, hostname: string = null) => {
     const server = http.createServer(handler)
-    server.listen(port)
+    server.listen(port, hostname)
     return server
 }
 

@@ -6,6 +6,7 @@ import { Context } from 'wezi-types'
 import { server } from './helpers'
 import {
     send
+    , empty
     , buffer
     , stream
 } from '../packages/send'
@@ -53,7 +54,7 @@ test('send json message', async (t) => {
 })
 
 test('send empty', async (t) => {
-    const fn = (c: Context) => send(c)
+    const fn = (c: Context) => empty(c)
 
     const url = await server(fn)
     const res = await fetch(url)
@@ -74,22 +75,13 @@ test('send payload whit status code', async (t) => {
     t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
 })
 
-test('send only status code', async (t) => {
+test('send must throws error when is invoked whitout content', async (t) => {
     const fn = (c: Context) => send(c, 400)
 
     const url = await server(fn)
     const res = await fetch(url)
 
-    t.is(res.status, 400)
-})
-
-test('send Not Content whit other status', async (t) => {
-    const fn = (c: Context) => send(c, 400, null)
-
-    const url = await server(fn)
-    const res = await fetch(url)
-
-    t.is(res.status, 400)
+    t.is(res.status, 500)
 })
 
 test('send direct message', async (t) => {
