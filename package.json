@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "pub": "yarn run es6:add && lerna publish",
+    "pub": "lerna publish",
     "clean": "lerna run clean",
     "build": "lerna run build",
     "test": "node node_modules/.bin/ava",
