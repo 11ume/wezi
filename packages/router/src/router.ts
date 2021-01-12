@@ -13,19 +13,16 @@ export interface ContextParamsWildcard extends Context {
     }
 }
 
-export type Route = {
-    keys: Array<string>
-    pattern: RegExp
-}
-
 export type RouteEntity = {
     path: string
-    route: Route
     single: boolean
     method: string
     handler: Handler
     handlers: Handler[]
     namespace: string
+    // route <regexparam>
+    keys: Array<string>
+    pattern: RegExp
 }
 
 const isHead = (context: Context) => context.req.method === 'HEAD'
@@ -36,6 +33,9 @@ const createRouteContext = (context: Context, params: unknown) => Object.assign(
 
 const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecArray) => {
     if (isHead(context)) {
+        context.res.writeHead(200, {
+            'Content-Length': '0'
+        })
         context.res.end(null, null, null)
         return
     }
@@ -55,8 +55,7 @@ const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecA
 const findRouteMatch = (routerEntities: RouteEntity[]) => function routerMatch(context: Context) {
     for (const entity of routerEntities) {
         if (context.req.method !== entity.method) continue
-        const route = entity.route
-        const match = route.pattern.exec(context.req.url)
+        const match = entity.pattern.exec(context.req.url)
         if (match) {
             dispatchRoute(context, entity, match)
             return
@@ -68,10 +67,11 @@ const findRouteMatch = (routerEntities: RouteEntity[]) => function routerMatch(c
 
 const creteRouteEntity = (entity: RouteEntity, namespace: string) => {
     const namespaceMerge = `${namespace}${entity.namespace}`
-    const route = entity.route ?? regexparam(`${namespaceMerge}${entity.path}`)
+    const { keys, pattern } = regexparam(`${namespaceMerge}${entity.path}`)
     return {
         ...entity
-        , route
+        , keys
+        , pattern
         , namespace
     }
 }
@@ -91,14 +91,14 @@ const prepareRoutesWhitNamespace = (entities: RouteEntity[], namespace?: string)
 const inSingleHandler = (handlers: Handler[]) => handlers.length === 1
 
 const createRouteEntity = (method: string) => (path: string, ...handlers: Handler[]): RouteEntity => {
-    const route = null
     const single = inSingleHandler(handlers)
     const handler = handlers[0] ?? null
     const namespace = ''
 
     return {
         path
-        , route
+        , keys: null
+        , pattern: null
         , single
         , method
         , handler

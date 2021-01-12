@@ -1,19 +1,19 @@
-import { Route, RouteEntity } from './router'
+import { RouteEntity } from './router'
 
 type Params = {
     [key: string]: string
 }
 
-const regExpExtractParams = (route: Route, match: RegExpExecArray) => {
+const regExpExtractParams = (keys: string[], match: RegExpExecArray) => {
     let i = 0
     const params: Params = {}
-    while (i < route.keys.length) {
-        const key = route.keys[i]
+    while (i < keys.length) {
+        const key = keys[i]
         params[key] = match[++i] || null
     }
 
     return params
 }
 
-export const getUrlParams = (item: RouteEntity, match: RegExpExecArray) => regExpExtractParams(item.route, match)
+export const getUrlParams = (routerEntity: RouteEntity, match: RegExpExecArray) => regExpExtractParams(routerEntity.keys, match)
 
