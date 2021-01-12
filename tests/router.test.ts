@@ -11,6 +11,7 @@ import router, {
     , post
     , put
     , del
+    , patch
 } from '../packages/router'
 import { server } from './helpers'
 
@@ -60,16 +61,11 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
     }
 
     const responses = {
-        getAll: [1, 2, 3]
-        , create: {
-            action: 'create'
-        }
-        , update: {
-            action: 'update'
-        }
-        , delete: {
-            action: 'delete'
-        }
+        getAll: 'get_all'
+        , create: 'create'
+        , put: 'put'
+        , patch: 'patch'
+        , delete: 'delete'
     }
 
     const r = router()
@@ -77,32 +73,38 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
         get('/users', () => responses.getAll)
         , get('/users/:id', (context: ContextRouter<User>) => context.params.id)
         , post('/users', () => responses.create)
-        , put('/users', () => responses.update)
+        , put('/users', () => responses.put)
+        , patch('/users', () => responses.patch)
         , del('/users', () => responses.delete)
     ))
-    const getAll = await fetch(`${url}/users`)
-    const getById = await fetch(`${url}/users/1`)
-    const create = await fetch(`${url}/users`, {
+    const getAllres = await fetch(`${url}/users`)
+    const getByIdRes = await fetch(`${url}/users/1`)
+    const createRes = await fetch(`${url}/users`, {
         method: 'post'
     })
-    const update = await fetch(`${url}/users`, {
+    const putRes = await fetch(`${url}/users`, {
         method: 'put'
     })
-    const daleteOne = await fetch(`${url}/users`, {
+    const patchRes = await fetch(`${url}/users`, {
+        method: 'patch'
+    })
+    const daleteOneRes = await fetch(`${url}/users`, {
         method: 'delete'
     })
 
-    const bAll = await getAll.json()
-    const bById = await getById.text()
-    const bCreaste = await create.json()
-    const bUpdate = await update.json()
-    const bDelete = await daleteOne.json()
+    const bodyAll = await getAllres.text()
+    const bodyById = await getByIdRes.text()
+    const bodyCreaste = await createRes.text()
+    const bodyPatch = await patchRes.text()
+    const bodyPut = await putRes.text()
+    const bodyDelete = await daleteOneRes.text()
 
-    t.deepEqual(bAll, responses.getAll)
-    t.is(bById, '1')
-    t.deepEqual(bCreaste, responses.create)
-    t.deepEqual(bUpdate, responses.update)
-    t.deepEqual(bDelete, responses.delete)
+    t.deepEqual(bodyAll, responses.getAll)
+    t.is(bodyById, '1')
+    t.deepEqual(bodyCreaste, responses.create)
+    t.deepEqual(bodyPut, responses.put)
+    t.deepEqual(bodyPatch, responses.patch)
+    t.deepEqual(bodyDelete, responses.delete)
 })
 
 test('different routes whit static paths, method get', async (t) => {

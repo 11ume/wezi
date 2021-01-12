@@ -128,10 +128,10 @@ export const routes = (namespace?: string) => (...entities: RouteEntity[]) => {
     return entities
 }
 
-export const post = createRouteEntity('POST')
 export const get = createRouteEntity('GET')
+export const post = createRouteEntity('POST')
 export const put = createRouteEntity('PUT')
-export const path = createRouteEntity('PATH')
 export const del = createRouteEntity('DELETE')
 export const head = createRouteEntity('HEAD')
+export const patch = createRouteEntity('PATCH')
 export const options = createRouteEntity('OPTIONS')
