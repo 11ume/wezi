@@ -3,45 +3,41 @@ import { Context, Body } from 'wezi-types'
 import { parseJSON } from './utils'
 import fastGetBody from 'fast-get-body'
 
-type CacheWeakMap<T> = WeakMap<IncomingMessage, T>
+type CacheWeakMap<T = any> = WeakMap<IncomingMessage, T>
+type FastGetJsonBody<T> = () => Promise<T>
+
+const handleGetBody = <T = void>(context: Context, weakMap: CacheWeakMap<T>, fn: FastGetJsonBody<T>) => {
+    const body = weakMap.get(context.req)
+    if (body) return Promise.resolve(body)
+    return fn()
+}
 
 const toJson = () => {
-    const cacheJsonWeakMap: CacheWeakMap<any> = new WeakMap()
-    return <T>(context: Context): Promise<T> => {
-        const cached = cacheJsonWeakMap.get(context.req)
-        if (cached) return Promise.resolve(cached)
-
-        return fastGetBody(context.req, true)
-            .then((payload) => {
-                const body = parseJSON(payload.body)
-                cacheJsonWeakMap.set(context.req, body)
-                return body
-            })
-    }
+    const weakMap: CacheWeakMap = new WeakMap()
+    return <T>(context: Context) => handleGetBody<T>(context, weakMap, async () => {
+        const payload = await fastGetBody(context.req, true)
+        const body = parseJSON(payload.body)
+        weakMap.set(context.req, body)
+        return body
+    })
 }
 
 const toBuffer = () => {
-    const cacheBufferWeakMap: CacheWeakMap<Buffer> = new WeakMap()
-    return (context: Context) => fastGetBody(context.req)
-        .then((payload) => {
-            const cached = cacheBufferWeakMap.get(context.req)
-            if (cached) return cached
-
-            cacheBufferWeakMap.set(context.req, payload.body)
-            return payload.body
-        })
+    const weakMap: CacheWeakMap<Buffer> = new WeakMap()
+    return (context: Context) => handleGetBody<Buffer>(context, weakMap, async () => {
+        const payload = await fastGetBody(context.req)
+        weakMap.set(context.req, payload.body)
+        return payload.body
+    })
 }
 
 const toText = () => {
-    const cacheStringWeakMap: CacheWeakMap<string> = new WeakMap()
-    return (context: Context): Promise<string> => fastGetBody(context.req, true)
-        .then((payload) => {
-            const cached = cacheStringWeakMap.get(context.req)
-            if (cached) return cached
-
-            cacheStringWeakMap.set(context.req, payload.body)
-            return payload.body
-        })
+    const weakMap: CacheWeakMap<string> = new WeakMap()
+    return (context: Context) => handleGetBody<string>(context, weakMap, async () => {
+        const payload = await fastGetBody(context.req, true)
+        weakMap.set(context.req, payload.body)
+        return payload.body
+    })
 }
 
 export const text = toText()
