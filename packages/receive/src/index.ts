@@ -1,7 +1,7 @@
 import { IncomingMessage } from 'http'
+import fastGetBody from 'fast-get-body'
 import { Context, Body } from 'wezi-types'
 import { parseJSON } from './utils'
-import fastGetBody from 'fast-get-body'
 
 type CacheWeakMap<T = any> = WeakMap<IncomingMessage, T>
 type FastGetJsonBody<T> = () => Promise<T>

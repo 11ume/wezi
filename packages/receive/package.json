@@ -16,13 +16,9 @@
         "prepublishOnly": "yarn run build"
     },
     "dependencies": {
-        "content-type": "^1.0.4",
-        "fast-get-body": "https://github.com/11ume/fast-get-body",
+        "fast-get-body": "^0.1.0",
         "wezi-error": "^1.0.0-alpha.16",
         "wezi-types": "^1.0.0-alpha.16"
-    },
-    "devDependencies": {
-        "@types/content-type": "^1.1.3"
     },
     "type": "module"
 }
