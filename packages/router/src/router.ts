@@ -27,16 +27,20 @@ export type RouteEntity = {
 
 const isHead = (context: Context) => context.req.method === 'HEAD'
 
+const replyHead = (context: Context) => {
+    context.res.writeHead(200, {
+        'Content-Length': '0'
+    })
+    context.res.end(null, null, null)
+}
+
 const createRouteContext = (context: Context, params: unknown) => Object.assign(context, {
     params
 })
 
 const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecArray) => {
     if (isHead(context)) {
-        context.res.writeHead(200, {
-            'Content-Length': '0'
-        })
-        context.res.end(null, null, null)
+        replyHead(context)
         return
     }
 
