@@ -21,7 +21,9 @@ export type Route = {
 export type RouteEntity = {
     path: string
     route: Route
+    single: boolean
     method: string
+    handler: Handler
     handlers: Handler[]
     namespace: string
 }
@@ -40,14 +42,13 @@ const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecA
 
     const params = getUrlParams(entity, match)
     const routeContext = createRouteContext(context, params)
-    if (entity.handlers.length > 1) {
-        const dispatch = composer(false, ...entity.handlers)
+    if (entity.single) {
+        const dispatch = composerSingleHandler(entity.handler)
         dispatch(routeContext)
         return
     }
 
-    const handler = entity.handlers[0]
-    const dispatch = composerSingleHandler(handler)
+    const dispatch = composer(false, ...entity.handlers)
     dispatch(routeContext)
 }
 
@@ -87,13 +88,22 @@ const prepareRoutesWhitNamespace = (entities: RouteEntity[], namespace?: string)
     return findRouteMatch(stack)
 }
 
+const inSingleHandler = (handlers: Handler[]) => handlers.length === 1
+
 const createRouteEntity = (method: string) => (path: string, ...handlers: Handler[]): RouteEntity => {
+    const route = null
+    const single = inSingleHandler(handlers)
+    const handler = handlers[0] ?? null
+    const namespace = ''
+
     return {
         path
-        , route: null
+        , route
+        , single
         , method
+        , handler
         , handlers
-        , namespace: ''
+        , namespace
     }
 }
 
