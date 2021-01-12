@@ -1,7 +1,5 @@
-import { Options as GetRawBodyOptions } from 'raw-body'
-
 export interface Body {
-    text: (options?: GetRawBodyOptions) => Promise<string>
-    json: <T>(options?: GetRawBodyOptions) => Promise<T>
-    buffer: (options?: GetRawBodyOptions) => Promise<Buffer | null>
+    text: () => Promise<string>
+    json: <T>() => Promise<T>
+    buffer: () => Promise<Buffer | null>
 }
