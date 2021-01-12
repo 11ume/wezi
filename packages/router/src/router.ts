@@ -13,20 +13,26 @@ export interface ContextParamsWildcard extends Context {
     }
 }
 
-export type Route = {
+export type RouteEntity = {
+    path: string
+    single: boolean
+    method: string
+    handler: Handler
+    handlers: Handler[]
+    namespace: string
+    // route <regexparam>
     keys: Array<string>
     pattern: RegExp
 }
 
-export type RouteEntity = {
-    path: string
-    route: Route
-    method: string
-    handlers: Handler[]
-    namespace: string
-}
-
 const isHead = (context: Context) => context.req.method === 'HEAD'
+
+const replyHead = (context: Context) => {
+    context.res.writeHead(200, {
+        'Content-Length': '0'
+    })
+    context.res.end(null, null, null)
+}
 
 const createRouteContext = (context: Context, params: unknown) => Object.assign(context, {
     params
@@ -34,28 +40,26 @@ const createRouteContext = (context: Context, params: unknown) => Object.assign(
 
 const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecArray) => {
     if (isHead(context)) {
-        context.res.end(null, null, null)
+        replyHead(context)
         return
     }
 
     const params = getUrlParams(entity, match)
     const routeContext = createRouteContext(context, params)
-    if (entity.handlers.length > 1) {
-        const dispatch = composer(false, ...entity.handlers)
+    if (entity.single) {
+        const dispatch = composerSingleHandler(entity.handler)
         dispatch(routeContext)
         return
     }
 
-    const handler = entity.handlers[0]
-    const dispatch = composerSingleHandler(handler)
+    const dispatch = composer(false, ...entity.handlers)
     dispatch(routeContext)
 }
 
 const findRouteMatch = (routerEntities: RouteEntity[]) => function routerMatch(context: Context) {
     for (const entity of routerEntities) {
         if (context.req.method !== entity.method) continue
-        const route = entity.route
-        const match = route.pattern.exec(context.req.url)
+        const match = entity.pattern.exec(context.req.url)
         if (match) {
             dispatchRoute(context, entity, match)
             return
@@ -67,10 +71,11 @@ const findRouteMatch = (routerEntities: RouteEntity[]) => function routerMatch(c
 
 const creteRouteEntity = (entity: RouteEntity, namespace: string) => {
     const namespaceMerge = `${namespace}${entity.namespace}`
-    const route = entity.route ?? regexparam(`${namespaceMerge}${entity.path}`)
+    const { keys, pattern } = regexparam(`${namespaceMerge}${entity.path}`)
     return {
         ...entity
-        , route
+        , keys
+        , pattern
         , namespace
     }
 }
@@ -87,13 +92,22 @@ const prepareRoutesWhitNamespace = (entities: RouteEntity[], namespace?: string)
     return findRouteMatch(stack)
 }
 
+const inSingleHandler = (handlers: Handler[]) => handlers.length === 1
+
 const createRouteEntity = (method: string) => (path: string, ...handlers: Handler[]): RouteEntity => {
+    const single = inSingleHandler(handlers)
+    const handler = handlers[0] ?? null
+    const namespace = ''
+
     return {
         path
-        , route: null
+        , keys: null
+        , pattern: null
+        , single
         , method
+        , handler
         , handlers
-        , namespace: ''
+        , namespace
     }
 }
 
