@@ -15,5 +15,7 @@ const regExpExtractParams = (keys: string[], match: RegExpExecArray) => {
     return params
 }
 
-export const getUrlParams = (routerEntity: RouteEntity, match: RegExpExecArray) => regExpExtractParams(routerEntity.keys, match)
-
+export const getUrlParams = (routerEntity: RouteEntity, match: RegExpExecArray) => {
+    if (routerEntity.keys.length) return regExpExtractParams(routerEntity.keys, match)
+    return null
+}
