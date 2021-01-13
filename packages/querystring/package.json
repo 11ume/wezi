@@ -1,7 +1,7 @@
 {
-    "name": "wezi",
+    "name": "wezi-query",
     "version": "1.0.0-alpha.17",
-    "description": "",
+    "description": "wezi querystring parser",
     "main": "dist/index.js",
     "types": "index.ts",
     "license": "MIT",
@@ -16,10 +16,7 @@
         "prepublishOnly": "yarn run build"
     },
     "dependencies": {
-        "wezi-actions": "^1.0.0-alpha.17",
-        "wezi-composer": "^1.0.0-alpha.17",
-        "wezi-error": "^1.0.0-alpha.17",
-        "wezi-receive": "^1.0.0-alpha.17",
         "wezi-types": "^1.0.0-alpha.17"
-    }
+    },
+    "type": "module"
 }
