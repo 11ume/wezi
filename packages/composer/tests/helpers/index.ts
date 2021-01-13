@@ -9,7 +9,6 @@ export const server = (handler: RequestListener) => {
 export const createContext = ({
     req
     , res
-    , params = {}
     , body = null
     , next = null
     , panic = null
@@ -18,7 +17,6 @@ export const createContext = ({
 }): Context => ({
     req
     , res
-    , params
     , body
     , next
     , panic

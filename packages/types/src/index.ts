@@ -10,7 +10,6 @@ export interface Context {
     readonly panic: Panic
     readonly status: Status
     readonly actions: Actions
-    readonly params: any
 }
 
 export type Next = <T>(payload?: T) => void

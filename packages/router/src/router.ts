@@ -4,11 +4,11 @@ import composer, { composerSingleHandler } from 'wezi-composer'
 import { getUrlParams } from './extractors'
 
 export interface ContextRouter<P = any> extends Context {
-    readonly params: P
+    readonly params?: P
 }
 
 export interface ContextParamsWildcard extends Context {
-    params: {
+    params?: {
         wild: string
     }
 }

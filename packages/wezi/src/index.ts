@@ -15,7 +15,6 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
         req
         , res
-        , params: {}
         , body: null
         , next: null
         , panic: null
