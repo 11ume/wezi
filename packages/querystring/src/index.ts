@@ -1,8 +1,8 @@
 import { Context } from 'wezi-types'
-import querystring from 'querystring'
+import querystring, { ParsedUrlQuery } from 'querystring'
 
 interface QueryContext extends Context {
-    query?: any
+    query?: ParsedUrlQuery
 }
 
 const getQuery = (url: string, idx: number) => {
@@ -14,11 +14,8 @@ const getQuery = (url: string, idx: number) => {
 
 const getQueryString = (url: string) => {
     const index = url.indexOf('?', 1)
-    if (index !== -1) {
-        return getQuery(url, index)
-    }
-
-    return {}
+    if (index !== -1) return getQuery(url, index)
+    return null
 }
 
 export const queryParser = (context: QueryContext) => {
