@@ -3,6 +3,44 @@ import composer from 'wezi-composer'
 import { body } from 'wezi-receive'
 import { actions } from 'wezi-actions'
 import { Context, Handler, Status } from 'wezi-types'
+import createError from 'wezi-error'
+
+type SharableKey = string | number | symbol
+
+const setSharableValue = (obj: unknown, key: SharableKey, value: unknown, options: PropertyDescriptor = {}) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { value: _, ...opts } = options
+    return Object.defineProperties(obj, {
+        [key]: {
+            value
+            , writable: true
+            , ...opts
+        }
+    })
+}
+
+const sharable = <E>(c: Context) => {
+    const weakmap = new WeakMap()
+    const map = weakmap.set(c.req, {})
+    return {
+        set: <T extends E, K extends keyof T>(key: K, value: T[K], options?: PropertyDescriptor) => {
+            const obj = map.get(c.req)
+            try {
+                setSharableValue(obj, key, value, options)
+            } catch (err) {
+                throw createError(500, `set sharable value error, key: ${key}`, err)
+            }
+        }
+        , get: (key: any) => {
+            const obj = weakmap.get(c.req)
+            if (obj[key]) {
+                return obj[key]
+            }
+
+            throw createError(500, `get sharable value error, dont exist key: ${key}`)
+        }
+    }
+}
 
 const status = (context: Context): Status => (code: number, message?: string) => {
     context.res.statusCode = code
@@ -20,6 +58,7 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
         , panic: null
         , status: null
         , actions: null
+        , sharable: null
     }
 }
 
@@ -29,6 +68,7 @@ const createEnhancedContext = (context: Context): Context => {
         , body: body(context)
         , status: status(context)
         , actions: actions(context)
+        , sharable: sharable(context)
     }
 }
 
