@@ -10,12 +10,14 @@ export interface Context<T = any> {
     readonly panic: Panic
     readonly status: Status
     readonly actions: Actions
-    readonly sharable: Sharable<T>
+    readonly shared: Shared<T>
 }
 
-export type Sharable<E> = {
+export type Shared<E> = {
     set: <T extends E, K extends keyof T>(key: K, value: T[K], options?: PropertyDescriptor) => void
     get: <T extends E, K extends keyof T>(key: K) => T[K]
+    remove: <T extends E, K extends keyof T>(key: K) => void
+    values: () => E
 }
 
 export type Payload<T = any> = {

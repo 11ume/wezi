@@ -29,6 +29,9 @@
       "wezi-types": [
         "packages/types"
       ],
+      "wezi-shared": [
+        "packages/shared"
+      ],
       "wezi": [
         "packages/wezi"
       ]

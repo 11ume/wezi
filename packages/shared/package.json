@@ -1,0 +1,23 @@
+{
+    "name": "wezi-shared",
+    "version": "1.0.0-alpha.17",
+    "description": "",
+    "main": "dist/index.js",
+    "types": "index.ts",
+    "license": "MIT",
+    "author": {
+        "name": "Horacio Rivero",
+        "email": "horacioriverods@gmail.com"
+    },
+    "scripts": {
+        "build": "yarn run clean && yarn run compile",
+        "clean": "rm -rf ./dist && rm -rf ./node_modules/.cache",
+        "compile": "rollup -c",
+        "prepublishOnly": "yarn run build"
+    },
+    "dependencies": {
+        "wezi-types": "^1.0.0-alpha.17",
+        "wezi-error": "^1.0.0-alpha.17"
+    },
+    "type": "module"
+}
