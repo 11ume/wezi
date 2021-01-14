@@ -3,7 +3,11 @@ import { Context, Handler, Payload } from 'wezi-types'
 import composer, { composerSingleHandler } from 'wezi-composer'
 import { getUrlParams } from './extractors'
 
-export interface ParamsWildcardPayload {
+export interface Params<T = any> {
+    params: T
+}
+
+export interface ParamsWildcard {
     params?: {
         wild: string
     }
@@ -30,7 +34,7 @@ const replyHead = (context: Context) => {
     context.res.end(null, null, null)
 }
 
-const dispatchRoute = (context: Context, payload: Payload, entity: RouteEntity, match: RegExpExecArray) => {
+const dispatchRoute = (context: Context, payload: Payload<Params>, entity: RouteEntity, match: RegExpExecArray) => {
     if (isHead(context)) {
         replyHead(context)
         return
@@ -53,7 +57,7 @@ const dispatchRoute = (context: Context, payload: Payload, entity: RouteEntity, 
     })
 }
 
-const findRouteMatch = (routerEntities: RouteEntity[]) => function routerMatch(context: Context, payload: Payload = {}) {
+const findRouteMatch = (routerEntities: RouteEntity[]) => function routerMatch(context: Context, payload: Payload<Params>) {
     for (const entity of routerEntities) {
         if (context.req.method !== entity.method) continue
         const match = entity.pattern.exec(context.req.url)
