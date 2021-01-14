@@ -4,7 +4,7 @@ import { createError } from 'wezi-error'
 import { Context } from 'wezi-types'
 import * as receive from 'wezi-receive'
 import router, {
-    ParamsWildcardPayload
+    ParamsWildcard
     , routes
     , get
     , head
@@ -355,7 +355,7 @@ test('match head, match route and return empty body', async (t) => {
 })
 
 test('multiple matching routes match whit wildcards', async (t) => {
-    const getChar = (_context: Context, { params }: ParamsWildcardPayload) => params.wild
+    const getChar = (_context: Context, { params }: ParamsWildcard) => params.wild
     const r = router()
     const url = await server(r(
         get('/character/*', getChar)
