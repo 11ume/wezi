@@ -1,6 +1,6 @@
 import test from 'ava'
 import fetch from 'node-fetch'
-import cors from '../packages/cors'
+import cors from 'wezi-cors'
 import { server } from './helpers'
 
 const methods = [

@@ -1,13 +1,9 @@
 import regexparam from 'regexparam'
-import { Context, Handler } from 'wezi-types'
+import { Context, Handler, Payload } from 'wezi-types'
 import composer, { composerSingleHandler } from 'wezi-composer'
 import { getUrlParams } from './extractors'
 
-export interface ContextRouter<P = any> extends Context {
-    readonly params?: P
-}
-
-export interface ContextParamsWildcard extends Context {
+export interface ParamsWildcardPayload {
     params?: {
         wild: string
     }
@@ -20,8 +16,8 @@ export type RouteEntity = {
     handler: Handler
     handlers: Handler[]
     namespace: string
-    // route <regexparam>
     keys: Array<string>
+    params: boolean
     pattern: RegExp
 }
 
@@ -34,47 +30,52 @@ const replyHead = (context: Context) => {
     context.res.end(null, null, null)
 }
 
-const createRouteContext = (context: Context, params: unknown) => Object.assign(context, {
-    params
-})
-
-const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecArray) => {
+const dispatchRoute = (context: Context, payload: Payload, entity: RouteEntity, match: RegExpExecArray) => {
     if (isHead(context)) {
         replyHead(context)
         return
     }
 
     const params = getUrlParams(entity, match)
-    const routeContext = createRouteContext(context, params)
     if (entity.single) {
         const dispatch = composerSingleHandler(entity.handler)
-        dispatch(routeContext)
+        dispatch(context, {
+            params
+            , ...payload
+        })
         return
     }
 
     const dispatch = composer(false, ...entity.handlers)
-    dispatch(routeContext)
+    dispatch(context, {
+        params
+        , ...payload
+    })
 }
 
-const findRouteMatch = (routerEntities: RouteEntity[]) => function routerMatch(context: Context) {
+const findRouteMatch = (routerEntities: RouteEntity[]) => function routerMatch(context: Context, payload: Payload = {}) {
     for (const entity of routerEntities) {
         if (context.req.method !== entity.method) continue
         const match = entity.pattern.exec(context.req.url)
         if (match) {
-            dispatchRoute(context, entity, match)
+            dispatchRoute(context, payload, entity, match)
             return
         }
     }
 
-    context.next()
+    context.next(payload)
 }
+
+const haveParams = (keys: string[]) => keys.length > 0
 
 const creteRouteEntity = (entity: RouteEntity, namespace: string) => {
     const namespaceMerge = `${namespace}${entity.namespace}`
     const { keys, pattern } = regexparam(`${namespaceMerge}${entity.path}`)
+    const params = haveParams(keys)
     return {
         ...entity
         , keys
+        , params
         , pattern
         , namespace
     }
@@ -103,6 +104,7 @@ const createRouteEntity = (method: string) => (path: string, ...handlers: Handle
         path
         , keys: null
         , pattern: null
+        , params: false
         , single
         , method
         , handler
