@@ -1,1 +1,1 @@
-export { shared } from './src/index'
+export * from './src'

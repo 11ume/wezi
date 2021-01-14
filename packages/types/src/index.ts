@@ -9,8 +9,8 @@ export interface Context<T = any> {
     readonly next: Next
     readonly panic: Panic
     readonly status: Status
-    readonly actions: Actions
     readonly shared: Shared<T>
+    readonly actions: Actions
 }
 
 export type Shared<E> = {

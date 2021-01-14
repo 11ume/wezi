@@ -20,8 +20,8 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
         , next: null
         , panic: null
         , status: null
-        , actions: null
         , shared: null
+        , actions: null
     }
 }
 
