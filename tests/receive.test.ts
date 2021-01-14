@@ -1,7 +1,7 @@
 import test from 'ava'
 import fetch from 'node-fetch'
-import { Context } from '../packages/types'
-import { text, json, buffer } from '../packages/receive'
+import { Context } from 'wezi-types'
+import { text, json, buffer } from 'wezi-receive'
 import { server } from './helpers'
 
 type ErrorPayload = {

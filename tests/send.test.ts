@@ -9,7 +9,7 @@ import {
     , empty
     , buffer
     , stream
-} from '../packages/send'
+} from 'wezi-send'
 
 type ErrorPayload = {
     message: string
