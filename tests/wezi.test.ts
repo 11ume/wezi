@@ -114,3 +114,23 @@ test('context set response status code whitout message', async (t) => {
     t.is(res.status, 300)
     t.is(res.statusText, 'Multiple Choices')
 })
+
+test('context send empty whitout message', async (t) => {
+    const handler = ({ empty }: Context) => empty(300)
+
+    const url = await server(handler)
+    const res = await fetch(url)
+
+    t.is(res.status, 300)
+    t.is(res.statusText, 'Multiple Choices')
+})
+
+test('context send empty whit message', async (t) => {
+    const handler = ({ empty }: Context) => empty(300, 'Cool')
+
+    const url = await server(handler)
+    const res = await fetch(url)
+
+    t.is(res.status, 300)
+    t.is(res.statusText, 'Cool')
+})

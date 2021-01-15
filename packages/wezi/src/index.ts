@@ -5,11 +5,15 @@ import { shared } from 'wezi-shared'
 import { actions } from 'wezi-actions'
 import { Context, Handler, Status } from 'wezi-types'
 
-const status = (context: Context): Status => (code: number, message?: string) => {
+const status = (context: Context): Status => (code: number, message = ''): void => {
     context.res.statusCode = code
-    if (message) {
-        context.res.statusMessage = message
-    }
+    context.res.statusMessage = message
+}
+
+const empty = (context: Context) => (code: number, message = ''): void => {
+    context.res.statusCode = code
+    context.res.statusMessage = message
+    context.res.end(null, null, null)
 }
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
@@ -19,6 +23,7 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
         , body: null
         , next: null
         , panic: null
+        , empty: null
         , status: null
         , shared: null
         , actions: null
@@ -29,6 +34,7 @@ const createEnhancedContext = (context: Context): Context => {
     return {
         ...context
         , body: body(context)
+        , empty: empty(context)
         , status: status(context)
         , shared: shared(context)
         , actions: actions(context)
