@@ -4,7 +4,7 @@ import createError from 'wezi-error'
 
 type SharedWeakMap = WeakMap<IncomingMessage, any>
 
-const set = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K, value: T[K]) => {
+const set = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K, value: T[K]): void => {
     const obj = weakmap.get(context.req)
     obj[key] = value
 }
@@ -15,7 +15,7 @@ const get = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K ext
     throw createError(500, `get sharable value error, key: ${key} don't exists`)
 }
 
-const remove = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K) => {
+const remove = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K): void => {
     const obj = weakmap.get(context.req)
     if (key in obj) {
         delete obj[key]
