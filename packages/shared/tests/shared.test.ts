@@ -17,6 +17,17 @@ test('set propery and get property', (t) => {
     t.is(value, '123')
 })
 
+test('set same propery', (t) => {
+    const pointer = {
+        req: {}
+    }
+    const sharable = shared<Sharable>(pointer as any)
+    sharable.set('foo', '123')
+    sharable.set('foo', '321')
+    const value = sharable.get('foo')
+    t.is(value, '321')
+})
+
 test('get inexistent propery key', (t) => {
     const pointer = {
         req: {}
@@ -24,7 +35,7 @@ test('get inexistent propery key', (t) => {
     const sharable = shared<Sharable>(pointer as any)
     const err: InternalError = t.throws(() => sharable.get('foo'))
     t.is(err.statusCode, 500)
-    t.is(err.message, 'get sharable value error, key: foo don\'t exist')
+    t.is(err.message, 'get sharable value error, key: foo don\'t exists')
 })
 
 test('remove propery', (t) => {
@@ -37,6 +48,16 @@ test('remove propery', (t) => {
     t.is(value, '123')
     const removed = sharable.remove('foo')
     t.is(removed, undefined)
+})
+
+test('remove inexistent propery', (t) => {
+    const pointer = {
+        req: {}
+    }
+    const sharable = shared<Sharable>(pointer as any)
+    const err: InternalError = t.throws(() => sharable.remove('foo'))
+    t.is(err.statusCode, 500)
+    t.is(err.message, 'remove sharable value error, key: foo don\'t exists')
 })
 
 test('get all values', (t) => {
