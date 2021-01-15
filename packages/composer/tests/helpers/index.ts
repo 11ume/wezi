@@ -12,6 +12,7 @@ export const createContext = ({
     , body = null
     , next = null
     , panic = null
+    , shared = null
     , status = null
     , actions = null
 }): Context => ({
@@ -20,6 +21,7 @@ export const createContext = ({
     , body
     , next
     , panic
+    , shared
     , status
     , actions
 })

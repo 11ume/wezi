@@ -9,8 +9,5 @@
         "name": "Horacio Rivero",
         "email": "horacioriverods@gmail.com"
     },
-    "dependencies": {
-        "raw-body": "^2.4.1"
-    },
     "type": "module"
 }

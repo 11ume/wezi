@@ -2,14 +2,22 @@ import { IncomingMessage, ServerResponse } from 'http'
 import { Body } from './receive'
 import { Actions } from './actions'
 
-export interface Context {
+export interface Context<T = any> {
     readonly req: IncomingMessage
     readonly res: ServerResponse
     readonly body: Body
     readonly next: Next
     readonly panic: Panic
     readonly status: Status
+    readonly shared: Shared<T>
     readonly actions: Actions
+}
+
+export type Shared<E> = {
+    set: <T extends E, K extends keyof T>(key: K, value: T[K]) => void
+    get: <T extends E, K extends keyof T>(key: K) => T[K]
+    remove: <T extends E, K extends keyof T>(key: K) => void
+    values: () => E
 }
 
 export type Payload<T = any> = {
