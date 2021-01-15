@@ -14,7 +14,7 @@ export interface Context<T = any> {
 }
 
 export type Shared<E> = {
-    set: <T extends E, K extends keyof T>(key: K, value: T[K], options?: PropertyDescriptor) => void
+    set: <T extends E, K extends keyof T>(key: K, value: T[K]) => void
     get: <T extends E, K extends keyof T>(key: K) => T[K]
     remove: <T extends E, K extends keyof T>(key: K) => void
     values: () => E

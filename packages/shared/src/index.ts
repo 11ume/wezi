@@ -1,53 +1,40 @@
+import { IncomingMessage } from 'http'
 import { Context } from 'wezi-types'
 import createError from 'wezi-error'
 
-type SharableKey = string | number | symbol
+type SharedWeakMap = WeakMap<IncomingMessage, any>
 
-const setSharableValue = (obj: unknown, key: SharableKey, value: unknown, options: PropertyDescriptor = {}) => {
-    const { value: _, ...opts } = options
-    return Object.defineProperties(obj, {
-        [key]: {
-            value
-            , writable: true
-            , ...opts
-        }
-    })
+const set = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K, value: T[K]) => {
+    const obj = weakmap.get(context.req)
+    obj[key] = value
 }
 
-export const shared = <E>(c: Context) => {
-    const weakmap = new WeakMap()
-    const map = weakmap.set(c.req, {})
+const get = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K): T[K] => {
+    const obj = weakmap.get(context.req)
+    if (key in obj) return obj[key]
+    throw createError(500, `get sharable value error, key: ${key} don't exist`)
+}
+
+const remove = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K) => {
+    const obj = weakmap.get(context.req)
+    if (key in obj) {
+        delete obj[key]
+        weakmap.set(context.req, obj)
+        return
+    }
+
+    throw createError(500, `remove sharable value error, don't exists key: ${key}`)
+}
+
+const values = <E>(context: Context, weakmap: SharedWeakMap) => (): E => weakmap.get(context.req)
+
+export const shared = <E>(context: Context) => {
+    const weakmap = new WeakMap<IncomingMessage>()
+    const map = weakmap.set(context.req, {})
     return {
-        values: (): E => map.get(c.req)
-        , set: <T extends E, K extends keyof T>(key: K, value: T[K], options?: PropertyDescriptor) => {
-            const obj = map.get(c.req)
-            try {
-                setSharableValue(obj, key, value, options)
-            } catch (err) {
-                throw createError(500, `set sharable value error, key: ${key}`, err)
-            }
-        }
-        , get: <T extends E, K extends keyof T>(key: K): T[K] => {
-            const obj = weakmap.get(c.req)
-            if (key in obj) {
-                return obj[key]
-            }
-
-            throw createError(500, `get sharable value error, key: ${key} dont exist`)
-        }
-        , remove: <T extends E, K extends keyof T>(key: K) => {
-            const obj = map.get(c.req)
-            const newObj = {
-                ...obj
-            }
-
-            if (key in obj) {
-                delete newObj[key]
-                map.set(c.req, newObj)
-                return
-            }
-
-            throw createError(500, `remove sharable value error, dont exist key: ${key}`)
-        }
+        set: set<E>(context, map)
+        , get: get<E>(context, map)
+        , remove: remove<E>(context, map)
+        , values: values<E>(context, map)
     }
 }
