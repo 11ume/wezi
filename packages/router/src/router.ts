@@ -44,16 +44,16 @@ const dispatchRoute = (context: Context, payload: Payload<Params>, entity: Route
     if (entity.single) {
         const dispatch = composerSingleHandler(entity.handler)
         dispatch(context, {
-            ...payload
-            , params
+            params
+            , ...payload
         })
         return
     }
 
     const dispatch = composer(false, ...entity.handlers)
     dispatch(context, {
-        ...payload
-        , params
+        params
+        , ...payload
     })
 }
 

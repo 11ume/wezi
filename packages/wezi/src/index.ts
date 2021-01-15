@@ -1,6 +1,7 @@
 import http, { RequestListener, IncomingMessage, ServerResponse } from 'http'
 import composer from 'wezi-composer'
 import { body } from 'wezi-receive'
+import { shared } from 'wezi-shared'
 import { actions } from 'wezi-actions'
 import { Context, Handler, Status } from 'wezi-types'
 
@@ -19,6 +20,7 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
         , next: null
         , panic: null
         , status: null
+        , shared: null
         , actions: null
     }
 }
@@ -28,6 +30,7 @@ const createEnhancedContext = (context: Context): Context => {
         ...context
         , body: body(context)
         , status: status(context)
+        , shared: shared(context)
         , actions: actions(context)
     }
 }
