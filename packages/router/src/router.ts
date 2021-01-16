@@ -1,16 +1,10 @@
 import regexparam from 'regexparam'
-import { Context, Handler, Payload } from 'wezi-types'
+import { Context, Handler } from 'wezi-types'
 import composer, { composerSingleHandler } from 'wezi-composer'
 import { getUrlParams } from './extractors'
 
-export interface Params<T = any> {
-    params: T
-}
-
 export interface ParamsWildcard {
-    params?: {
-        wild: string
-    }
+    wild: string
 }
 
 export type RouteEntity = {
@@ -34,7 +28,7 @@ const replyHead = (context: Context) => {
     context.res.end(null, null, null)
 }
 
-const dispatchRoute = (context: Context, payload: Payload<Params>, entity: RouteEntity, match: RegExpExecArray) => {
+const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecArray) => {
     if (isHead(context)) {
         replyHead(context)
         return
@@ -43,26 +37,20 @@ const dispatchRoute = (context: Context, payload: Payload<Params>, entity: Route
     const params = getUrlParams(entity, match)
     if (entity.single) {
         const dispatch = composerSingleHandler(entity.handler)
-        dispatch(context, {
-            params
-            , ...payload
-        })
+        dispatch(context, params)
         return
     }
 
     const dispatch = composer(false, ...entity.handlers)
-    dispatch(context, {
-        params
-        , ...payload
-    })
+    dispatch(context, params)
 }
 
-const findRouteMatch = (routerEntities: RouteEntity[]) => function routerMatch(context: Context, payload: Payload<Params>) {
+const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context, payload: unknown) => {
     for (const entity of routerEntities) {
         if (context.req.method !== entity.method) continue
         const match = entity.pattern.exec(context.req.url)
         if (match) {
-            dispatchRoute(context, payload, entity, match)
+            dispatchRoute(context, entity, match)
             return
         }
     }
