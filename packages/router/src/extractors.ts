@@ -4,18 +4,16 @@ type Params = {
     [key: string]: string
 }
 
-const regExpExtractParams = (keys: string[], match: RegExpExecArray) => {
-    let i = 0
+const extractParams = (keys: string[], match: RegExpExecArray) => {
     const params: Params = {}
-    while (i < keys.length) {
-        const key = keys[i]
-        params[key] = match[++i] || null
+    for (let i = 0; i < keys.length;) {
+        params[keys[i]] = match[++i]
     }
 
     return params
 }
 
 export const getUrlParams = (entity: RouteEntity, match: RegExpExecArray) => {
-    if (entity.params) return regExpExtractParams(entity.keys, match)
+    if (entity.params) return extractParams(entity.keys, match)
     return null
 }
