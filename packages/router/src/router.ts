@@ -28,6 +28,19 @@ const replyHead = (context: Context) => {
     context.res.end(null, null, null)
 }
 
+// ignore '?', ';', '#'
+const sanitizeUrl = (url: string) => {
+    const len = url.length
+    for (let i = 0; i < len; i++) {
+        const charCode = url.charCodeAt(i)
+        if (charCode === 63 || charCode === 59 || charCode === 35) {
+            return url.slice(0, i)
+        }
+    }
+
+    return url
+}
+
 const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecArray) => {
     if (isHead(context)) {
         replyHead(context)
@@ -41,14 +54,15 @@ const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecA
         return
     }
 
-    const dispatch = composer(false, ...entity.handlers)
+    const dispatch = composer(false, entity.handlers)
     dispatch(context, params)
 }
 
 const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context, payload: unknown) => {
     for (const entity of routerEntities) {
         if (context.req.method !== entity.method) continue
-        const match = entity.pattern.exec(context.req.url)
+        const url = sanitizeUrl(context.req.url)
+        const match = entity.pattern.exec(url)
         if (match) {
             dispatchRoute(context, entity, match)
             return

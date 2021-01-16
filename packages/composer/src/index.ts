@@ -85,7 +85,7 @@ const createContext = (context: Context, dispatch: Dispatch) => {
     })
 }
 
-export const composer = (main: boolean, ...handlers: Handler[]): Dispatch => {
+export const composer = (main: boolean, handlers: Handler[]): Dispatch => {
     const len = handlers.length
     let inc = 0
     return function dispatch(context: Context, payload?: unknown): void {

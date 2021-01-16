@@ -14,7 +14,7 @@ test('main composer end response if all higher are executed, and none of them ha
             , res
         })
 
-        const dispatch = composer(true, foo, bar)
+        const dispatch = composer(true, [foo, bar])
         dispatch(context)
     })
 
@@ -31,7 +31,7 @@ test('main composer multi handler async, direct promise error return in first ha
     const url = await server((req, res) => {
         const check = (c: Context) => c.panic(createError(400))
         const never = () => Promise.resolve('hello')
-        const dispatch = composer(true, check, never)
+        const dispatch = composer(true, [check, never])
         const context = createContext({
             req
             , res
@@ -53,7 +53,7 @@ test('main composer multi handler async, direct promise error return in second h
     const url = await server((req, res) => {
         const next = (c: Context) => c.next()
         const greet = () => Promise.reject(createError(400))
-        const dispatch = composer(true, next, greet)
+        const dispatch = composer(true, [next, greet])
         const context = createContext({
             req
             , res
@@ -77,7 +77,7 @@ test('main composer multi handler, throw error inside first handler, <Error>', a
             throw new Error('Something wrong is happened')
         }
         const never = () => 'hello'
-        const dispatch = composer(true, err, never)
+        const dispatch = composer(true, [err, never])
         const context = createContext({
             req
             , res
@@ -97,9 +97,9 @@ test('main composer multi handler, throw error inside first handler, <Error>', a
 
 test('main composer call panic whiout pass an error, panic<not error type>', async (t) => {
     const url = await server((req, res) => {
-        const dispatch = composer(true, (c: Context) => c.panic({
+        const dispatch = composer(true, [(c: Context) => c.panic({
             foo: 'foo'
-        } as any))
+        } as any)])
         const context = createContext({
             req
             , res
