@@ -21,9 +21,6 @@ export type Shared<E> = {
     values: () => E
 }
 
-export type Payload<T = any> = {
-    [key: string]: T
-}
 export type Next = <T>(payload?: T) => void
 export type Panic = (error: Error) => void
 export type Status = (code: number, message?: string) => void

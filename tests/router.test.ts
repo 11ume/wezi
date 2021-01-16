@@ -57,9 +57,7 @@ test('pattern match /(.*)', async (t) => {
 
 test('different routes whit static paths diferent methods (CRUD)', async (t) => {
     type Payload = {
-        params: {
-            id: string
-        }
+        id: string
     }
 
     const responses = {
@@ -73,7 +71,7 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
     const r = router()
     const url = await server(r(
         get('/users', () => responses.getAll)
-        , get('/users/:id', (_: Context, { params }: Payload) => params.id)
+        , get('/users/:id', (_: Context, params: Payload) => params.id)
         , post('/users', () => responses.create)
         , put('/users', () => responses.put)
         , patch('/users', () => responses.patch)
@@ -146,12 +144,10 @@ test('different routes whit return null', async (t) => {
 
 test('routes with multi params', async (t) => {
     type Payload = {
-        params: {
-            foo: string
-            bar: string
-        }
+        foo: string
+        bar: string
     }
-    const greet = (_context: Context, { params }: Payload) => `${params.foo} ${params.bar}`
+    const greet = (_context: Context, params: Payload) => `${params.foo} ${params.bar}`
     const r = router()
     const url = await server(r(
         get('/hello/:foo/:bar', greet)
@@ -165,11 +161,9 @@ test('routes with multi params', async (t) => {
 
 test('routes with matching optional param', async (t) => {
     type Payload = {
-        params: {
-            msg: string
-        }
+        msg: string
     }
-    const greet = (_context: Context, { params }: Payload) => `Hello ${params.msg ?? ''}`
+    const greet = (_context: Context, params: Payload) => `Hello ${params.msg ?? ''}`
     const r = router()
     const url = await server(r(
         get('/path/:msg?', greet)
@@ -188,12 +182,10 @@ test('routes with matching optional param', async (t) => {
 
 test('routes with matching double optional params', async (t) => {
     type Payload = {
-        params: {
-            foo?: string
-            bar?: string
-        }
+        foo?: string
+        bar?: string
     }
-    const greet = (_context: Context, { params }: Payload) => {
+    const greet = (_context: Context, params: Payload) => {
         if (params.foo && params.bar) return `Hello ${params.foo} ${params.bar}`
         else if (params.foo) return `Hello ${params.foo}`
         else return 'Hello'
@@ -223,12 +215,10 @@ test('routes with matching double optional params', async (t) => {
 
 test('routes with matching params last optional only', async (t) => {
     type Payload = {
-        params: {
-            foo: string
-            bar?: string
-        }
+        foo: string
+        bar?: string
     }
-    const greet = (_context: Context, { params }: Payload) => {
+    const greet = (_context: Context, params: Payload) => {
         if (params.bar) return `Hello ${params.foo} ${params.bar}`
         else return `Hello ${params.foo}`
     }
@@ -252,12 +242,10 @@ test('routes with matching params last optional only', async (t) => {
 
 test('routes with matching params first optional only', async (t) => {
     type Payload = {
-        params: {
-            foo?: string
-            bar: string
-        }
+        foo?: string
+        bar: string
     }
-    const greet = (_context: Context, { params }: Payload) => {
+    const greet = (_context: Context, params: Payload) => {
         if (params.foo) return `Hello ${params.foo} ${params.bar}`
         else return `Hello ${params.bar}`
     }
@@ -355,7 +343,7 @@ test('match head, match route and return empty body', async (t) => {
 })
 
 test('multiple matching routes match whit wildcards', async (t) => {
-    const getChar = (_context: Context, { params }: ParamsWildcard) => params.wild
+    const getChar = (_context: Context, params: ParamsWildcard) => params.wild
     const r = router()
     const url = await server(r(
         get('/character/*', getChar)
@@ -369,15 +357,13 @@ test('multiple matching routes match whit wildcards', async (t) => {
 
 test('multiple routes handlers', async (t) => {
     type Payload = {
-        params: {
-            name: string
-        }
+        name: string
     }
     const checkChar = (context: Context, payload: Payload) => {
-        if (payload.params.name !== 'john') throw createError(400, 'Bad request')
+        if (payload.name !== 'john') throw createError(400, 'Bad request')
         context.next(payload)
     }
-    const getChar = (_context: Context, { params }: Payload) => params.name
+    const getChar = (_context: Context, params: Payload) => params.name
     const r = router()
     const url = await server(r(
         get('/character/:name', checkChar, getChar)
