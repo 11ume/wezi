@@ -12,13 +12,14 @@ export type ComposerSingle = (handler: Handler) => Dispatch
 
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 export type ErrorHandler = (context: Context, error: Partial<InternalError>) => void
-export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown) => void
+export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
 
 const createContext = (context: Context, dispatch: Dispatch, errHandler: ErrorHandler) => {
-    return Object.assign(context, {
-        next: createNext(context, dispatch)
+    return {
+        ...context
+        , next: createNext(context, dispatch)
         , panic: createPanic(context, errHandler)
-    })
+    }
 }
 
 const createNext = (context: Context, dispatch: Dispatch): Next => {
