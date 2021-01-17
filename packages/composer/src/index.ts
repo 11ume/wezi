@@ -1,9 +1,9 @@
 import { create, createSigle } from './create'
-import { endHandler, errorHandler, executeHandler } from './composers/resolver'
+import { endHandler, errorHandler, lazyExecteHandler } from './composers/lazy'
 
-// auto resolver composers
-const resolver = create(endHandler, errorHandler, executeHandler)
-const resolverSingle = createSigle(errorHandler, executeHandler)
+// lazy resolver composer
+const lazy = create(endHandler, errorHandler, lazyExecteHandler)
+const lazySingle = createSigle(errorHandler, lazyExecteHandler)
 
-export const composer = resolver
-export const composerSingle = resolverSingle
+export const composer = lazy
+export const composerSingle = lazySingle

@@ -1,8 +1,8 @@
 import * as send from 'wezi-send'
 import { Context, Handler } from 'wezi-types'
-import { createError, InternalError } from 'wezi-error'
+import { InternalError, createError } from 'wezi-error'
+import { isPromise, isProduction } from '../utils'
 import { EndHandler, ErrorHandler, ExecuteHandler } from '../composer'
-import { isProduction, isPromise } from '../utils'
 
 const reply = (context: Context, value: unknown): void => {
     if (value === null) {
@@ -39,10 +39,10 @@ export const errorHandler: ErrorHandler = (context: Context, error: Partial<Inte
     send.json(context, payload, status)
 }
 
-export const executeHandler: ExecuteHandler = (context: Context, handler: Handler, payload: unknown): void => {
+export const lazyExecteHandler: ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>): void => {
     try {
         const value = handler(context, payload)
-        if (isPromise(value)) {
+        if (value && isPromise(value)) {
             replyPromise(context, value)
             return
         }
@@ -52,4 +52,3 @@ export const executeHandler: ExecuteHandler = (context: Context, handler: Handle
         context.panic(err)
     }
 }
-
