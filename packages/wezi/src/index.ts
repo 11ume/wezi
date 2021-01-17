@@ -1,16 +1,26 @@
-import http, { RequestListener, IncomingMessage, ServerResponse } from 'http'
-import composer from 'wezi-composer'
 import { body } from 'wezi-receive'
 import { shared } from 'wezi-shared'
 import { actions } from 'wezi-actions'
-import { Context, Handler, Status } from 'wezi-types'
+import { composer } from 'wezi-composer'
+import http, {
+    Server
+    , IncomingMessage
+    , ServerResponse
+    , RequestListener
+} from 'http'
+import {
+    Context
+    , Empty
+    , Status
+    , Handler
+} from 'wezi-types'
 
 const status = (context: Context): Status => (code: number, message = ''): void => {
     context.res.statusCode = code
     context.res.statusMessage = message
 }
 
-const empty = (context: Context) => (code: number, message = ''): void => {
+const empty = (context: Context): Empty => (code: number, message = ''): void => {
     context.res.statusCode = code
     context.res.statusMessage = message
     context.res.end(null, null, null)
@@ -41,16 +51,16 @@ const createEnhancedContext = (context: Context): Context => {
     }
 }
 
-const wezi = (...handlers: Handler[]) => function run(req: IncomingMessage, res: ServerResponse) {
+const wezi = (...handlers: Handler[]) => (req: IncomingMessage, res: ServerResponse): void => {
     const dispatch = composer(true, handlers)
     const context = createContext(req, res)
     const enhancedContext = createEnhancedContext(context)
     dispatch(enhancedContext)
 }
 
-export const listen = (handler: RequestListener, port = 3000, cb?: () => void) => {
+export const listen = (handler: RequestListener, port = 3000, listeningListener?: () => void): Server => {
     const server = http.createServer(handler)
-    server.listen(port, cb)
+    server.listen(port, listeningListener)
     return server
 }
 

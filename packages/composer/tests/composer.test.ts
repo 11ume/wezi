@@ -2,7 +2,7 @@ import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
 import { server, createContext } from './helpers'
-import composer from '..'
+import { composer, composerSingle } from '..'
 
 test('main composer single handler, direct<string:200>', async (t) => {
     const url = await server((req, res) => {
@@ -224,3 +224,21 @@ test('main composer end the response if higher-order handlers are executed and n
     t.is(res.status, 404)
 })
 
+test('composer single handler, direct<string:200>', async (t) => {
+    const url = await server((req, res) => {
+        const greet = () => 'hello'
+        const dispatch = composerSingle(greet)
+        const context = createContext({
+            req
+            , res
+        })
+
+        dispatch(context)
+    })
+
+    const res = await fetch(url)
+    const body = await res.text()
+
+    t.is(res.status, 200)
+    t.is(body, 'hello')
+})

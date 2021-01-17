@@ -1,6 +1,6 @@
 import regexparam from 'regexparam'
 import { Context, Handler } from 'wezi-types'
-import composer, { composerSingleHandler } from 'wezi-composer'
+import { composer, composerSingle } from 'wezi-composer'
 import { getUrlParams } from './extractors'
 
 export interface ParamsWildcard {
@@ -19,6 +19,8 @@ export type RouteEntity = {
     pattern: RegExp
 }
 
+const haveParams = (keys: string[]) => keys.length > 0
+
 const isHead = (context: Context) => context.req.method === 'HEAD'
 
 const replyHead = (context: Context) => {
@@ -28,11 +30,11 @@ const replyHead = (context: Context) => {
     context.res.end(null, null, null)
 }
 
-// ignore '?', ';', '#'
 const sanitizeUrl = (url: string) => {
     const len = url.length
     for (let i = 0; i < len; i++) {
         const charCode = url.charCodeAt(i)
+        // ignore '?', ';', '#'
         if (charCode === 63 || charCode === 59 || charCode === 35) {
             return url.slice(0, i)
         }
@@ -49,7 +51,7 @@ const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecA
 
     const params = getUrlParams(entity, match)
     if (entity.single) {
-        const dispatch = composerSingleHandler(entity.handler)
+        const dispatch = composerSingle(entity.handler)
         dispatch(context, params)
         return
     }
@@ -71,8 +73,6 @@ const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context, pay
 
     context.next(payload)
 }
-
-const haveParams = (keys: string[]) => keys.length > 0
 
 const creteRouteEntity = (entity: RouteEntity, namespace: string) => {
     const namespaceMerge = `${namespace}${entity.namespace}`
