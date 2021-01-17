@@ -5,9 +5,9 @@ import { Actions } from './actions'
 export interface Context<T = any> {
     readonly req: IncomingMessage
     readonly res: ServerResponse
-    readonly body: Body
     readonly next: Next
     readonly panic: Panic
+    readonly body: Body
     readonly shared: Shared<T>
     readonly actions: Actions
 }
