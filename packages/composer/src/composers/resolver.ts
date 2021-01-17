@@ -52,3 +52,4 @@ export const executeHandler: ExecuteHandler = (context: Context, handler: Handle
         context.panic(err)
     }
 }
+

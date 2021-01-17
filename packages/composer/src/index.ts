@@ -1,8 +1,9 @@
 import { create, createSigle } from './create'
-import { endHandler, errorHandler, executeHandler } from './composers/common'
+import { endHandler, errorHandler, executeHandler } from './composers/resolver'
 
-const common = create(endHandler, errorHandler, executeHandler)
-const commonSigle = createSigle(errorHandler, executeHandler)
+// auto resolver composers
+const resolver = create(endHandler, errorHandler, executeHandler)
+const resolverSingle = createSigle(errorHandler, executeHandler)
 
-export const composer = common
-export const composerSingle = commonSigle
+export const composer = resolver
+export const composerSingle = resolverSingle
