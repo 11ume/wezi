@@ -78,8 +78,8 @@ test('context body parse text', async (t) => {
 })
 
 test('context set response status code', async (t) => {
-    const handler = ({ res, status }: Context) => {
-        status(420)
+    const handler = ({ res }: Context) => {
+        res.statusCode = 420
         res.end()
     }
 
@@ -90,8 +90,9 @@ test('context set response status code', async (t) => {
 })
 
 test('context set response status code whit message', async (t) => {
-    const handler = ({ res, status }: Context) => {
-        status(420, 'Enhance your calm')
+    const handler = ({ res }: Context) => {
+        res.statusCode = 420
+        res.statusMessage = 'Enhance your calm'
         res.end()
     }
 
@@ -103,8 +104,8 @@ test('context set response status code whit message', async (t) => {
 })
 
 test('context set response status code whitout message', async (t) => {
-    const handler = ({ res, status }: Context) => {
-        status(300)
+    const handler = ({ res }: Context) => {
+        res.statusCode = 300
         res.end()
     }
 
@@ -113,24 +114,4 @@ test('context set response status code whitout message', async (t) => {
 
     t.is(res.status, 300)
     t.is(res.statusText, 'Multiple Choices')
-})
-
-test('context send empty whitout message', async (t) => {
-    const handler = ({ empty }: Context) => empty(300)
-
-    const url = await server(handler)
-    const res = await fetch(url)
-
-    t.is(res.status, 300)
-    t.is(res.statusText, 'Multiple Choices')
-})
-
-test('context send empty whit message', async (t) => {
-    const handler = ({ empty }: Context) => empty(300, 'Cool')
-
-    const url = await server(handler)
-    const res = await fetch(url)
-
-    t.is(res.status, 300)
-    t.is(res.statusText, 'Cool')
 })

@@ -8,33 +8,15 @@ import http, {
     , ServerResponse
     , RequestListener
 } from 'http'
-import {
-    Context
-    , Empty
-    , Status
-    , Handler
-} from 'wezi-types'
-
-const status = (context: Context): Status => (code: number, message = ''): void => {
-    context.res.statusCode = code
-    context.res.statusMessage = message
-}
-
-const empty = (context: Context): Empty => (code: number, message = ''): void => {
-    context.res.statusCode = code
-    context.res.statusMessage = message
-    context.res.end(null, null, null)
-}
+import { Context, Handler } from 'wezi-types'
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
         req
         , res
-        , body: null
         , next: null
         , panic: null
-        , empty: null
-        , status: null
+        , body: null
         , shared: null
         , actions: null
     }
@@ -44,8 +26,6 @@ const createEnhancedContext = (context: Context): Context => {
     return {
         ...context
         , body: body(context)
-        , empty: empty(context)
-        , status: status(context)
         , shared: shared(context)
         , actions: actions(context)
     }
