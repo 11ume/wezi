@@ -9,21 +9,17 @@ export const server = (handler: RequestListener) => {
 export const createContext = ({
     req
     , res
-    , body = null
     , next = null
     , panic = null
+    , body = null
     , shared = null
-    , empty = null
-    , status = null
     , actions = null
 }): Context => ({
     req
     , res
-    , body
     , next
     , panic
+    , body
     , shared
-    , empty
-    , status
     , actions
 })
