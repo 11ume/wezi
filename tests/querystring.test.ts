@@ -38,3 +38,16 @@ test('get query string params whit router params', async (t) => {
     t.is(body, '12 foo bar')
 })
 
+test('get query string params must be null', async (t) => {
+    type Query = {
+        name: string
+    }
+
+    const greet = (_c, { query }: Payload<void, Query>) => query === null ? 'is null' : 'not is null value'
+    const r = router()
+    const url = await server(r(get('/users', queryParser, greet)))
+    const res = await fetch(`${url}/users`)
+    const body = await res.text()
+
+    t.is(body, 'is null')
+})
