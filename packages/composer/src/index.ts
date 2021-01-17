@@ -1,5 +1,5 @@
 import * as send from 'wezi-send'
-import { createError, InternalError } from 'wezi-error'
+import { createError, effects } from 'wezi-error'
 import {
     Next
     , Panic
@@ -7,24 +7,11 @@ import {
     , Handler
     , Dispatch
 } from 'wezi-types'
-import { isPromise, isProduction } from './utils'
-
-const errorHandler = (context: Context, error: InternalError) => {
-    const status = error.statusCode ?? 500
-    const message = error.message || 'unknown'
-    const payload = {
-        message
-    }
-    if (isProduction()) {
-        send.empty(context, status)
-        return
-    }
-    send.json(context, payload, status)
-}
+import { isPromise } from './utils'
 
 const endHandler = (context: Context) => {
     const err = createError(404)
-    errorHandler(context, err)
+    effects.errorHandler(context, err)
 }
 
 const reply = (context: Context, value: unknown) => {
@@ -70,11 +57,11 @@ const createNext = (context: Context, dispatch: Dispatch): Next => {
 const createPanic = (context: Context): Panic => {
     return function panic(error?: Error): void {
         if (error instanceof Error) {
-            errorHandler(context, error)
+            effects.errorHandler(context, error)
             return
         }
 
-        errorHandler(context, createError(500, 'panic error param, must be instance of Error'))
+        effects.errorHandler(context, createError(500, 'panic error param, must be instance of Error'))
     }
 }
 
