@@ -1,7 +1,10 @@
-import { composerProd, composerSingleProd } from './composer'
-import { composerDev, composerSingleDev } from './composer-dev'
+import { create, createSigle } from './create'
 import { isProduction } from './utils'
+import { endHandler, errorHandler, executeHandler } from './common'
 
 const isProd = isProduction()
-export const composer = isProd ? composerProd : composerDev
-export const composerSingle = isProd ? composerSingleProd : composerSingleDev
+const common = create(endHandler, errorHandler, executeHandler)
+const commonSigle = createSigle(errorHandler, executeHandler)
+
+export const composer = isProd ? common : common
+export const composerSingle = isProd ? commonSigle : commonSigle
