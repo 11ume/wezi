@@ -1,8 +1,8 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
-import { server, createContext } from './helpers'
-import { composer, composerSingle } from '..'
+import { server, createContext } from '../helpers'
+import { composer, composerSingle } from '../../'
 
 test('main composer single handler, direct<string:200>', async (t) => {
     const url = await server((req, res) => {

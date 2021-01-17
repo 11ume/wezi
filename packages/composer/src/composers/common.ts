@@ -1,7 +1,7 @@
 import * as send from 'wezi-send'
 import { Context, Handler } from 'wezi-types'
 import { createError, InternalError } from 'wezi-error'
-import { ErrorHandler, ExecuteHandler } from '../composer'
+import { EndHandler, ErrorHandler, ExecuteHandler } from '../composer'
 import { isProduction, isPromise } from '../utils'
 
 const reply = (context: Context, value: unknown): void => {
@@ -19,7 +19,7 @@ const replyPromise = (context: Context, value: Promise<unknown>): Promise<void> 
     .then((val: unknown) => reply(context, val))
     .catch(context.panic)
 
-export const endHandler = (context: Context, errHandler: ErrorHandler) => {
+export const endHandler: EndHandler = (context: Context, errHandler: ErrorHandler) => {
     const err = createError(404)
     errHandler(context, err)
 }

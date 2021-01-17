@@ -2,9 +2,5 @@
 
 <br>
 
-The composer package is a especial middleware, used to manage the execution and control data flow of each handler.
-
-     
-
-
-
+The composer components are responsible for managing the flow and execution of each handler.
+This module is extremely versatile, you can create your own composer if you need it.
