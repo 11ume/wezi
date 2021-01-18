@@ -20,7 +20,7 @@ const replyPromise = (context: Context, value: Promise<unknown>): Promise<void> 
     .then((val: unknown) => reply(context, val))
     .catch(context.panic)
 
-export const endHandler: EndHandler = (context: Context, errHandler: ErrorHandler) => {
+export const endHandler: EndHandler = (context: Context, errHandler: ErrorHandler): void => {
     const err = createError(404)
     errHandler(context, err)
 }
@@ -40,7 +40,9 @@ export const errorHandler: ErrorHandler = (context: Context, error: Partial<Inte
     send.json(context, payload, status)
 }
 
-export const executeHandler: ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>): void => {
+export const executeHandler: ExecuteHandler = (context: Context
+    , handler: Handler
+    , payload: unknown | Promise<unknown>): void => {
     try {
         const value = handler(context, payload)
         if (value && isPromise(value)) {

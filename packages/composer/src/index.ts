@@ -1,4 +1,4 @@
-import { lazyComposer, lazyComposerSingle } from './composers/lazy'
+import { lazyComposer, lazyComposerSingle } from './composer/lazy'
 
 export const composer = lazyComposer
 export const composerSingle = lazyComposerSingle
