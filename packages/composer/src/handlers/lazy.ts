@@ -1,7 +1,6 @@
 import * as send from 'wezi-send'
-import { Context, Handler, ErrorHandler } from 'wezi-types'
-import { InternalError, createError } from 'wezi-error'
-import { isPromise, isProduction } from './utils'
+import { Context, Handler } from 'wezi-types'
+import { isPromise } from './utils'
 
 const reply = (context: Context, value: unknown): void => {
     if (value === null) {
@@ -18,27 +17,7 @@ const replyPromise = (context: Context, value: Promise<unknown>): Promise<void> 
     .then((val: unknown) => reply(context, val))
     .catch(context.panic)
 
-export const errorHandler = (context: Context, error: Partial<InternalError>): void => {
-    const status = error.statusCode ?? 500
-    const message = error.message || 'unknown'
-    const payload = {
-        message
-    }
-
-    if (isProduction()) {
-        send.empty(context, status)
-        return
-    }
-
-    send.json(context, payload, status)
-}
-
-export const endHandler = (context: Context, handler: ErrorHandler): void => {
-    const err = createError(404)
-    handler(context, err)
-}
-
-export const executeHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>): void => {
+export const executeHandlerLazy = (context: Context, handler: Handler, payload: unknown | Promise<unknown>): void => {
     try {
         const value = handler(context, payload)
         if (value && isPromise(value)) {
