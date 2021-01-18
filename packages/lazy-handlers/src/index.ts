@@ -1,9 +1,7 @@
 import * as send from 'wezi-send'
-import { Context, Handler } from 'wezi-types'
+import { Context, Handler, ErrorHandler } from 'wezi-types'
 import { InternalError, createError } from 'wezi-error'
-import { create, createSigle } from './factory'
-import { EndHandler, ErrorHandler, ExecuteHandler } from './composer'
-import { isPromise, isProduction } from '../utils'
+import { isPromise, isProduction } from './utils'
 
 const reply = (context: Context, value: unknown): void => {
     if (value === null) {
@@ -20,7 +18,7 @@ const replyPromise = (context: Context, value: Promise<unknown>): Promise<void> 
     .then((val: unknown) => reply(context, val))
     .catch(context.panic)
 
-export const endHandler: EndHandler = (context: Context, errHandler: ErrorHandler): void => {
+export const endHandler = (context: Context, errHandler: ErrorHandler): void => {
     const err = createError(404)
     errHandler(context, err)
 }
@@ -40,9 +38,7 @@ export const errorHandler: ErrorHandler = (context: Context, error: Partial<Inte
     send.json(context, payload, status)
 }
 
-export const executeHandler: ExecuteHandler = (context: Context
-    , handler: Handler
-    , payload: unknown | Promise<unknown>): void => {
+export const executeHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>): void => {
     try {
         const value = handler(context, payload)
         if (value && isPromise(value)) {
@@ -55,6 +51,3 @@ export const executeHandler: ExecuteHandler = (context: Context
         context.panic(err)
     }
 }
-
-export const lazyComposer = create(endHandler, errorHandler, executeHandler)
-export const lazyComposerSingle = createSigle(errorHandler, executeHandler)
