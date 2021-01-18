@@ -18,12 +18,7 @@ const replyPromise = (context: Context, value: Promise<unknown>): Promise<void> 
     .then((val: unknown) => reply(context, val))
     .catch(context.panic)
 
-export const endHandler = (context: Context, errHandler: ErrorHandler): void => {
-    const err = createError(404)
-    errHandler(context, err)
-}
-
-export const errorHandler: ErrorHandler = (context: Context, error: Partial<InternalError>): void => {
+export const errorHandler = (context: Context, error: Partial<InternalError>): void => {
     const status = error.statusCode ?? 500
     const message = error.message || 'unknown'
     const payload = {
@@ -36,6 +31,11 @@ export const errorHandler: ErrorHandler = (context: Context, error: Partial<Inte
     }
 
     send.json(context, payload, status)
+}
+
+export const endHandler = (context: Context, handler: ErrorHandler): void => {
+    const err = createError(404)
+    handler(context, err)
 }
 
 export const executeHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>): void => {
