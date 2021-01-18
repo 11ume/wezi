@@ -19,18 +19,18 @@ export type RouteEntity = {
     pattern: RegExp
 }
 
-const haveParams = (keys: string[]) => keys.length > 0
+const haveParams = (keys: string[]): boolean => keys.length > 0
 
-const isHead = (context: Context) => context.req.method === 'HEAD'
+const isHead = (context: Context): boolean => context.req.method === 'HEAD'
 
-const replyHead = (context: Context) => {
+const replyHead = (context: Context): void => {
     context.res.writeHead(200, {
         'Content-Length': '0'
     })
     context.res.end(null, null, null)
 }
 
-const sanitizeUrl = (url: string) => {
+const sanitizeUrl = (url: string): string => {
     const len = url.length
     for (let i = 0; i < len; i++) {
         const charCode = url.charCodeAt(i)
@@ -43,7 +43,7 @@ const sanitizeUrl = (url: string) => {
     return url
 }
 
-const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecArray) => {
+const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecArray): void => {
     if (isHead(context)) {
         replyHead(context)
         return
@@ -60,7 +60,7 @@ const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecA
     dispatch(context, params)
 }
 
-const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context, payload: unknown) => {
+const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context, payload: unknown): void => {
     for (const entity of routerEntities) {
         if (context.req.method !== entity.method) continue
         const url = sanitizeUrl(context.req.url)
@@ -74,7 +74,7 @@ const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context, pay
     context.next(payload)
 }
 
-const creteRouteEntity = (entity: RouteEntity, namespace: string) => {
+const creteRouteEntity = (entity: RouteEntity, namespace: string): RouteEntity => {
     const namespaceMerge = `${namespace}${entity.namespace}`
     const { keys, pattern } = regexparam(`${namespaceMerge}${entity.path}`)
     const params = haveParams(keys)
@@ -99,7 +99,7 @@ const prepareRoutesWhitNamespace = (entities: RouteEntity[], namespace?: string)
     return findRouteMatch(stack)
 }
 
-const inSingleHandler = (handlers: Handler[]) => handlers.length === 1
+const inSingleHandler = (handlers: Handler[]): boolean => handlers.length === 1
 
 const createRouteEntity = (method: string) => (path: string, ...handlers: Handler[]): RouteEntity => {
     const single = inSingleHandler(handlers)

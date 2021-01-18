@@ -1,6 +1,6 @@
 import { createError } from 'wezi-error'
 
-export const parseJSON = (str: string) => {
+export const parseJSON = <T>(str: string): T => {
     try {
         return JSON.parse(str)
     } catch (err) {

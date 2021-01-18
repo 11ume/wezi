@@ -29,7 +29,7 @@ export type CorsOptions = {
     , exposeHeaders?: string[]
 }
 
-export const cors = (options: CorsOptions = {}) => (context: Context) => {
+export const cors = (options: CorsOptions = {}) => (context: Context): void => {
     const {
         origin = '*'
         , maxAge = DEFAULT_MAX_AGE_SECONDS

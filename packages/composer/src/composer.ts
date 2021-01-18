@@ -14,7 +14,7 @@ type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 type ErrorHandler = (context: Context, error: Error) => void
 type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
 
-const createContext = (context: Context, dispatch: Dispatch, errorHandler: ErrorHandler) => {
+const createContext = (context: Context, dispatch: Dispatch, errorHandler: ErrorHandler): Context => {
     return {
         ...context
         , next: createNext(context, dispatch)
