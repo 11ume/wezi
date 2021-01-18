@@ -44,7 +44,7 @@ const createPanic = (context: Context, errorHandler: ErrorHandler): Panic => {
     }
 }
 
-const composer = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHandler: ExecuteHandler): Composer => (main: boolean, handlers: Handler[]): Dispatch => {
+export const createComposer = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHandler: ExecuteHandler): Composer => (main: boolean, handlers: Handler[]): Dispatch => {
     const len = handlers.length
     let inc = 0
     return function dispatch(context: Context, payload?: unknown): void {
@@ -59,17 +59,9 @@ const composer = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHan
     }
 }
 
-const composerSingle = (errorHandler: ErrorHandler, executeHandler: ExecuteHandler): ComposerSingle => (handler: Handler): Dispatch => {
+export const createComposerSingle = (errorHandler: ErrorHandler, executeHandler: ExecuteHandler): ComposerSingle => (handler: Handler): Dispatch => {
     return function dispatch(context: Context, payload?: unknown): void {
         const newContext = createContext(context, dispatch, errorHandler)
         setImmediate(executeHandler, newContext, handler, payload)
     }
-}
-
-export const create = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHandler: ExecuteHandler) => {
-    return composer(endHandler, errorHandler, executeHandler)
-}
-
-export const createSigle = (errorHandler: ErrorHandler, executeHandler: ExecuteHandler) => {
-    return composerSingle(errorHandler, executeHandler)
 }

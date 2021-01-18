@@ -17,9 +17,6 @@
       "wezi-error": [
         "packages/error"
       ],
-      "wezi-lazy-handlers": [
-        "packages/lazy-handlers"
-      ],
       "wezi-query": [
         "packages/querystring"
       ],
