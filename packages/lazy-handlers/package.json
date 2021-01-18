@@ -1,5 +1,5 @@
 {
-    "name": "wezi-composer",
+    "name": "wezi-lazy-handlers",
     "version": "1.0.0-alpha.18",
     "description": "",
     "main": "dist/index.js",
@@ -17,8 +17,8 @@
     },
     "dependencies": {
         "wezi-error": "^1.0.0-alpha.17",
-        "wezi-types": "^1.0.0-alpha.18",
-        "wezi-lazy-handlers": "^1.0.0-alpha.18"
+        "wezi-send": "^1.0.0-alpha.18",
+        "wezi-types": "^1.0.0-alpha.18"
     },
     "type": "module"
 }
