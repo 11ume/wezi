@@ -21,6 +21,6 @@ export type Shared<E> = {
 
 export type Next = <T>(payload?: T) => void
 export type Panic = (error: Error) => void
-export type Handler = <T = any>(context: Context, payload?: T) => any
+export type Handler = (context: Context, payload?: any) => any
 export type ErrorHandler = (context: Context, error: Error) => void
 export type Dispatch = (context: Context, payload?: unknown) => void
