@@ -3,7 +3,7 @@ import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
 import { isJsonable } from './utils'
 
-export const stream = (context: Context, statusCode = 200, payload: Readable) => {
+export const stream = (context: Context, statusCode = 200, payload: Readable): void => {
     context.res.statusCode = statusCode
     if (payload instanceof Stream) {
         context.res.writeHead(statusCode, {
@@ -16,7 +16,7 @@ export const stream = (context: Context, statusCode = 200, payload: Readable) =>
     context.panic(createError(500, 'stream payload must be a instance of Stream'))
 }
 
-export const buffer = (context: Context, statusCode = 200, payload: Buffer) => {
+export const buffer = (context: Context, statusCode = 200, payload: Buffer): void => {
     const type = context.res.getHeader('Content-Type')
     const contentType = type || 'application/json charset=utf-8'
 
@@ -33,7 +33,7 @@ export const buffer = (context: Context, statusCode = 200, payload: Buffer) => {
     context.panic(createError(500, 'buffer payload must be a instance of Buffer'))
 }
 
-export const json = <T = void>(context: Context, payload: T, statusCode = 200) => {
+export const json = <T = void>(context: Context, payload: T, statusCode = 200): void => {
     const chunk = JSON.stringify(payload)
     const type = context.res.getHeader('Content-Type')
     const contentType = type || 'application/json charset=utf-8'
@@ -46,7 +46,7 @@ export const json = <T = void>(context: Context, payload: T, statusCode = 200) =
     context.res.end(chunk, null, null)
 }
 
-export const text = (context: Context, payload: string | number, statusCode = 200) => {
+export const text = (context: Context, payload: string | number, statusCode = 200): void => {
     const chunk = typeof payload === 'number' ? payload.toString() : payload
     const type = context.res.getHeader('Content-Type')
     const contentType = type || 'text/plain charset=utf-8'
@@ -59,14 +59,14 @@ export const text = (context: Context, payload: string | number, statusCode = 20
     context.res.end(chunk, null, null)
 }
 
-export const empty = (context: Context, statusCode = 204) => {
+export const empty = (context: Context, statusCode = 204): void => {
     context.res.writeHead(statusCode, {
         'Content-Length': '0'
     })
     context.res.end(null, null, null)
 }
 
-export const send = (context: Context, statusCode?: number, payload?: any) => {
+export const send = (context: Context, statusCode?: number, payload?: any): void => {
     if (isJsonable(payload)) {
         return json(context, payload, statusCode)
     }

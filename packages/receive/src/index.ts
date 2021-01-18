@@ -6,7 +6,7 @@ import { parseJSON } from './utils'
 type CacheWeakMap<T = any> = WeakMap<IncomingMessage, T>
 type FastGetJsonBody<T> = () => Promise<T>
 
-const handleGetBody = <T = void>(context: Context, weakMap: CacheWeakMap<T>, getBodyFn: FastGetJsonBody<T>) => {
+const handleGetBody = <T = void>(context: Context, weakMap: CacheWeakMap<T>, getBodyFn: FastGetJsonBody<T>): Promise<T> => {
     const body = weakMap.get(context.req)
     if (body) return Promise.resolve(body)
     return getBodyFn()
@@ -14,7 +14,7 @@ const handleGetBody = <T = void>(context: Context, weakMap: CacheWeakMap<T>, get
 
 const toBuffer = () => {
     const weakMap: CacheWeakMap<Buffer> = new WeakMap()
-    return (context: Context) => handleGetBody<Buffer>(context, weakMap, async () => {
+    return (context: Context): Promise<Buffer> => handleGetBody<Buffer>(context, weakMap, async () => {
         const payload = await fastGetBody(context.req)
         weakMap.set(context.req, payload.body)
         return payload.body
@@ -23,9 +23,9 @@ const toBuffer = () => {
 
 const toJson = () => {
     const weakMap: CacheWeakMap = new WeakMap()
-    return <T>(context: Context) => handleGetBody<T>(context, weakMap, async () => {
+    return <T>(context: Context): Promise<T> => handleGetBody<T>(context, weakMap, async () => {
         const payload = await fastGetBody(context.req, true)
-        const body = parseJSON(payload.body)
+        const body = parseJSON<T>(payload.body)
         weakMap.set(context.req, body)
         return body
     })
@@ -33,7 +33,7 @@ const toJson = () => {
 
 const toText = () => {
     const weakMap: CacheWeakMap<string> = new WeakMap()
-    return (context: Context) => handleGetBody<string>(context, weakMap, async () => {
+    return (context: Context): Promise<string> => handleGetBody<string>(context, weakMap, async () => {
         const payload = await fastGetBody(context.req, true)
         weakMap.set(context.req, payload.body)
         return payload.body

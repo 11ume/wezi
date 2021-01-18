@@ -9,7 +9,7 @@ export class InternalError extends Error {
     }
 }
 
-export const createError = (status: number, message?: string, error?: Error) => {
+export const createError = (status: number, message?: string, error?: Error): InternalError => {
     const msg = message || codes[status]
     if (status > 511 || status < 100) {
         throw new Error(`Invalid status code ${status}`)

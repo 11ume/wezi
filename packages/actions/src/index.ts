@@ -8,7 +8,7 @@ export const redirect = (context: Context, location: string, statusCode = 301): 
 
 export const actions = (context: Context): Actions => {
     return {
-        redirect: (location: string) => redirect(context, location)
+        redirect: (location: string): void => redirect(context, location)
     }
 }
 

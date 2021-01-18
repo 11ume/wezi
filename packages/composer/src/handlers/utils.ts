@@ -1,3 +1,3 @@
-export const isPromise = (obj: any) => typeof obj.then === 'function'
-export const isProduction = () => process.env.NODE_ENV === 'production'
+export const isPromise = (obj: any): boolean => typeof obj.then === 'function'
+export const isProduction = (): boolean => process.env.NODE_ENV === 'production'
 
