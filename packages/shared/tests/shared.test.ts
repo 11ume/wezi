@@ -5,12 +5,14 @@ import { InternalError } from 'wezi-error'
 type Sharable = {
     foo: string
     bar: number
+    baz?: string
 };
 
+const pointer = {
+    req: {}
+}
+
 test('set propery and get property', (t) => {
-    const pointer = {
-        req: {}
-    }
     const sharable = shared<Sharable>(pointer as any)
     sharable.set('foo', '123')
     const value = sharable.get('foo')
@@ -18,9 +20,6 @@ test('set propery and get property', (t) => {
 })
 
 test('set same propery', (t) => {
-    const pointer = {
-        req: {}
-    }
     const sharable = shared<Sharable>(pointer as any)
     sharable.set('foo', '123')
     sharable.set('foo', '321')
@@ -29,19 +28,13 @@ test('set same propery', (t) => {
 })
 
 test('get inexistent propery key', (t) => {
-    const pointer = {
-        req: {}
-    }
     const sharable = shared<Sharable>(pointer as any)
-    const err: InternalError = t.throws(() => sharable.get('foo'))
+    const err: InternalError = t.throws(() => sharable.get('baz'))
     t.is(err.statusCode, 500)
-    t.is(err.message, 'get sharable value error, key: foo don\'t exists')
+    t.is(err.message, 'get sharable value error, key: baz don\'t exists')
 })
 
 test('remove propery', (t) => {
-    const pointer = {
-        req: {}
-    }
     const sharable = shared<Sharable>(pointer as any)
     sharable.set('foo', '123')
     const value = sharable.get('foo')
@@ -51,19 +44,13 @@ test('remove propery', (t) => {
 })
 
 test('remove inexistent propery', (t) => {
-    const pointer = {
-        req: {}
-    }
     const sharable = shared<Sharable>(pointer as any)
-    const err: InternalError = t.throws(() => sharable.remove('foo'))
+    const err: InternalError = t.throws(() => sharable.remove('baz'))
     t.is(err.statusCode, 500)
-    t.is(err.message, 'remove sharable value error, key: foo don\'t exists')
+    t.is(err.message, 'remove sharable value error, key: baz don\'t exists')
 })
 
 test('get all values', (t) => {
-    const pointer = {
-        req: {}
-    }
     const sharable = shared<Sharable>(pointer as any)
     sharable.set('foo', '123')
     sharable.set('bar', 123)
@@ -75,9 +62,6 @@ test('get all values', (t) => {
 })
 
 test('get get value after delete reference', (t) => {
-    const pointer = {
-        req: {}
-    }
     const sharable = shared<Sharable>(pointer as any)
     sharable.set('foo', '123')
     const value = sharable.get('foo')
