@@ -42,7 +42,7 @@
 * **Fast** High performance.
 * **Focus opt-in**: All features are opt-in.  
 * **Async** Implements an enhanced async control of handlers execution.
-* **Modular** Extremly modular.
+* **Modular** Extremely versatile.
 * **Middlwares** Implements a middleware logic.
 * **ES6 modules** Native ESM modules syntax support.
 
