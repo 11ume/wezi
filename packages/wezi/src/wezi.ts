@@ -1,9 +1,4 @@
-import http, {
-    Server
-    , IncomingMessage
-    , ServerResponse
-    , RequestListener
-} from 'http'
+import http, { Server, IncomingMessage, ServerResponse, RequestListener } from 'http'
 import { Context, Handler } from 'wezi-types'
 import { Composer } from 'wezi-composer'
 import { shared } from 'wezi-shared'
@@ -31,7 +26,7 @@ const createEnhancedContext = (context: Context): Context => {
     }
 }
 
-export const createApp = (composer: Composer) => (...handlers: Handler[]) => (req: IncomingMessage, res: ServerResponse): void => {
+export const createWezi = (composer: Composer) => (...handlers: Handler[]) => (req: IncomingMessage, res: ServerResponse): void => {
     const dispatch = composer(true, handlers)
     const context = createContext(req, res)
     const enhancedContext = createEnhancedContext(context)
