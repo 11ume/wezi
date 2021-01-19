@@ -21,7 +21,8 @@
         "wezi-error": "^1.0.0-alpha.17",
         "wezi-receive": "^1.0.0-alpha.18",
         "wezi-shared": "^1.0.0-alpha.18",
-        "wezi-types": "^1.0.0-alpha.18"
+        "wezi-types": "^1.0.0-alpha.18",
+        "wezi-router": "^1.0.0-alpha.18"
     },
     "type": "module"
 }

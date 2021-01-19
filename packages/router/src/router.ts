@@ -1,27 +1,20 @@
 import regexparam from 'regexparam'
 import { Context, Handler } from 'wezi-types'
-import { composer, composerSingle } from 'wezi-composer'
+import { Composer, ComposerSingle } from 'wezi-composer'
 import { getUrlParams } from './extractors'
 
-export interface ParamsWildcard {
-    wild: string
-}
-
-export type RouteEntity = {
+type RouteEntity = {
     path: string
     single: boolean
     method: string
     handler: Handler
     handlers: Handler[]
     namespace: string
+
     keys: Array<string>
     params: boolean
     pattern: RegExp
 }
-
-const haveParams = (keys: string[]): boolean => keys.length > 0
-
-const isHead = (context: Context): boolean => context.req.method === 'HEAD'
 
 const replyHead = (context: Context): void => {
     context.res.writeHead(200, {
@@ -43,13 +36,17 @@ const sanitizeUrl = (url: string): string => {
     return url
 }
 
-const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecArray): void => {
-    if (isHead(context)) {
+const dispatchRoute = (context: Context
+    , composer: Composer
+    , composerSingle: ComposerSingle
+    , entity: RouteEntity
+    , match: RegExpExecArray): void => {
+    if (context.req.method === 'HEAD') {
         replyHead(context)
         return
     }
 
-    const params = getUrlParams(entity, match)
+    const params = getUrlParams(entity.params, entity.keys, match)
     if (entity.single) {
         const dispatch = composerSingle(entity.handler)
         dispatch(context, params)
@@ -60,13 +57,19 @@ const dispatchRoute = (context: Context, entity: RouteEntity, match: RegExpExecA
     dispatch(context, params)
 }
 
-const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context, payload: unknown): void => {
+const findRouteMatch = (routerEntities: RouteEntity[]
+    , composer: Composer
+    , composerSingle: ComposerSingle) => (context: Context, payload: unknown): void => {
     for (const entity of routerEntities) {
         if (context.req.method !== entity.method) continue
         const url = sanitizeUrl(context.req.url)
         const match = entity.pattern.exec(url)
         if (match) {
-            dispatchRoute(context, entity, match)
+            dispatchRoute(context
+                , composer
+                , composerSingle
+                , entity
+                , match)
             return
         }
     }
@@ -74,10 +77,17 @@ const findRouteMatch = (routerEntities: RouteEntity[]) => (context: Context, pay
     context.next(payload)
 }
 
-const creteRouteEntity = (entity: RouteEntity, namespace: string): RouteEntity => {
+const mapEntityWhitNamespace = (namespace: string, entities: RouteEntity[]) => entities.map((entity) => {
+    return {
+        ...entity
+        , namespace
+    }
+})
+
+const mapRouteEntity = (entity: RouteEntity, namespace = '') => {
     const namespaceMerge = `${namespace}${entity.namespace}`
     const { keys, pattern } = regexparam(`${namespaceMerge}${entity.path}`)
-    const params = haveParams(keys)
+    const params = keys.length > 0
     return {
         ...entity
         , keys
@@ -87,53 +97,42 @@ const creteRouteEntity = (entity: RouteEntity, namespace: string): RouteEntity =
     }
 }
 
-const prepareRouteStack = (entities: RouteEntity[], namespace = ''): RouteEntity[] => entities.map((entity) => creteRouteEntity(entity, namespace))
+const prepareRouterStack = (entities: RouteEntity[], namespace?: string): RouteEntity[] => entities
+    .map((entity) => mapRouteEntity(entity, namespace))
 
-const prepareRoutes = (entities: RouteEntity[]) => {
-    const stack = prepareRouteStack(entities)
-    return findRouteMatch(stack)
+const prepareRoutes = (entities: RouteEntity[], composer: Composer, composerSingle: ComposerSingle) => {
+    const stack = prepareRouterStack(entities)
+    return findRouteMatch(stack, composer, composerSingle)
 }
-
-const prepareRoutesWhitNamespace = (entities: RouteEntity[], namespace?: string) => {
-    const stack = prepareRouteStack(entities, namespace)
-    return findRouteMatch(stack)
-}
-
-const inSingleHandler = (handlers: Handler[]): boolean => handlers.length === 1
 
 const createRouteEntity = (method: string) => (path: string, ...handlers: Handler[]): RouteEntity => {
-    const single = inSingleHandler(handlers)
+    const single = handlers.length === 1
     const handler = handlers[0] ?? null
     const namespace = ''
+    const keys = null
+    const pattern = null
+    const params = null
 
     return {
         path
-        , keys: null
-        , pattern: null
-        , params: false
         , single
         , method
         , handler
         , handlers
         , namespace
+        , keys
+        , params
+        , pattern
     }
 }
 
-export const createRouter = (namespace?: string) => (...entities: RouteEntity[] | RouteEntity[][]) => {
-    const flat = [].concat(...entities)
-    if (namespace) return prepareRoutesWhitNamespace(flat, namespace)
-    return prepareRoutes(flat)
+export const createRouter = (composer: Composer, composerSingle: ComposerSingle) => (...entities: RouteEntity[]) => {
+    return prepareRoutes(entities, composer, composerSingle)
 }
 
-export const routes = (namespace?: string) => (...entities: RouteEntity[]) => {
-    if (namespace) {
-        return entities.map((entity) => {
-            entity.namespace = namespace
-            return entity
-        })
-    }
-
-    return entities
+export const createRouterSpace = (composer: Composer, composerSingle: ComposerSingle) => (namespace = '') => (...entities: RouteEntity[]) => {
+    const entitiesWhitSpace = mapEntityWhitNamespace(namespace, entities)
+    return prepareRoutes(entitiesWhitSpace, composer, composerSingle)
 }
 
 export const get = createRouteEntity('GET')
