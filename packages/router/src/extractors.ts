@@ -1,5 +1,3 @@
-import { RouteEntity } from './router'
-
 type Params = {
     [key: string]: string
 }
@@ -13,7 +11,7 @@ const extractParams = (keys: string[], match: RegExpExecArray): Params => {
     return params
 }
 
-export const getUrlParams = (entity: RouteEntity, match: RegExpExecArray): Params | null => {
-    if (entity.params) return extractParams(entity.keys, match)
+export const getUrlParams = (params: boolean, entityKeys: string[], match: RegExpExecArray): Params | null => {
+    if (params) return extractParams(entityKeys, match)
     return null
 }
