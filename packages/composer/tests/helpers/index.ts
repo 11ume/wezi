@@ -12,7 +12,6 @@ export const createContext = ({
     , next = null
     , panic = null
     , body = null
-    , shared = null
     , actions = null
 }): Context => ({
     req
@@ -20,6 +19,5 @@ export const createContext = ({
     , next
     , panic
     , body
-    , shared
     , actions
 })
