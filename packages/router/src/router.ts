@@ -10,10 +10,17 @@ type RouteEntity = {
     handler: Handler
     handlers: Handler[]
     namespace: string
-
     keys: Array<string>
     params: boolean
     pattern: RegExp
+}
+
+type DispatchRouteArgs = {
+    entity: RouteEntity
+    , match: RegExpExecArray
+    , composer: Composer
+    , context: Context
+    , composerSingle: ComposerSingle
 }
 
 const replyHead = (context: Context): void => {
@@ -36,11 +43,13 @@ const sanitizeUrl = (url: string): string => {
     return url
 }
 
-const dispatchRoute = (context: Context
-    , composer: Composer
-    , composerSingle: ComposerSingle
-    , entity: RouteEntity
-    , match: RegExpExecArray): void => {
+const dispatchRoute = ({
+    match
+    , entity
+    , context
+    , composer
+    , composerSingle
+}: DispatchRouteArgs): void => {
     if (context.req.method === 'HEAD') {
         replyHead(context)
         return
@@ -65,11 +74,13 @@ const findRouteMatch = (routerEntities: RouteEntity[]
         const url = sanitizeUrl(context.req.url)
         const match = entity.pattern.exec(url)
         if (match) {
-            dispatchRoute(context
-                , composer
-                , composerSingle
+            dispatchRoute({
+                match
                 , entity
-                , match)
+                , composer
+                , context
+                , composerSingle
+            })
             return
         }
     }
@@ -110,8 +121,8 @@ const createRouteEntity = (method: string) => (path: string, ...handlers: Handle
     const handler = handlers[0] ?? null
     const namespace = ''
     const keys = null
-    const pattern = null
     const params = null
+    const pattern = null
 
     return {
         path
