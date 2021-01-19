@@ -6,7 +6,14 @@ type SharedWeakMap = WeakMap<IncomingMessage, any>
 
 const set = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K, value: T[K]): void => {
     const obj = weakmap.get(context.req)
-    obj[key] = value
+    if (obj) {
+        obj[key] = value
+        return
+    }
+
+    weakmap.set(context.req, {
+        [key]: value
+    })
 }
 
 const get = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K): T[K] => {
@@ -28,13 +35,14 @@ const remove = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K 
 
 const values = <E>(context: Context, weakmap: SharedWeakMap) => (): E => weakmap.get(context.req)
 
+export const weakmap = new WeakMap<IncomingMessage>()
+
 export const shared = <E>(context: Context) => {
-    const weakmap = new WeakMap<IncomingMessage>()
-    const map = weakmap.set(context.req, {})
     return {
-        set: set<E>(context, map)
-        , get: get<E>(context, map)
-        , remove: remove<E>(context, map)
-        , values: values<E>(context, map)
+        set: set<E>(context, weakmap)
+        , get: get<E>(context, weakmap)
+        , remove: remove<E>(context, weakmap)
+        , values: values<E>(context, weakmap)
     }
 }
+

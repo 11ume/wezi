@@ -39,9 +39,10 @@
 
 * **Small** To be easy and fast to learn.
 * **Simple** Focused on simplicity, hides the complexity and respect the [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle.
-* **Fast** High performance (even JSON parsing is opt-in, fast router).  
+* **Fast** High performance.
+* **Focus opt-in**: All features are opt-in.  
 * **Async** Implements an enhanced async control of handlers execution.
-* **CoC** Convention over configuration.
+* **Modular** Extremly modular.
 * **Middlwares** Implements a middleware logic.
 * **ES6 modules** Native ESM modules syntax support.
 
