@@ -16,11 +16,8 @@
         "prepublishOnly": "yarn run build"
     },
     "dependencies": {
-        "wezi-actions": "^1.0.0-alpha.18",
         "wezi-composer": "^1.0.0-alpha.18",
         "wezi-error": "^1.0.0-alpha.17",
-        "wezi-receive": "^1.0.0-alpha.18",
-        "wezi-shared": "^1.0.0-alpha.18",
         "wezi-types": "^1.0.0-alpha.18",
         "wezi-router": "^1.0.0-alpha.18"
     },

@@ -1,7 +1,6 @@
 import http, { Server, IncomingMessage, ServerResponse, RequestListener } from 'http'
 import { Context, Handler } from 'wezi-types'
 import { Composer } from 'wezi-composer'
-import { body } from 'wezi-receive'
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
@@ -9,22 +8,12 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
         , res
         , next: null
         , panic: null
-        , body: null
-    }
-}
-
-const createEnhancedContext = (context: Context): Context => {
-    return {
-        ...context
-        , body: body(context)
     }
 }
 
 export const createWezi = (composer: Composer) => (...handlers: Handler[]) => (req: IncomingMessage, res: ServerResponse): void => {
     const dispatch = composer(true, handlers)
-    const context = createContext(req, res)
-    const enhancedContext = createEnhancedContext(context)
-    dispatch(enhancedContext)
+    dispatch(createContext(req, res))
 }
 
 export const listen = (handler: RequestListener, port = 3000, listeningListener?: () => void): Server => {

@@ -1,6 +1,6 @@
 import { IncomingMessage } from 'http'
+import { Context } from 'wezi-types'
 import fastGetBody from 'fast-get-body'
-import { Context, Body } from 'wezi-types'
 import { parseJSON } from './utils'
 
 type CacheWeakMap<T = any> = WeakMap<IncomingMessage, T>
@@ -43,10 +43,4 @@ const toText = () => {
 export const text = toText()
 export const json = toJson()
 export const buffer = toBuffer()
-export const body = (context: Context): Body => {
-    return {
-        text: () => text(context)
-        , json: <T>() => json<T>(context)
-        , buffer: () => buffer(context)
-    }
-}
+

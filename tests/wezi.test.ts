@@ -1,7 +1,8 @@
 import test from 'ava'
 import fetch from 'node-fetch'
-import { Context } from 'wezi-types'
 import wezi, { listen } from 'wezi'
+import { Context } from 'wezi-types'
+import { text, json, buffer } from 'wezi-receive'
 import { server } from './helpers'
 
 test('server listen', async (t) => {
@@ -19,7 +20,7 @@ test('context body parse json', async (t) => {
         name: string
     }
 
-    const handler = ({ body }: Context): Promise<Character> => body.json()
+    const handler = (c: Context): Promise<Character> => json(c)
 
     const url = await server(handler)
     const res = await fetch(url, {
@@ -35,7 +36,7 @@ test('context body parse json', async (t) => {
 })
 
 test('context body parse buffer', async (t) => {
-    const handler = ({ body }: Context) => body.buffer()
+    const handler = (c: Context) => buffer(c)
 
     const url = await server(handler)
     const res = await fetch(url, {
@@ -49,7 +50,7 @@ test('context body parse buffer', async (t) => {
 })
 
 test('context body parse text', async (t) => {
-    const handler = ({ body }: Context) => body.text()
+    const handler = (c: Context) => text(c)
 
     const url = await server(handler)
     const res = await fetch(url, {
