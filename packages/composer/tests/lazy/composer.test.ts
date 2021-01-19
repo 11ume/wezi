@@ -2,12 +2,12 @@ import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
 import { server, createContext } from '../helpers'
-import { composer, composerSingle } from '../../'
+import { lazyComposer, lazyComposerSingle } from '../../'
 
 test('main composer single handler, direct<string:200>', async (t) => {
     const url = await server((req, res) => {
         const greet = () => 'hello'
-        const dispatch = composer(true, [greet])
+        const dispatch = lazyComposer(true, [greet])
         const context = createContext({
             req
             , res
@@ -26,7 +26,7 @@ test('main composer single handler, direct<string:200>', async (t) => {
 test('main composer single handler, direct<empty:204>', async (t) => {
     const url = await server((req, res) => {
         const empty = () => null
-        const dispatch = composer(true, [empty])
+        const dispatch = lazyComposer(true, [empty])
         const context = createContext({
             req
             , res
@@ -46,7 +46,7 @@ test('main composer multi handler, direct return in first handler, direct<empty:
     const url = await server((req, res) => {
         const empty = () => null
         const greet = () => 'hello'
-        const dispatch = composer(true, [empty, greet])
+        const dispatch = lazyComposer(true, [empty, greet])
         const context = createContext({
             req
             , res
@@ -66,7 +66,7 @@ test('main composer multi handler, direct return in second handler, next<empty> 
     const url = await server((req, res) => {
         const empty = (c: Context) => c.next()
         const greet = () => null
-        const dispatch = composer(true, [empty, greet])
+        const dispatch = lazyComposer(true, [empty, greet])
         const context = createContext({
             req
             , res
@@ -86,7 +86,7 @@ test('main composer multi handler, direct return in first handler, direct<string
     const url = await server((req, res) => {
         const greet = () => 'hello'
         const never = () => 'never'
-        const dispatch = composer(true, [greet, never])
+        const dispatch = lazyComposer(true, [greet, never])
         const context = createContext({
             req
             , res
@@ -106,7 +106,7 @@ test('main composer multi handler, direct return in second handler, next<empty> 
     const url = await server((req, res) => {
         const next = (c: Context) => c.next()
         const greet = () => 'hello'
-        const dispatch = composer(true, [next, greet])
+        const dispatch = lazyComposer(true, [next, greet])
         const context = createContext({
             req
             , res
@@ -126,7 +126,7 @@ test('main composer multi handler async, direct promise return in first handler,
     const url = await server((req, res) => {
         const greet = () => Promise.resolve('hello')
         const never = () => 'never'
-        const dispatch = composer(true, [greet, never])
+        const dispatch = lazyComposer(true, [greet, never])
         const context = createContext({
             req
             , res
@@ -146,7 +146,7 @@ test('main composer multi handler async, direct promise return in second handler
     const url = await server((req, res) => {
         const next = (c: Context) => c.next()
         const greet = () => Promise.resolve('hello')
-        const dispatch = composer(true, [next, greet])
+        const dispatch = lazyComposer(true, [next, greet])
         const context = createContext({
             req
             , res
@@ -166,7 +166,7 @@ test('main composer multi handlers, pass parameters whit next, next<string>, dir
     const url = await server((req, res) => {
         const next = (c: Context) => c.next('hello')
         const greet = (_, message: string) => message
-        const dispatch = composer(true, [next, greet])
+        const dispatch = lazyComposer(true, [next, greet])
         const context = createContext({
             req
             , res
@@ -193,7 +193,7 @@ test('main composer multi handlers async, pass parameters whit next, next<string
             t.is(message, 'hello')
             return message
         }
-        const dispatch = composer(true, [next, greet])
+        const dispatch = lazyComposer(true, [next, greet])
         const context = createContext({
             req
             , res
@@ -211,7 +211,7 @@ test('main composer multi handlers async, pass parameters whit next, next<string
 
 test('main composer end the response if higher-order handlers are executed and none of them have call end, next<empty> next<empty>', async (t) => {
     const url = await server((req, res) => {
-        const dispatch = composer(true, [(c: Context) => c.next(), (c: Context) => c.next()])
+        const dispatch = lazyComposer(true, [(c: Context) => c.next(), (c: Context) => c.next()])
         const context = createContext({
             req
             , res
@@ -227,7 +227,7 @@ test('main composer end the response if higher-order handlers are executed and n
 test('composer single handler, direct<string:200>', async (t) => {
     const url = await server((req, res) => {
         const greet = () => 'hello'
-        const dispatch = composerSingle(greet)
+        const dispatch = lazyComposerSingle(greet)
         const context = createContext({
             req
             , res

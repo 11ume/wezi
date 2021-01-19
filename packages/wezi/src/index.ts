@@ -1,7 +1,11 @@
-import { composer, composerSingle } from 'wezi-composer'
 import { createRouter, createRouterSpace } from 'wezi-router'
-import { createApp } from './wezi'
+import { lazyComposer, lazyComposerSingle, Composer, ComposerSingle } from 'wezi-composer'
+import { createWezi } from './wezi'
 
-export const wezi = createApp(composer)
-export const router = createRouter(composer, composerSingle)
-export const routerSpace = createRouterSpace(composer, composerSingle)
+export const create = (composer: Composer = lazyComposer, composerSingle: ComposerSingle = lazyComposerSingle) => {
+    return {
+        wezi: createWezi(composer)
+        , router: createRouter(composer, composerSingle)
+        , routerSpace: createRouterSpace(composer, composerSingle)
+    }
+}
