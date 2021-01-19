@@ -14,14 +14,6 @@ type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 type ErrorHandler = (context: Context, error: Error) => void
 type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
 
-const createContext = (context: Context, dispatch: Dispatch, errorHandler: ErrorHandler): Context => {
-    return {
-        ...context
-        , next: createNext(context, dispatch)
-        , panic: createPanic(context, errorHandler)
-    }
-}
-
 const createNext = (context: Context, dispatch: Dispatch): Next => {
     return function next(payload?: unknown): void {
         if (payload === undefined) {
@@ -41,6 +33,14 @@ const createPanic = (context: Context, errorHandler: ErrorHandler): Panic => {
         }
 
         errorHandler(context, createError(500, 'panic error param, must be instance of Error'))
+    }
+}
+
+const createContext = (context: Context, dispatch: Dispatch, errorHandler: ErrorHandler): Context => {
+    return {
+        ...context
+        , next: createNext(context, dispatch)
+        , panic: createPanic(context, errorHandler)
     }
 }
 
