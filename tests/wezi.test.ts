@@ -14,21 +14,6 @@ test('server listen', async (t) => {
     t.is(body, 'hello')
 })
 
-test('context redirect response', async (t) => {
-    const handler = ({ req, res, actions }: Context) => {
-        if (req.url === '/redirect') {
-            res.end()
-            return
-        }
-        actions.redirect('/redirect')
-    }
-
-    const url = await server(handler)
-    const res = await fetch(url)
-
-    t.true(res.redirected)
-})
-
 test('context body parse json', async (t) => {
     type Character = {
         name: string

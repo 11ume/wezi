@@ -1,6 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http'
 import { Body } from './receive'
-import { Actions } from './actions'
 
 export interface Context {
     readonly req: IncomingMessage
@@ -8,7 +7,6 @@ export interface Context {
     readonly next: Next
     readonly panic: Panic
     readonly body: Body
-    readonly actions: Actions
 }
 
 export type Shared<E> = {
