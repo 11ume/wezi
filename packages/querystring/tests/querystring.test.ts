@@ -69,3 +69,13 @@ test('parse query string whit path and diferent assignment char', (t) => {
     t.is(query.bar, '2')
 })
 
+test('parse query string whiout query string params', (t) => {
+    const ctx = {
+        req: {
+            url: 'http://localhost:3000'
+        }
+    }
+
+    const query = qs(ctx as any)
+    t.is(query, null)
+})
