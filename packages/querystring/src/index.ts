@@ -1,32 +1,20 @@
 import { Context } from 'wezi-types'
-import querystring, { ParsedUrlQuery } from 'querystring'
+import querystring from 'querystring'
 
-export type Payload<P = void, Q = void> = {
-    query: Q
-    params: P
+type Query = {
+    [key: string]: string | string[]
 }
 
-type Dictionary = {
-    [key: string]: string
-}
-
-const getQuery = (url: string, idx: number): ParsedUrlQuery => {
-    const search = url.substring(idx)
+const getQuery = <T = Query>(url: string, index: number, sep?: string, eq?: string): T => {
+    const search = url.substring(index)
     const path = search.substring(1)
-    const query = querystring.parse(path)
-    return query
+    return querystring.parse(path, sep, eq) as any
 }
 
-const getQueryString = (url: string): ParsedUrlQuery | null => {
+const getQueryString = <T = Query>(url: string, sep?: string, eq?: string): T => {
     const index = url.indexOf('?', 1)
-    if (index !== -1) return getQuery(url, index)
+    if (index !== -1) return getQuery(url, index, sep, eq)
     return null
 }
 
-export const queryParser = (context: Context, params: Dictionary): void => {
-    const query = getQueryString(context.req.url)
-    context.next({
-        params
-        , query
-    })
-}
+export const queryParser = <T = Query>(context: Context, sep?: string, eq?: string): T => getQueryString(context.req.url, sep, eq)
