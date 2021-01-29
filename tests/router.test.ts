@@ -11,7 +11,6 @@ import {
     , del
     , patch
     , router
-    , routerSpace
 } from 'wezi'
 import { server } from './helpers'
 
@@ -165,119 +164,6 @@ test('routes with multi params', async (t) => {
     t.is(body, 'foo bar')
 })
 
-test('routes with matching optional param', async (t) => {
-    type Payload = {
-        msg: string
-    }
-    const greet = (_context: Context, params: Payload) => `Hello ${params.msg ?? ''}`
-    const r = router(
-        get('/path/:msg?', greet)
-    )
-    const url = await server(r)
-    const res = await fetch(`${url}/path`)
-    const resOptional = await fetch(`${url}/path/world`)
-    const body = await res.text()
-    const bodyOptional = await resOptional.text()
-
-    t.is(res.status, 200)
-    t.is(body, 'Hello ')
-
-    t.is(resOptional.status, 200)
-    t.is(bodyOptional, 'Hello world')
-})
-
-test('routes with matching double optional params', async (t) => {
-    type Payload = {
-        foo?: string
-        bar?: string
-    }
-    const greet = (_context: Context, params: Payload) => {
-        if (params.foo && params.bar) return `Hello ${params.foo} ${params.bar}`
-        else if (params.foo) return `Hello ${params.foo}`
-        else return 'Hello'
-    }
-
-    const r = router(
-        get('/path/:foo?/:bar?', greet)
-    )
-    const url = await server(r)
-    const res = await fetch(`${url}/path`)
-    const resOptional = await fetch(`${url}/path/john`)
-    const resOptionalWhitTwo = await fetch(`${url}/path/john/connor`)
-
-    const body = await res.text()
-    const bodyOptional = await resOptional.text()
-    const bodyOptionalWhitTwo = await resOptionalWhitTwo.text()
-
-    t.is(res.status, 200)
-    t.is(body, 'Hello')
-
-    t.is(resOptional.status, 200)
-    t.is(bodyOptional, 'Hello john')
-
-    t.is(resOptionalWhitTwo.status, 200)
-    t.is(bodyOptionalWhitTwo, 'Hello john connor')
-})
-
-test('routes with matching params last optional only', async (t) => {
-    type Payload = {
-        foo: string
-        bar?: string
-    }
-    const greet = (_context: Context, params: Payload) => {
-        if (params.bar) return `Hello ${params.foo} ${params.bar}`
-        else return `Hello ${params.foo}`
-    }
-
-    const r = router(
-        get('/path/:foo/:bar?', greet)
-    )
-    const url = await server(r)
-    const resOptional = await fetch(`${url}/path/john`)
-    const resOptionalWhitLast = await fetch(`${url}/path/john/connor`)
-
-    const bodyOptional = await resOptional.text()
-    const bodyOptionalWhitLast = await resOptionalWhitLast.text()
-
-    t.is(resOptional.status, 200)
-    t.is(bodyOptional, 'Hello john')
-
-    t.is(resOptionalWhitLast.status, 200)
-    t.is(bodyOptionalWhitLast, 'Hello john connor')
-})
-
-test('routes with matching params first optional only', async (t) => {
-    type Payload = {
-        foo?: string
-        bar: string
-    }
-    const greet = (_context: Context, params: Payload) => {
-        if (params.foo) return `Hello ${params.foo} ${params.bar}`
-        else return `Hello ${params.bar}`
-    }
-
-    const r = router(
-        get('/path/:foo?/:bar', greet)
-    )
-    const url = await server(r)
-    const resOptional = await fetch(`${url}/path/john`)
-    const resOptionalAll = await fetch(`${url}/path/john/connor`)
-    const resOptionalFirst = await fetch(`${url}/path/connor`)
-
-    const bodyOptional = await resOptional.text()
-    const bodyOptionalAll = await resOptionalAll.text()
-    const bodyOptionalFirst = await resOptionalFirst.text()
-
-    t.is(resOptional.status, 200)
-    t.is(bodyOptional, 'Hello john')
-
-    t.is(resOptionalAll.status, 200)
-    t.is(bodyOptionalAll, 'Hello john connor')
-
-    t.is(resOptionalFirst.status, 200)
-    t.is(bodyOptionalFirst, 'Hello connor')
-})
-
 test('multiple matching routes', async (t) => {
     const withPath = () => 'Hello world'
     const withParam = () => t.fail('Clashing route should not have been called')
@@ -294,32 +180,6 @@ test('multiple matching routes', async (t) => {
     t.is(body, 'Hello world')
 })
 
-test('compose routes with namespace', async (t) => {
-    const spaceRouter = routerSpace('/v1')
-    const r = spaceRouter(
-        get('/foo', () => 'foo')
-    )
-    const url = await server(r)
-    const res = await fetch(`${url}/v1/foo`)
-    const body = await res.text()
-
-    t.is(res.status, 200)
-    t.is(body, 'foo')
-})
-
-test('compose routes with namespace empty', async (t) => {
-    const spaceRouter = routerSpace()
-    const r = spaceRouter(
-        get('/foo', () => 'foo')
-    )
-    const url = await server(r)
-    const res = await fetch(`${url}/foo`)
-    const body = await res.text()
-
-    t.is(res.status, 200)
-    t.is(body, 'foo')
-})
-
 test('match head, match route and return empty body', async (t) => {
     const ping = () => 'hello'
     const r = router(
@@ -333,23 +193,6 @@ test('match head, match route and return empty body', async (t) => {
 
     t.is(res.status, 200)
     t.is(body.size, 0)
-})
-
-test('multiple matching routes match whit wildcards', async (t) => {
-    type Params = {
-        wild: string
-    }
-
-    const getChar = (_context: Context, params: Params) => params.wild
-    const r = router(
-        get('/character/*', getChar)
-    )
-    const url = await server(r)
-    const res = await fetch(`${url}/character/john/connor`)
-    const body = await res.text()
-
-    t.is(res.status, 200)
-    t.is(body, 'john/connor')
 })
 
 test('multiple routes handlers', async (t) => {
