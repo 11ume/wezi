@@ -16,7 +16,7 @@
         "prepublishOnly": "yarn run build"
     },
     "dependencies": {
-        "regexparam": "^1.3.0",
+        "matchit-radix-tree": "https://github.com/11ume/matchit-radix-tree",
         "wezi-composer": "^1.0.0-alpha.18",
         "wezi-error": "^1.0.0-alpha.17",
         "wezi-types": "^1.0.0-alpha.18"

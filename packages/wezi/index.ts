@@ -1,5 +1,5 @@
 import { wezi } from './src'
-export { create, router, routerSpace } from './src'
+export { create, router } from './src'
 export { listen } from './src/wezi'
 export { Context, Handler } from 'wezi-types'
 export {
