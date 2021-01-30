@@ -65,7 +65,7 @@ export const createRouter = (...entities: RouteEntity[]) => {
         return prepareRoutes(matcher, entities, composer)
     }
 
-    Object.defineProperty(match, 'name', {
+    Object.defineProperty(match, 'id', {
         value: $composer
     })
 

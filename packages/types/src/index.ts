@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http'
+import { Composer } from 'wezi-composer'
 
 export interface Context {
     readonly req: IncomingMessage
@@ -12,6 +13,17 @@ export type Shared<E> = {
     get: <T extends E, K extends keyof T>(key: K) => T[K]
     remove: <T extends E, K extends keyof T>(key: K) => void
     values: () => E
+}
+
+export interface ComposerHandlerMix extends Function {
+    id?: symbol
+    (context: Context, payload?: any): any
+    (composer: Composer): Handler
+}
+
+export interface ComposerHandler extends Function {
+    id?: symbol
+    (composer: Composer): Handler
 }
 
 export type Next = <T>(payload?: T) => void

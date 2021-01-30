@@ -1,9 +1,8 @@
 import http, { Server, IncomingMessage, ServerResponse } from 'http'
-import { Context } from 'wezi-types'
+import { Context, Handler, ComposerHandler, ComposerHandlerMix } from 'wezi-types'
 import { Composer, $composer, lazy } from 'wezi-composer'
 
-type Wezi = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
-type Handler = (...args: any[]) => any
+type Run = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
@@ -14,21 +13,24 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     }
 }
 
-const composeHandlers = (composer: Composer, handlers: Handler[]) => handlers.map((handler) => {
-    if (handler.name === $composer) return handler(composer)
+const composeHandlers = (composer: Composer, handlers: ComposerHandlerMix[]) => handlers.map((handler) => {
+    if (handler.id === $composer) return handler(composer)
     return handler
 })
 
-export const wezi = (...handlersIn: Handler[]) => (composer: Composer) => {
-    const handlers = composeHandlers(composer, handlersIn)
-    return (req: IncomingMessage, res: ServerResponse): void => {
-        const dispatch = composer(true, ...handlers)
-        dispatch(createContext(req, res))
+export function wezi(...handlers: (ComposerHandler | Handler)[]): Run
+export function wezi(...handlers: any[]): Run {
+    return (composer: Composer) => {
+        const composedHandlers = composeHandlers(composer, handlers)
+        return (req: IncomingMessage, res: ServerResponse): void => {
+            const dispatch = composer(true, ...composedHandlers)
+            dispatch(createContext(req, res))
+        }
     }
 }
 
-export const listen = (handler: Wezi, port = 3000, listeningListener?: () => void): Server => {
-    const server = http.createServer(handler(lazy))
+export const listen = (run: Run, port = 3000, listeningListener?: () => void): Server => {
+    const server = http.createServer(run(lazy))
     server.listen(port, listeningListener)
     return server
 }
