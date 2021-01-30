@@ -1,23 +1,24 @@
-import { createRouter } from 'wezi-router'
-import { lazyComposer, lazyComposerSingle, Composer, ComposerSingle } from 'wezi-composer'
-import { createWezi } from './wezi'
+import http, { Server, IncomingMessage, ServerResponse, RequestListener } from 'http'
+import { Context, Handler } from 'wezi-types'
+import { Composer } from 'wezi-composer'
 
-type Create = {
-    composer?: Composer
-    composerSingle?: ComposerSingle
-}
-
-const create = ({ composer = lazyComposer, composerSingle = lazyComposerSingle }: Create = {}) => {
+const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
-        wezi: createWezi(composer)
-        , router: createRouter(composer, composerSingle)
+        req
+        , res
+        , next: null
+        , panic: null
     }
 }
 
-const { wezi, router } = create()
-
-export {
-    create
-    , wezi
-    , router
+export const wezi = (...handlers: Handler[]) => (composer: Composer) => (req: IncomingMessage, res: ServerResponse): void => {
+    const dispatch = composer(true, ...handlers)
+    dispatch(createContext(req, res))
 }
+
+export const listen = (handler: RequestListener, port = 3000, listeningListener?: () => void): Server => {
+    const server = http.createServer(handler)
+    server.listen(port, listeningListener)
+    return server
+}
+

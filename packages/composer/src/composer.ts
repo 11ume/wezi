@@ -7,8 +7,7 @@ import {
     , Dispatch
 } from 'wezi-types'
 
-export type Composer = (main: boolean, handlers: Handler[]) => Dispatch
-export type ComposerSingle = (handler: Handler) => Dispatch
+export type Composer = (main: boolean, ...handlers: Handler[]) => Dispatch
 
 type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 type ErrorHandler = (context: Context, error: Error) => void
@@ -44,7 +43,7 @@ const createContext = (context: Context, dispatch: Dispatch, errorHandler: Error
     }
 }
 
-export const createComposer = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHandler: ExecuteHandler): Composer => (main: boolean, handlers: Handler[]): Dispatch => {
+export const createComposer = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHandler: ExecuteHandler): Composer => (main: boolean, ...handlers: Handler[]): Dispatch => {
     let inc = 0
     return function dispatch(context: Context, payload?: unknown): void {
         if (inc < handlers.length) {
@@ -55,12 +54,5 @@ export const createComposer = (endHandler: EndHandler, errorHandler: ErrorHandle
         }
 
         main && setImmediate(endHandler, context, errorHandler)
-    }
-}
-
-export const createComposerSingle = (errorHandler: ErrorHandler, executeHandler: ExecuteHandler): ComposerSingle => (handler: Handler): Dispatch => {
-    return function dispatch(context: Context, payload?: unknown): void {
-        const newContext = createContext(context, dispatch, errorHandler)
-        setImmediate(executeHandler, newContext, handler, payload)
     }
 }
