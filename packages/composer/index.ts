@@ -1,2 +1,2 @@
 export * from './src'
-export { Composer, ComposerSingle } from './src/composer'
+export { Composer } from './src/composer'

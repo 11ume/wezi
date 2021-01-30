@@ -1,10 +1,12 @@
 import http from 'http'
 import listen from 'test-listen'
-import wezi from '../../packages/wezi'
-import { Handler } from '../../packages/types'
+import wezi from 'wezi'
+import { lazy } from 'wezi-composer'
+import { ComposerHandler, Handler } from 'wezi-types'
 
-export const server = (...fn: Handler[]) => {
+export function server(...handlers: (ComposerHandler | Handler)[]): Promise<string>
+export function server(...fn: any[]) {
     const w = wezi(...fn)
-    return listen(http.createServer(w))
+    return listen(http.createServer(w(lazy)))
 }
 

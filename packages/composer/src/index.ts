@@ -1,7 +1,7 @@
 import { executeHandlerLazy } from './handlers/lazy'
 import { endHandler, errorHandler } from './handlers/common'
-import { createComposer, createComposerSingle } from './composer'
+import { createComposer } from './composer'
 
-export const lazyComposer = createComposer(endHandler, errorHandler, executeHandlerLazy)
-export const lazyComposerSingle = createComposerSingle(errorHandler, executeHandlerLazy)
+export const $composer = Symbol('composer')
+export const lazy = createComposer(endHandler, errorHandler, executeHandlerLazy)
 

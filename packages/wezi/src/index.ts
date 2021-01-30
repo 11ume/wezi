@@ -1,23 +1,37 @@
-import { createRouter } from 'wezi-router'
-import { lazyComposer, lazyComposerSingle, Composer, ComposerSingle } from 'wezi-composer'
-import { createWezi } from './wezi'
+import http, { Server, IncomingMessage, ServerResponse } from 'http'
+import { Context, Handler, ComposerHandler, ComposerHandlerMix } from 'wezi-types'
+import { Composer, $composer, lazy } from 'wezi-composer'
 
-type Create = {
-    composer?: Composer
-    composerSingle?: ComposerSingle
-}
+type Run = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
 
-const create = ({ composer = lazyComposer, composerSingle = lazyComposerSingle }: Create = {}) => {
+const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
-        wezi: createWezi(composer)
-        , router: createRouter(composer, composerSingle)
+        req
+        , res
+        , next: null
+        , panic: null
     }
 }
 
-const { wezi, router } = create()
+const composeHandlers = (composer: Composer, handlers: ComposerHandlerMix[]) => handlers.map((handler) => {
+    if (handler.id === $composer) return handler(composer)
+    return handler
+})
 
-export {
-    create
-    , wezi
-    , router
+export function wezi(...handlers: (ComposerHandler | Handler)[]): Run
+export function wezi(...handlers: any[]): Run {
+    return (composer: Composer) => {
+        const composedHandlers = composeHandlers(composer, handlers)
+        return (req: IncomingMessage, res: ServerResponse): void => {
+            const dispatch = composer(true, ...composedHandlers)
+            dispatch(createContext(req, res))
+        }
+    }
 }
+
+export const listen = (run: Run, port = 3000, listeningListener?: () => void): Server => {
+    const server = http.createServer(run(lazy))
+    server.listen(port, listeningListener)
+    return server
+}
+
