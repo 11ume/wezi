@@ -3,15 +3,14 @@ import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
-import {
+import router, {
     get
     , head
     , post
     , put
     , del
     , patch
-    , router
-} from 'wezi'
+} from 'wezi-router'
 import { server } from './helpers'
 
 test('base path', async (t) => {

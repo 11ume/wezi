@@ -1,6 +1,7 @@
 import test from 'ava'
 import fetch from 'node-fetch'
-import { Context, router, get } from 'wezi'
+import { Context } from 'wezi'
+import router, { get } from 'wezi-router'
 import queryParser from 'wezi-query'
 import { server } from './helpers'
 
