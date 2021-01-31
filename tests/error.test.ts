@@ -10,7 +10,7 @@ type ErrorPayload = {
 
 test.before('pass to panic http error in production', async (t) => {
     process.env.NODE_ENV = 'production'
-    const url = await server((c: Context) => c.panic(createError(420)))
+    const url = await server(true, (c: Context) => c.panic(createError(420)))
     const res = await fetch(url)
     const body: string = await res.text()
 
@@ -20,7 +20,7 @@ test.before('pass to panic http error in production', async (t) => {
 })
 
 test('pass to panic empty error', async (t) => {
-    const url = await server((c: Context) => c.panic(new Error()))
+    const url = await server(true, (c: Context) => c.panic(new Error()))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -29,7 +29,7 @@ test('pass to panic empty error', async (t) => {
 })
 
 test('pass to panic random error whit message', async (t) => {
-    const url = await server((c: Context) => c.panic(new Error('opps')))
+    const url = await server(true, (c: Context) => c.panic(new Error('opps')))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -38,7 +38,7 @@ test('pass to panic random error whit message', async (t) => {
 })
 
 test('create and pass to next http error', async (t) => {
-    const url = await server((c: Context) => c.panic(createError(420)))
+    const url = await server(true, (c: Context) => c.panic(createError(420)))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -47,7 +47,7 @@ test('create and pass to next http error', async (t) => {
 })
 
 test('create and pass to panic http error whit custom status code and message', async (t) => {
-    const url = await server((c: Context) => c.panic(createError(418, 'Im a teapot')))
+    const url = await server(true, (c: Context) => c.panic(createError(418, 'Im a teapot')))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -56,7 +56,7 @@ test('create and pass to panic http error whit custom status code and message', 
 })
 
 test('create and pass http error to panic, whit multiple handlers combine next and panic', async (t) => {
-    const url = await server((c: Context) => c.next(), (c: Context) => c.panic(createError(420)), () => 'not')
+    const url = await server(true, (c: Context) => c.next(), (c: Context) => c.panic(createError(420)), () => 'not')
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
