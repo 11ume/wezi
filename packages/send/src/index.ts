@@ -1,68 +1,61 @@
-import { Stream, Readable } from 'stream'
+import { Readable } from 'stream'
 import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
 import { isJsonable } from './utils'
 
 export const stream = (context: Context, statusCode = 200, payload: Readable): void => {
     context.res.statusCode = statusCode
-    if (payload instanceof Stream) {
-        context.res.writeHead(statusCode, {
-            'Content-Type': 'application/octet-stream'
-        })
-        payload.pipe(context.res)
-        return
-    }
+    context.res.writeHead(statusCode, {
+        'Content-Type': 'application/octet-stream'
+    })
 
-    context.panic(createError(500, 'stream payload must be a instance of Stream'))
+    payload.pipe(context.res)
 }
 
 export const buffer = (context: Context, statusCode = 200, payload: Buffer): void => {
     const type = context.res.getHeader('Content-Type')
-    const contentType = type || 'application/json charset=utf-8'
+    const contentType = type || 'application/octet-stream'
 
-    if (Buffer.isBuffer(payload)) {
-        context.res.writeHead(statusCode, {
-            'Content-Type': contentType
-            , 'Content-Length': payload.length
-        })
+    context.res.writeHead(statusCode, {
+        'Content-Type': contentType
+        , 'Content-Length': payload.length
+    })
 
-        context.res.end(payload, null, null)
-        return
-    }
-
-    context.panic(createError(500, 'buffer payload must be a instance of Buffer'))
+    context.res.end(payload, null, null)
 }
 
 export const json = <T = void>(context: Context, payload: T, statusCode = 200): void => {
-    const chunk = JSON.stringify(payload)
+    const body = JSON.stringify(payload)
     const type = context.res.getHeader('Content-Type')
     const contentType = type || 'application/json charset=utf-8'
-    const contentlength = Buffer.byteLength(chunk)
+    const contentlength = Buffer.byteLength(body)
 
     context.res.writeHead(statusCode, {
         'Content-Type': contentType
         , 'Content-Length': contentlength
     })
-    context.res.end(chunk, null, null)
+
+    context.res.end(body, null, null)
 }
 
-export const text = (context: Context, payload: string | number, statusCode = 200): void => {
-    const chunk = typeof payload === 'number' ? payload.toString() : payload
+export const text = (context: Context, payload: string, statusCode = 200): void => {
     const type = context.res.getHeader('Content-Type')
     const contentType = type || 'text/plain charset=utf-8'
-    const contentlength = Buffer.byteLength(chunk)
+    const contentlength = Buffer.byteLength(payload)
 
     context.res.writeHead(statusCode, {
         'Content-Type': contentType
         , 'Content-Length': contentlength
     })
-    context.res.end(chunk, null, null)
+
+    context.res.end(payload, null, null)
 }
 
 export const empty = (context: Context, statusCode = 204): void => {
     context.res.writeHead(statusCode, {
         'Content-Length': '0'
     })
+
     context.res.end(null, null, null)
 }
 
@@ -71,5 +64,21 @@ export const send = (context: Context, statusCode?: number, payload?: any): void
         return json(context, payload, statusCode)
     }
 
-    return text(context, payload, statusCode)
+    if (typeof payload === 'string') {
+        return text(context, payload, statusCode)
+    }
+
+    if (typeof payload === 'number') {
+        return text(context, payload.toString(), statusCode)
+    }
+
+    if (Buffer.isBuffer(payload)) {
+        return buffer(context, statusCode, payload)
+    }
+
+    if (payload instanceof Readable) {
+        return stream(context, statusCode, payload)
+    }
+
+    context.panic(createError(500, 'cannot send, payload is not a valid'))
 }

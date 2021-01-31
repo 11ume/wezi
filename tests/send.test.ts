@@ -11,10 +11,6 @@ import {
     , stream
 } from 'wezi-send'
 
-type ErrorPayload = {
-    message: string
-};
-
 test('send text string message', async (t) => {
     const fn = (c: Context) => send(c, 200, 'hello')
 
@@ -75,15 +71,6 @@ test('send payload whit status code', async (t) => {
     t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
 })
 
-test('send must throws error when is invoked whitout content', async (t) => {
-    const fn = (c: Context) => send(c, 400)
-
-    const url = await server(fn)
-    const res = await fetch(url)
-
-    t.is(res.status, 500)
-})
-
 test('send direct message', async (t) => {
     const fn = () => 'hello'
 
@@ -92,6 +79,7 @@ test('send direct message', async (t) => {
     const body = await res.text()
 
     t.is(res.status, 200)
+    t.is(res.headers.get('Content-Type'), 'text/plain charset=utf-8')
     t.is(body, 'hello')
 })
 
@@ -132,6 +120,7 @@ test('send stream readable', async (t) => {
     const body = await res.text()
 
     t.is(res.status, 200)
+    t.is(res.headers.get('Content-Type'), 'application/octet-stream')
     t.is(body, 'foo')
 })
 
@@ -144,6 +133,7 @@ test('send file read stream', async (t) => {
     const body: { repository: string } = await res.json()
 
     t.is(res.status, 200)
+    t.is(res.headers.get('Content-Type'), 'application/octet-stream')
     t.is(body.repository, '11ume/wezi')
 })
 
@@ -155,27 +145,21 @@ test('send buffer', async (t) => {
     const body = await res.text()
 
     t.is(res.status, 200)
+    t.is(res.headers.get('Content-Type'), 'application/octet-stream')
     t.is(body, 'foo')
 })
 
-test('try send not buffer', async (t) => {
-    const fn = (c: Context) => buffer(c, 200, '' as any)
+test('send must throws error when is invoked whit invalid content', async (t) => {
+    type ErrorPayload = {
+        message: string
+    }
+
+    const fn = (c: Context) => send(c, 400, Symbol('test'))
 
     const url = await server(fn)
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
     t.is(res.status, 500)
-    t.is(body.message, 'buffer payload must be a instance of Buffer')
-})
-
-test('try send not stream', async (t) => {
-    const fn = (c: Context) => stream(c, 200, '' as any)
-
-    const url = await server(fn)
-    const res = await fetch(url)
-    const body: ErrorPayload = await res.json()
-
-    t.is(res.status, 500)
-    t.is(body.message, 'stream payload must be a instance of Stream')
+    t.is(body.message, 'cannot send, payload is not a valid')
 })
