@@ -46,6 +46,7 @@ test('send json message', async (t) => {
 
     t.is(res.status, 200)
     t.is(body.message, 'hello')
+    t.is(res.headers.get('Content-Length'), '19')
     t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
 })
 
@@ -68,10 +69,11 @@ test('send payload whit status code', async (t) => {
 
     t.is(res.status, 401)
     t.is(body.message, 'hello')
+    t.is(res.headers.get('Content-Length'), '19')
     t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
 })
 
-test('send direct message', async (t) => {
+test('send direct lazy message', async (t) => {
     const fn = () => 'hello'
 
     const url = await server(fn)
@@ -80,10 +82,11 @@ test('send direct message', async (t) => {
 
     t.is(res.status, 200)
     t.is(res.headers.get('Content-Type'), 'text/plain charset=utf-8')
+    t.is(res.headers.get('Content-Length'), '5')
     t.is(body, 'hello')
 })
 
-test('send direct json', async (t) => {
+test('send direct lazy json', async (t) => {
     const fn = () => ({
         message: 'hello'
     })
@@ -93,12 +96,44 @@ test('send direct json', async (t) => {
     const body: { message: string } = await res.json()
 
     t.is(res.status, 200)
-    t.is(body.message, 'hello')
-    t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
     t.is(res.headers.get('Content-Length'), '19')
+    t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
+    t.is(body.message, 'hello')
 })
 
-test('send direct Not Content 204', async (t) => {
+test('send direct lazy buffer', async (t) => {
+    const fn = () => Buffer.from('foo')
+
+    const url = await server(fn)
+    const res = await fetch(url)
+    const body = await res.text()
+
+    t.is(res.status, 200)
+    t.is(res.headers.get('Content-Length'), '3')
+    t.is(res.headers.get('Content-Type'), 'application/octet-stream')
+    t.is(body, 'foo')
+})
+
+test('send direct lazy readable', async (t) => {
+    const readable = new Readable()
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    readable._read = () => { }
+    readable.push('foo')
+    readable.push(',bar')
+    readable.push(null)
+
+    const fn = () => readable
+
+    const url = await server(fn)
+    const res = await fetch(url)
+    const body = await res.text()
+
+    t.is(res.status, 200)
+    t.is(res.headers.get('Content-Type'), 'application/octet-stream')
+    t.is(body, 'foo,bar')
+})
+
+test('send direct lazy Not Content 204', async (t) => {
     const fn = () => null
 
     const url = await server(fn)
@@ -146,6 +181,7 @@ test('send buffer', async (t) => {
 
     t.is(res.status, 200)
     t.is(res.headers.get('Content-Type'), 'application/octet-stream')
+    t.is(res.headers.get('Content-Length'), '3')
     t.is(body, 'foo')
 })
 

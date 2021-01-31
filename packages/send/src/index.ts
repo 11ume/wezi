@@ -1,12 +1,15 @@
 import { Readable } from 'stream'
 import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
-import { isJsonable } from './utils'
+import { isJsonable, isReadable } from './utils'
 
 export const stream = (context: Context, statusCode = 200, payload: Readable): void => {
+    const type = context.res.getHeader('Content-Type')
+    const contentType = type || 'application/octet-stream'
+
     context.res.statusCode = statusCode
     context.res.writeHead(statusCode, {
-        'Content-Type': 'application/octet-stream'
+        'Content-Type': contentType
     })
 
     payload.pipe(context.res)
@@ -76,7 +79,7 @@ export const send = (context: Context, statusCode?: number, payload?: any): void
         return buffer(context, statusCode, payload)
     }
 
-    if (payload instanceof Readable) {
+    if (isReadable(payload)) {
         return stream(context, statusCode, payload)
     }
 
