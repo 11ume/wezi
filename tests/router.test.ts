@@ -18,7 +18,7 @@ test('base path', async (t) => {
     const r = router(
         get('/', greet)
     )
-    const url = await server(r)
+    const url = await server(true, r)
     const res = await fetch(url)
     const body = await res.text()
 
@@ -33,7 +33,7 @@ test('not found', async (t) => {
         , get('/bar', bar)
     )
     const notFound = (c: Context) => c.panic(createError(404))
-    const url = await server(r, notFound)
+    const url = await server(true, r, notFound)
     const res = await fetch(url)
     const body: { message: string } = await res.json()
 
@@ -46,7 +46,7 @@ test('pattern match /(.*)', async (t) => {
     const r = router(
         get('*', greet)
     )
-    const url = await server(r)
+    const url = await server(true, r)
     const res = await fetch(url)
     const resTwo = await fetch(url)
     const body = await res.text()
@@ -80,7 +80,7 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
         , patch('/users', () => responses.patch)
         , del('/users', () => responses.delete)
     )
-    const url = await server(r)
+    const url = await server(true, r)
     const getAllres = await fetch(`${url}/users`)
     const getByIdRes = await fetch(`${url}/users/1`)
     const createRes = await fetch(`${url}/users`, {
@@ -120,7 +120,7 @@ test('different routes whit static paths, method get', async (t) => {
             name: 'bar'
         }))
     )
-    const url = await server(r)
+    const url = await server(true, r)
     const resFoo = await fetch(`${url}/foo`)
     const resBar = await fetch(`${url}/bar`)
 
@@ -138,7 +138,7 @@ test('different routes whit return null', async (t) => {
     const r = router(
         get('/foo', () => null)
     )
-    const url = await server(r)
+    const url = await server(true, r)
     const res = await fetch(`${url}/foo`)
     const body = await res.text()
 
@@ -155,7 +155,7 @@ test('routes with multi params', async (t) => {
     const r = router(
         get('/hello/:foo/:bar', greet)
     )
-    const url = await server(r)
+    const url = await server(true, r)
     const res = await fetch(`${url}/hello/foo/bar`)
     const body = await res.text()
 
@@ -171,7 +171,7 @@ test('multiple matching routes', async (t) => {
         get('/path', withPath)
         , get('/:param', withParam)
     )
-    const url = await server(r)
+    const url = await server(true, r)
     const res = await fetch(`${url}/path`)
     const body = await res.text()
 
@@ -184,7 +184,7 @@ test('match head, match route and return empty body', async (t) => {
     const r = router(
         head('/hello', ping)
     )
-    const url = await server(r)
+    const url = await server(true, r)
     const res = await fetch(`${url}/hello`, {
         method: 'head'
     })
@@ -206,7 +206,7 @@ test('multiple routes handlers', async (t) => {
     const r = router(
         get('/character/:name', checkChar, getChar)
     )
-    const url = await server(r)
+    const url = await server(true, r)
     const res = await fetch(`${url}/character/john`)
     const body = await res.text()
 
@@ -224,7 +224,7 @@ test('multiple routes handlers fail next', async (t) => {
     const r = router(
         post('/character', checkChar, getChar)
     )
-    const url = await server(r)
+    const url = await server(true, r)
     const res = await fetch(`${url}/character`, {
         method: 'post'
         , body: JSON.stringify({

@@ -2,9 +2,9 @@ import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
 import { server, createContext } from '../helpers'
-import { lazy } from '../../'
+import { lazyComposer } from '../../'
 
-const composer = lazy
+const composer = lazyComposer
 
 test('main composer single handler, direct<string:200>', async (t) => {
     const url = await server((req, res) => {

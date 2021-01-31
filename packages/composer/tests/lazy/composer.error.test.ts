@@ -3,9 +3,9 @@ import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
 import { server, createContext } from '../helpers'
-import { lazy } from '../..'
+import { lazyComposer } from '../..'
 
-const composer = lazy
+const composer = lazyComposer
 
 test('main composer end response if all higher are executed, and none of them has ended the response, errorHandler<Error:400>', async (t) => {
     const foo = (c: Context) => c.next()

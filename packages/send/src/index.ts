@@ -31,11 +31,11 @@ export const json = <T = void>(context: Context, payload: T, statusCode = 200): 
     const body = JSON.stringify(payload)
     const type = context.res.getHeader('Content-Type')
     const contentType = type || 'application/json charset=utf-8'
-    const contentlength = Buffer.byteLength(body)
+    const contentLength = Buffer.byteLength(body)
 
     context.res.writeHead(statusCode, {
         'Content-Type': contentType
-        , 'Content-Length': contentlength
+        , 'Content-Length': contentLength
     })
 
     context.res.end(body, null, null)
@@ -44,11 +44,11 @@ export const json = <T = void>(context: Context, payload: T, statusCode = 200): 
 export const text = (context: Context, payload: string, statusCode = 200): void => {
     const type = context.res.getHeader('Content-Type')
     const contentType = type || 'text/plain charset=utf-8'
-    const contentlength = Buffer.byteLength(payload)
+    const contentLength = Buffer.byteLength(payload)
 
     context.res.writeHead(statusCode, {
         'Content-Type': contentType
-        , 'Content-Length': contentlength
+        , 'Content-Length': contentLength
     })
 
     context.res.end(payload, null, null)

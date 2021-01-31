@@ -13,7 +13,7 @@ const methods = [
 ]
 
 test('adds default max age header only for OPTIONS request', async (t) => {
-    const url = await server(cors(), () => null)
+    const url = await server(true, cors(), () => null)
     for (const method of methods) {
         const res = await fetch(url, {
             method: 'OPTIONS'
@@ -27,7 +27,7 @@ test('adds default max age header only for OPTIONS request', async (t) => {
 })
 
 test('adds configured max age header', async t => {
-    const url = await server(cors({
+    const url = await server(true, cors({
         maxAge: 2000
     }), () => null)
 
@@ -40,7 +40,7 @@ test('adds configured max age header', async t => {
 })
 
 test('adds default allow origin header', async t => {
-    const url = await server(cors(), () => null)
+    const url = await server(true, cors(), () => null)
     for (const method of methods) {
         const res = await fetch(url, {
             method
@@ -52,7 +52,7 @@ test('adds default allow origin header', async t => {
 })
 
 test('adds configured allow origin header', async t => {
-    const url = await server(cors({
+    const url = await server(true, cors({
         origin: 'localhost'
     }), () => null)
 
@@ -67,7 +67,7 @@ test('adds configured allow origin header', async t => {
 })
 
 test('adds default allow methods header only for OPTIONS request', async t => {
-    const url = await server(cors(), () => null)
+    const url = await server(true, cors(), () => null)
     for (const method of methods) {
         const res = await fetch(url, {
             method
@@ -82,7 +82,7 @@ test('adds default allow methods header only for OPTIONS request', async t => {
 })
 
 test('adds configured allow methods header', async t => {
-    const url = await server(cors({
+    const url = await server(true, cors({
         allowMethods: ['GET', 'POST']
     }), () => null)
 
@@ -95,7 +95,7 @@ test('adds configured allow methods header', async t => {
 })
 
 test('adds default allow headers header only for OPTIONS request', async t => {
-    const url = await server(cors(), () => null)
+    const url = await server(true, cors(), () => null)
     for (const method of methods) {
         const res = await fetch(url, {
             method
@@ -113,7 +113,7 @@ test('adds default allow headers header only for OPTIONS request', async t => {
 })
 
 test('adds configured allow headers header', async t => {
-    const url = await server(cors({
+    const url = await server(true, cors({
         allowHeaders: ['GET', 'POST']
     }), () => null)
 
@@ -129,7 +129,7 @@ test('adds configured allow headers header', async t => {
 })
 
 test('allows configured expose headers header', async t => {
-    const url = await server(cors({
+    const url = await server(true, cors({
         exposeHeaders: ['GET']
     }), () => null)
 
@@ -147,7 +147,7 @@ test('allows configured expose headers header', async t => {
 })
 
 test('adds allow credentials header by default', async t => {
-    const url = await server(cors(), () => null)
+    const url = await server(true, cors(), () => null)
     for (const method of methods) {
         const res = await fetch(url, {
             method
@@ -159,7 +159,7 @@ test('adds allow credentials header by default', async t => {
 })
 
 test('allows remove allow credentials header', async t => {
-    const url = await server(cors({
+    const url = await server(true, cors({
         allowCredentials: false
     }), () => null)
 
