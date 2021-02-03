@@ -1,2 +1,2 @@
 export * from './src'
-export { Composer } from './src/composer'
+export * from './src/composer'
