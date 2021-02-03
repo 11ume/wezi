@@ -31,7 +31,7 @@ test('server listen no lazy', async (t) => {
     t.is(body, 'hello')
 })
 
-test('no lazy composer', async (t) => {
+test('response before lazy composer reply', async (t) => {
     const handler = ({ res }: Context) => {
         res.end('foo')
         return 'never'
@@ -45,7 +45,7 @@ test('no lazy composer', async (t) => {
     t.is(body, 'foo')
 })
 
-test('no lazy composer throw error', async (t) => {
+test('throw error inside handler', async (t) => {
     const handler = () => {
         throw createError(500, 'something wrong has happened')
     }
@@ -58,7 +58,7 @@ test('no lazy composer throw error', async (t) => {
     t.is(body.message, 'something wrong has happened')
 })
 
-test('no lazy composer throw promise error', async (t) => {
+test('throw promise error inside handler', async (t) => {
     const handler = async () => {
         throw createError(500, 'something wrong has happened')
     }
@@ -71,7 +71,7 @@ test('no lazy composer throw promise error', async (t) => {
     t.is(body.message, 'something wrong has happened')
 })
 
-test('context body parse json', async (t) => {
+test('parse and reply same received json', async (t) => {
     type Character = {
         name: string
     }
@@ -91,7 +91,7 @@ test('context body parse json', async (t) => {
     t.is(body.name, 't800')
 })
 
-test('context body parse buffer', async (t) => {
+test('parse and reply same received buffer', async (t) => {
     const handler = (c: Context) => buffer(c)
 
     const url = await server(true, handler)
@@ -105,7 +105,7 @@ test('context body parse buffer', async (t) => {
     t.is(body, '🐻')
 })
 
-test('context body parse text', async (t) => {
+test('parse and reply same received text', async (t) => {
     const handler = (c: Context) => text(c)
 
     const url = await server(true, handler)
@@ -119,7 +119,7 @@ test('context body parse text', async (t) => {
     t.is(body, '🐻 im a small polar bear')
 })
 
-test('context set response status code', async (t) => {
+test('response only whit status code', async (t) => {
     const handler = ({ res }: Context) => {
         res.statusCode = 420
         res.end()
@@ -131,7 +131,7 @@ test('context set response status code', async (t) => {
     t.is(res.status, 420)
 })
 
-test('context set response status code whit message', async (t) => {
+test('response only whit status code and custom status message', async (t) => {
     const handler = ({ res }: Context) => {
         res.statusCode = 420
         res.statusMessage = 'Enhance your calm'
@@ -145,7 +145,7 @@ test('context set response status code whit message', async (t) => {
     t.is(res.statusText, 'Enhance your calm')
 })
 
-test('context set response status code whitout message', async (t) => {
+test('response only whit status code and whitout custom status message', async (t) => {
     const handler = ({ res }: Context) => {
         res.statusCode = 300
         res.end()
