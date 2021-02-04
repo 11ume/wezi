@@ -9,7 +9,7 @@ type ErrorPayload = {
 };
 
 test('pass to panic empty error', async (t) => {
-    const url = await server(true, (c: Context) => c.panic(new Error()))
+    const url = await server((c: Context) => c.panic(new Error()))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -18,7 +18,7 @@ test('pass to panic empty error', async (t) => {
 })
 
 test('pass to panic random error whit message', async (t) => {
-    const url = await server(true, (c: Context) => c.panic(new Error('error message')))
+    const url = await server((c: Context) => c.panic(new Error('error message')))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -27,7 +27,7 @@ test('pass to panic random error whit message', async (t) => {
 })
 
 test('create custom error and call panic fn only whit code', async (t) => {
-    const url = await server(true, (c: Context) => c.panic(createError(420)))
+    const url = await server((c: Context) => c.panic(createError(420)))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -36,7 +36,7 @@ test('create custom error and call panic fn only whit code', async (t) => {
 })
 
 test('create custom error and call panic whit code and message', async (t) => {
-    const url = await server(true, (c: Context) => c.panic(createError(418, 'im a teapot')))
+    const url = await server((c: Context) => c.panic(createError(418, 'im a teapot')))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -45,7 +45,7 @@ test('create custom error and call panic whit code and message', async (t) => {
 })
 
 test('create custom error and pass this error to panic fn, whit multiple handlers combine next and panic', async (t) => {
-    const url = await server(true, (c: Context) => c.next(), (c: Context) => c.panic(createError(420)), () => 'never')
+    const url = await server((c: Context) => c.next(), (c: Context) => c.panic(createError(420)), () => 'never')
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 

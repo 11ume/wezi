@@ -3,7 +3,6 @@ import listen from 'test-listen'
 import { Context } from 'wezi-types'
 
 export const server = (handler: RequestListener) => listen(http.createServer(handler))
-
 export const createContext = ({
     req
     , res

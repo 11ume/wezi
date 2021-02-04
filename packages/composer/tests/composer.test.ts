@@ -1,8 +1,8 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import { Context } from 'wezi-types'
-import { server, createContext } from '../helpers'
-import { lazyComposer } from '../../'
+import { server, createContext } from './helpers'
+import { lazyComposer } from '../'
 
 const composer = lazyComposer
 
