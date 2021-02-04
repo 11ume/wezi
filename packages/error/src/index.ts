@@ -9,4 +9,4 @@ export class InternalError extends Error {
     }
 }
 
-export const createError = (status: number, message?: string, error?: Error): InternalError => new InternalError(message, status, error)
+export const createError = (code: number, message?: string, error?: Error): InternalError => new InternalError(message, code, error)
