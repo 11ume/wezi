@@ -1,23 +1,8 @@
-import * as send from 'wezi-send'
 import { Context, Handler } from 'wezi-types'
+import { reply, replyPromise } from './reply'
 import { isPromise } from './utils'
 
-const reply = (context: Context, value: unknown): void => {
-    if (value === null) {
-        send.empty(context, 204)
-        return
-    }
-
-    if (value !== undefined) {
-        send.send(context, context.res.statusCode, value)
-    }
-}
-
-const replyPromise = (context: Context, value: Promise<unknown>): Promise<void> => value
-    .then((val: unknown) => reply(context, val))
-    .catch(context.panic)
-
-export const executeNoLazy = (context: Context, handler: Handler, payload: unknown | Promise<unknown>): void => {
+export const executeHandlerNoLazy = (context: Context, handler: Handler, payload: unknown | Promise<unknown>): void => {
     try {
         const value = handler(context, payload)
         if (value && isPromise(value)) {
