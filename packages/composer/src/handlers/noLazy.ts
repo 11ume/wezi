@@ -1,5 +1,5 @@
 import { Context, Handler } from 'wezi-types'
-import { isPromise } from './utils'
+import { isPromise } from './common/utils'
 
 export const executeNoLazy = (context: Context, handler: Handler, payload: unknown | Promise<unknown>): void => {
     try {

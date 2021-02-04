@@ -1,6 +1,6 @@
 import * as send from 'wezi-send'
 import { Context, Handler } from 'wezi-types'
-import { isPromise } from './utils'
+import { isPromise } from './common/utils'
 
 const reply = (context: Context, value: unknown): void => {
     if (value === null) {

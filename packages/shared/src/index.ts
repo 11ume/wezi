@@ -1,6 +1,5 @@
 import { IncomingMessage } from 'http'
 import { Context } from 'wezi-types'
-import createError from 'wezi-error'
 
 type SharedWeakMap = WeakMap<IncomingMessage, any>
 
@@ -19,18 +18,18 @@ const set = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K ext
 const get = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K): T[K] => {
     const obj = weakmap.get(context.req)
     if (key in obj) return obj[key]
-    throw createError(500, `get sharable value error, key: ${key} don't exists`)
+    return undefined
 }
 
-const remove = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K): void => {
+const remove = <E>(context: Context, weakmap: SharedWeakMap) => <T extends E, K extends keyof T>(key: K): boolean => {
     const obj = weakmap.get(context.req)
     if (key in obj) {
         delete obj[key]
         weakmap.set(context.req, obj)
-        return
+        return true
     }
 
-    throw createError(500, `remove sharable value error, key: ${key} don't exists`)
+    return false
 }
 
 const values = <E>(context: Context, weakmap: SharedWeakMap) => (): E => weakmap.get(context.req)
@@ -45,4 +44,3 @@ export const shared = <E>(context: Context) => {
         , values: values<E>(context, weakmap)
     }
 }
-

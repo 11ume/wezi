@@ -29,37 +29,37 @@ test('pass to panic empty error', async (t) => {
 })
 
 test('pass to panic random error whit message', async (t) => {
-    const url = await server(true, (c: Context) => c.panic(new Error('opps')))
+    const url = await server(true, (c: Context) => c.panic(new Error('error message')))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
     t.is(res.status, 500)
-    t.is(body.message, 'opps')
+    t.is(body.message, 'error message')
 })
 
-test('create and pass to next http error', async (t) => {
+test('create custom error and call panic fn only whit code', async (t) => {
     const url = await server(true, (c: Context) => c.panic(createError(420)))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
     t.is(res.status, 420)
-    t.is(body.message, 'Enhance Your Calm')
+    t.is(body.message, 'unknown')
 })
 
-test('create and pass to panic http error whit custom status code and message', async (t) => {
-    const url = await server(true, (c: Context) => c.panic(createError(418, 'Im a teapot')))
+test('create custom error and call panic whit code and message', async (t) => {
+    const url = await server(true, (c: Context) => c.panic(createError(418, 'im a teapot')))
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
     t.is(res.status, 418)
-    t.is(body.message, 'Im a teapot')
+    t.is(body.message, 'im a teapot')
 })
 
-test('create and pass http error to panic, whit multiple handlers combine next and panic', async (t) => {
-    const url = await server(true, (c: Context) => c.next(), (c: Context) => c.panic(createError(420)), () => 'not')
+test('create custom error and pass this error to panic fn, whit multiple handlers combine next and panic', async (t) => {
+    const url = await server(true, (c: Context) => c.next(), (c: Context) => c.panic(createError(420)), () => 'never')
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
     t.is(res.status, 420)
-    t.is(body.message, 'Enhance Your Calm')
+    t.is(body.message, 'unknown')
 })

@@ -4,7 +4,7 @@ import { InternalError, createError } from 'wezi-error'
 import { isProduction } from './utils'
 
 export const errorHandler = (context: Context, error: Partial<InternalError>): void => {
-    const status = error.statusCode ?? 500
+    const status = error.code ?? 500
     const message = error.message || 'unknown'
     const payload = {
         message
