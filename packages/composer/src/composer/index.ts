@@ -42,7 +42,7 @@ const createContext = (context: Context, dispatch: Dispatch, errorHandler: Error
     }
 }
 
-export const createComposer = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHandler: ExecuteHandler): Composer => (main: boolean, ...handlers: Handler[]): Dispatch => {
+export const createComposer = (errorHandler: ErrorHandler, endHandler: EndHandler, executeHandler: ExecuteHandler): Composer => (main: boolean, ...handlers: Handler[]): Dispatch => {
     let inc = 0
     return function dispatch(context: Context, payload?: unknown): void {
         if (inc < handlers.length) {

@@ -13,7 +13,7 @@ test('redirect response', async (t) => {
         redirect(c, '/redirect')
     }
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     t.true(res.redirected)
 })

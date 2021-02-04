@@ -14,7 +14,7 @@ import {
 test('send text string message', async (t) => {
     const fn = (c: Context) => send(c, 200, 'hello')
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body = await res.text()
 
@@ -26,7 +26,7 @@ test('send text string message', async (t) => {
 test('send text number message', async (t) => {
     const fn = (c: Context) => send(c, 200, 1)
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body = await res.text()
 
@@ -40,7 +40,7 @@ test('send json message', async (t) => {
         message: 'hello'
     })
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body: { message: string } = await res.json()
 
@@ -53,7 +53,7 @@ test('send json message', async (t) => {
 test('send empty', async (t) => {
     const fn = (c: Context) => empty(c)
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     t.is(res.status, 204)
 })
@@ -63,7 +63,7 @@ test('send payload whit status code', async (t) => {
         message: 'hello'
     })
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body: { message: string } = await res.json()
 
@@ -76,7 +76,7 @@ test('send payload whit status code', async (t) => {
 test('send direct lazy message', async (t) => {
     const fn = () => 'hello'
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body = await res.text()
 
@@ -91,7 +91,7 @@ test('send direct lazy json', async (t) => {
         message: 'hello'
     })
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body: { message: string } = await res.json()
 
@@ -104,7 +104,7 @@ test('send direct lazy json', async (t) => {
 test('send direct lazy buffer', async (t) => {
     const fn = () => Buffer.from('foo')
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body = await res.text()
 
@@ -124,7 +124,7 @@ test('send direct lazy readable', async (t) => {
 
     const fn = () => readable
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body = await res.text()
 
@@ -136,7 +136,7 @@ test('send direct lazy readable', async (t) => {
 test('send direct lazy Not Content 204', async (t) => {
     const fn = () => null
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
 
     t.is(res.status, 204)
@@ -150,7 +150,7 @@ test('send stream readable', async (t) => {
     readable.push(null)
 
     const fn = (c: Context) => stream(c, 200, readable)
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body = await res.text()
 
@@ -163,7 +163,7 @@ test('send file read stream', async (t) => {
     const readable = fs.createReadStream('./package.json')
     const fn = (c: Context) => stream(c, 200, readable)
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body: { repository: string } = await res.json()
 
@@ -175,7 +175,7 @@ test('send file read stream', async (t) => {
 test('send buffer', async (t) => {
     const fn = (c: Context) => buffer(c, 200, Buffer.from('foo'))
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body = await res.text()
 
@@ -192,7 +192,7 @@ test('send must throws error when is invoked whit invalid content', async (t) =>
 
     const fn = (c: Context) => send(c, 400, Symbol('test'))
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 

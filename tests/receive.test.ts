@@ -23,7 +23,7 @@ test('receive json', async (t) => {
     ]
 
     const fn = async (c: Context) => json<Character[]>(c)
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url, {
         method: 'POST'
         , body: JSON.stringify(chars)
@@ -43,7 +43,7 @@ test('json parse error', async (t) => {
         }
     }
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const { status } = await fetch(url, {
         method: 'POST'
         , body: '{ "bad json" }'
@@ -61,7 +61,7 @@ test('receive buffer', async (t) => {
         t.true(Buffer.isBuffer(body))
         return body
     }
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url, {
         method: 'POST'
         , body: Buffer.from('🐻')
@@ -73,7 +73,7 @@ test('receive buffer', async (t) => {
 
 test('receive text', async (t) => {
     const fn = async (c: Context) => text(c)
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url, {
         method: 'POST'
         , body: '🐻 im a grizzly bear'
@@ -85,7 +85,7 @@ test('receive text', async (t) => {
 
 test('json should throw 400 on empty body with no headers', async (t) => {
     const fn = async (c: Context) => json(c)
-    const url = await server(true, fn)
+    const url = await server(fn)
 
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
@@ -102,7 +102,7 @@ test('json cache works', async (t) => {
         c.res.end()
     }
 
-    const url = await server(true, fn)
+    const url = await server(fn)
     const res = await fetch(url, {
         method: 'POST'
         , body: JSON.stringify({

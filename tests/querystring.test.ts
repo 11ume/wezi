@@ -15,7 +15,7 @@ test('get query string params', async (t) => {
         const query = queryParser<Query>(c)
         return `${query.name} ${query.surname}`
     }
-    const url = await server(true, greet)
+    const url = await server(greet)
     const res = await fetch(`${url}/users?name=foo&surname=bar`)
     const body = await res.text()
 
@@ -35,7 +35,7 @@ test('get query string params whit router flow', async (t) => {
     const r = router(
         get('/users', greet)
     )
-    const url = await server(true, r)
+    const url = await server(r)
     const res = await fetch(`${url}/users?name=foo&surname=bar`)
     const body = await res.text()
 

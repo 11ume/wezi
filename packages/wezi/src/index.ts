@@ -1,11 +1,11 @@
 import http, { Server, IncomingMessage, ServerResponse } from 'http'
 import { Context, Handler, ComposerHandler, ComposerHandlerMix } from 'wezi-types'
-import { Composer, $composer, lazyComposer, noLazyComposer } from 'wezi-composer'
+import { Composer, $composer, lazyComposer } from 'wezi-composer'
 
-type Compose = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
+type ComposeHandlers = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
 
 type ListenOptions = {
-    lazy?: boolean
+    port?: number
     , composer?: Composer
 }
 
@@ -23,8 +23,15 @@ const composeHandlers = (composer: Composer, handlers: ComposerHandlerMix[]) => 
     return handler
 })
 
-export function wezi(...handlers: (ComposerHandler | Handler)[]): Compose
-export function wezi(...handlers: any[]): Compose {
+export const listen = (compose: ComposeHandlers, { port = 3000, composer }: ListenOptions = {}): Server => {
+    const run = composer ? compose(composer) : compose(lazyComposer)
+    const server = http.createServer(run)
+    server.listen(port)
+    return server
+}
+
+export function wezi(...handlers: (ComposerHandler | Handler)[]): ComposeHandlers
+export function wezi(...handlers: any[]): ComposeHandlers {
     return (composer: Composer) => {
         const composedHandlers = composeHandlers(composer, handlers)
         return (req: IncomingMessage, res: ServerResponse): void => {
@@ -32,12 +39,5 @@ export function wezi(...handlers: any[]): Compose {
             dispatch(createContext(req, res))
         }
     }
-}
-
-export const listen = (compose: Compose, port = 3000, { lazy = true }: ListenOptions = {}): Server => {
-    const run = lazy ? compose(lazyComposer) : compose(noLazyComposer)
-    const server = http.createServer(run)
-    server.listen(port)
-    return server
 }
 
