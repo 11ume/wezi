@@ -1,6 +1,5 @@
 import test from 'ava'
 import { shared } from '..'
-import { InternalError } from 'wezi-error'
 
 type Sharable = {
     foo: string
@@ -29,9 +28,8 @@ test('set same propery', (t) => {
 
 test('get inexistent propery key', (t) => {
     const sharable = shared<Sharable>(pointer as any)
-    const err: InternalError = t.throws(() => sharable.get('baz'))
-    t.is(err.statusCode, 500)
-    t.is(err.message, 'get sharable value error, key: baz don\'t exists')
+    const value = sharable.get('baz')
+    t.is(value, undefined)
 })
 
 test('remove propery', (t) => {
@@ -39,15 +37,14 @@ test('remove propery', (t) => {
     sharable.set('foo', '123')
     const value = sharable.get('foo')
     t.is(value, '123')
-    const removed = sharable.remove('foo')
-    t.is(removed, undefined)
+    const result = sharable.remove('foo')
+    t.true(result)
 })
 
 test('remove inexistent propery', (t) => {
     const sharable = shared<Sharable>(pointer as any)
-    const err: InternalError = t.throws(() => sharable.remove('baz'))
-    t.is(err.statusCode, 500)
-    t.is(err.message, 'remove sharable value error, key: baz don\'t exists')
+    const value = sharable.remove('baz')
+    t.false(value)
 })
 
 test('get all values', (t) => {

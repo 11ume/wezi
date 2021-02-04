@@ -38,7 +38,7 @@ test('not found', async (t) => {
     const body: { message: string } = await res.json()
 
     t.is(res.status, 404)
-    t.is(body.message, 'Not Found')
+    t.is(body.message, 'unknown')
 })
 
 test('pattern match /(.*)', async (t) => {

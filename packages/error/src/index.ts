@@ -1,18 +1,12 @@
-import codes from './codes'
-
 export class InternalError extends Error {
-    constructor(
-        public readonly message: string
-        , public readonly statusCode?: number
-        , public readonly originalError?: Error) {
+    readonly code: number
+    readonly message: string
+    readonly originalError: Error
+    constructor(message: string, code?: number, originalError?: Error) {
         super(message)
+        this.code = code
+        this.originalError = originalError
     }
 }
 
-export const createError = (status: number, message?: string, error?: Error): InternalError => {
-    const msg = message || codes[status]
-    if (status > 511 || status < 100) {
-        throw new Error(`Invalid status code ${status}`)
-    }
-    return new InternalError(msg, status, error)
-}
+export const createError = (code: number, message?: string, error?: Error): InternalError => new InternalError(message, code, error)

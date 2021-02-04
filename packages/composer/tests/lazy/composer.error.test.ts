@@ -25,7 +25,7 @@ test('main composer end response if all higher are executed, and none of them ha
 
     t.is(res.status, 404)
     t.deepEqual(body, {
-        message: 'Not Found'
+        message: 'unknown'
     })
 })
 
@@ -47,7 +47,7 @@ test('main composer multi handler async, direct promise error return in first ha
 
     t.is(res.status, 400)
     t.deepEqual(body, {
-        message: 'Bad Request'
+        message: 'unknown'
     })
 })
 
@@ -69,7 +69,7 @@ test('main composer multi handler async, direct promise error return in second h
 
     t.is(res.status, 400)
     t.deepEqual(body, {
-        message: 'Bad Request'
+        message: 'unknown'
     })
 })
 
