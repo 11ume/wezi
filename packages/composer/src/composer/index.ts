@@ -8,6 +8,7 @@ import {
 } from 'wezi-types'
 
 export type Composer = (main: boolean, ...handlers: Handler[]) => Dispatch
+export type ComposerCreator = (errHandler?: ErrorHandler) => Composer
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 export type ErrorHandler = (context: Context, error: Error) => void
 export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void

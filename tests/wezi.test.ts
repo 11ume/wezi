@@ -3,7 +3,7 @@ import fetch from 'node-fetch'
 import wezi, { listen } from 'wezi'
 import { Context } from 'wezi-types'
 import { text, json, buffer } from 'wezi-receive'
-import { server } from './helpers'
+import { server, serverError } from './helpers'
 import createError from 'wezi-error'
 
 test('server listen lazy', async (t) => {
@@ -14,6 +14,53 @@ test('server listen lazy', async (t) => {
     const body = await res.text()
 
     t.is(body, 'hello')
+})
+
+test('create custom error handler and throw error inside handler whit listen fn', async (t) => {
+    const w = wezi(() => {
+        throw createError(400, 'Bad Request')
+    })
+
+    const errorHandler = (c: Context, error: Error) => {
+        const message = error.message
+        c.res.statusCode = 400
+        c.res.end(message)
+    }
+
+    const promListen = () => new Promise((r) => {
+        const ln = listen(w, {
+            port: 3001
+            , errorHandler
+        })
+
+        ln.on('listening', r)
+    })
+
+    await promListen()
+    const res = await fetch('http://localhost:3001')
+    const message = await res.text()
+
+    t.is(res.status, 400)
+    t.is(message, 'Bad Request')
+})
+
+test('create custom error handler and throw error inside handler', async (t) => {
+    const handler = () => {
+        throw createError(500, 'something wrong has happened')
+    }
+
+    const errorHandler = (c: Context, error: Error) => {
+        const message = error.message
+        c.res.statusCode = 500
+        c.res.end(message)
+    }
+
+    const url = await serverError(errorHandler, handler)
+    const res = await fetch(url)
+    const message = await res.text()
+
+    t.is(res.status, 500)
+    t.is(message, 'something wrong has happened')
 })
 
 test('throw error inside handler', async (t) => {

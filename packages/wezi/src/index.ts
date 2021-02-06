@@ -1,12 +1,19 @@
 import http, { Server, IncomingMessage, ServerResponse } from 'http'
 import { Context, Handler, ComposerHandler, ComposerHandlerMix } from 'wezi-types'
-import { Composer, $composer, lazyComposer } from 'wezi-composer'
+import {
+    Composer
+    , ComposerCreator
+    , ErrorHandler
+    , lazyComposer
+    , $composer
+} from 'wezi-composer'
 
 type ComposeHandlers = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
 
 type ListenOptions = {
     port?: number
-    , composer?: Composer
+    , composer?: ComposerCreator
+    , errorHandler?: ErrorHandler
 }
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
@@ -23,8 +30,8 @@ const composeHandlers = (composer: Composer, handlers: ComposerHandlerMix[]) => 
     return handler
 })
 
-export const listen = (compose: ComposeHandlers, { port = 3000, composer }: ListenOptions = {}): Server => {
-    const run = composer ? compose(composer) : compose(lazyComposer)
+export const listen = (compose: ComposeHandlers, { port = 3000, composer, errorHandler }: ListenOptions = {}): Server => {
+    const run = composer ? compose(composer(errorHandler)) : compose(lazyComposer(errorHandler))
     const server = http.createServer(run)
     server.listen(port)
     return server
@@ -40,4 +47,3 @@ export function wezi(...handlers: any[]): ComposeHandlers {
         }
     }
 }
-
