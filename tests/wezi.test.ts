@@ -7,7 +7,7 @@ import { server, serverError } from './helpers'
 import createError from 'wezi-error'
 
 test('server listen lazy', async (t) => {
-    const w = wezi(() => 'hello')
+    const w = wezi(null, () => 'hello')
 
     listen(w)
     const res = await fetch('http://localhost:3000')
@@ -17,20 +17,21 @@ test('server listen lazy', async (t) => {
 })
 
 test('create custom error handler and throw error inside handler whit listen fn', async (t) => {
-    const w = wezi(() => {
-        throw createError(400, 'Bad Request')
-    })
-
     const errorHandler = (c: Context, error: Error) => {
         const message = error.message
         c.res.statusCode = 400
         c.res.end(message)
     }
 
+    const fail = () => {
+        throw createError(400, 'Bad Request')
+    }
+
+    const w = wezi(errorHandler, fail)
+
     const promListen = () => new Promise((r) => {
         const ln = listen(w, {
             port: 3001
-            , errorHandler
         })
 
         ln.on('listening', r)

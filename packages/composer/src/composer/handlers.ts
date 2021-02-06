@@ -1,8 +1,9 @@
 import * as send from 'wezi-send'
-import { Context, ErrorHandler } from 'wezi-types'
+import { Context } from 'wezi-types'
 import { InternalError, createError } from 'wezi-error'
+import { ErrorHandler } from '.'
 
-export const errorHandler = (context: Context, error: Partial<InternalError>): void => {
+export const defaultErrorHandler = (context: Context, error: Partial<InternalError>): void => {
     const status = error.code ?? 500
     const message = error.message || 'unknown'
     const payload = {
@@ -12,7 +13,7 @@ export const errorHandler = (context: Context, error: Partial<InternalError>): v
     send.json(context, payload, status)
 }
 
-export const endHandler = (context: Context, handler: ErrorHandler): void => {
+export const defaultEndHandler = (context: Context, handleError: ErrorHandler): void => {
     const err = createError(404)
-    handler(context, err)
+    handleError(context, err)
 }

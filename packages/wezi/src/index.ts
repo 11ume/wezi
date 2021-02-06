@@ -2,7 +2,7 @@ import http, { Server, IncomingMessage, ServerResponse } from 'http'
 import { Context, Handler, ComposerHandler, ComposerHandlerMix } from 'wezi-types'
 import {
     Composer
-    , ComposerCreator
+    , Prepare
     , ErrorHandler
     , lazyComposer
     , $composer
@@ -12,8 +12,7 @@ type ComposeHandlers = (composer: Composer) => (req: IncomingMessage, res: Serve
 
 type ListenOptions = {
     port?: number
-    , composer?: ComposerCreator
-    , errorHandler?: ErrorHandler
+    , composer?: Composer
 }
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
@@ -25,24 +24,25 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     }
 }
 
-const composeHandlers = (composer: Composer, handlers: ComposerHandlerMix[]) => handlers.map((handler) => {
-    if (handler.id === $composer) return handler(composer)
+const composeHandlers = (prepare: Prepare, handlers: ComposerHandlerMix[]) => handlers.map((handler) => {
+    if (handler.id === $composer) return handler(prepare)
     return handler
 })
 
-export const listen = (compose: ComposeHandlers, { port = 3000, composer, errorHandler }: ListenOptions = {}): Server => {
-    const run = composer ? compose(composer(errorHandler)) : compose(lazyComposer(errorHandler))
+export const listen = (compose: ComposeHandlers, { port = 3000, composer }: ListenOptions = {}): Server => {
+    const run = composer ? compose(composer) : compose(lazyComposer)
     const server = http.createServer(run)
     server.listen(port)
     return server
 }
 
-export function wezi(...handlers: (ComposerHandler | Handler)[]): ComposeHandlers
-export function wezi(...handlers: any[]): ComposeHandlers {
+export function wezi(errorHandler: ErrorHandler, ...handlers: (ComposerHandler | Handler)[]): ComposeHandlers
+export function wezi(errorHandler: ErrorHandler, ...handlers: any[]): ComposeHandlers {
     return (composer: Composer) => {
-        const composedHandlers = composeHandlers(composer, handlers)
+        const prepare = composer(errorHandler)
+        const composedHandlers = composeHandlers(prepare, handlers)
         return (req: IncomingMessage, res: ServerResponse): void => {
-            const dispatch = composer(true, ...composedHandlers)
+            const dispatch = prepare(true, ...composedHandlers)
             dispatch(createContext(req, res))
         }
     }

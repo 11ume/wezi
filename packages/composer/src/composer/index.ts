@@ -1,4 +1,5 @@
 import { createError } from 'wezi-error'
+import { defaultErrorHandler } from './handlers'
 import {
     Next
     , Panic
@@ -7,8 +8,8 @@ import {
     , Dispatch
 } from 'wezi-types'
 
-export type Composer = (main: boolean, ...handlers: Handler[]) => Dispatch
-export type ComposerCreator = (errHandler?: ErrorHandler) => Composer
+export type Prepare = (main: boolean, ...handlers: Handler[]) => Dispatch
+export type Composer = (errorHandlerCustom: ErrorHandler) => (main: boolean, ...handlers: Handler[]) => Dispatch
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 export type ErrorHandler = (context: Context, error: Error) => void
 export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
@@ -43,16 +44,18 @@ const createContext = (context: Context, dispatch: Dispatch, errorHandler: Error
     }
 }
 
-export const createComposer = (errorHandler: ErrorHandler, endHandler: EndHandler, executeHandler: ExecuteHandler): Composer => (main: boolean, ...handlers: Handler[]): Dispatch => {
-    let inc = 0
-    return function dispatch(context: Context, payload?: unknown): void {
-        if (inc < handlers.length) {
-            const handler = handlers[inc++]
-            const newContext = createContext(context, dispatch, errorHandler)
-            setImmediate(executeHandler, newContext, handler, payload)
-            return
-        }
+export const createComposer = (errorHandler: ErrorHandler, endHandler: EndHandler, executeHandler: ExecuteHandler) =>
+    (customErrorHandler: ErrorHandler = defaultErrorHandler) => (main: boolean, ...handlers: Handler[]): Dispatch => {
+        let inc = 0
+        const errHandler = errorHandler ?? customErrorHandler
+        return function dispatch(context: Context, payload?: unknown): void {
+            if (inc < handlers.length) {
+                const handler = handlers[inc++]
+                const newContext = createContext(context, dispatch, errHandler)
+                setImmediate(executeHandler, newContext, handler, payload)
+                return
+            }
 
-        main && setImmediate(endHandler, context, errorHandler)
+            main && setImmediate(endHandler, context, errHandler)
+        }
     }
-}
