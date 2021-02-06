@@ -7,10 +7,9 @@
 
 ```ts
 import wezi, { Context, listen } from 'wezi'
-import { shared } from 'wezi-shared'
+import { shared } from '..'
 
 type Sharable = {
-    session: string
     user: {
         name: string
         surname: string
@@ -18,23 +17,20 @@ type Sharable = {
 }
 
 const pass = (c: Context) => {
-    const sd = shared.set<Sharable>(c)
-    sd.set('session', '123')
+    const sd = shared<Sharable>(c)
     sd.set('user', {
         name: 'foo'
         , surname: 'bar'
     })
     c.next()
-}    
+}
 
 const greet = (c: Context) => {
-    const sd = shared.get<Sharable>(c)
+    const sd = shared<Sharable>(c)
     const user = sd.get('user')
-    const session = sd.get('session')
-    return `session: ${session} ${user.name} ${user.surname}`
+    return `user: ${user.name} ${user.surname}`
 }
 
 listen(wezi(pass, greet))
-
 ```
 
