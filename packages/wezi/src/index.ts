@@ -2,18 +2,18 @@ import http, { Server, IncomingMessage, ServerResponse } from 'http'
 import { Context, Handler, ComposerHandler, ComposerHandlerMix } from 'wezi-types'
 import {
     Composer
-    , Prepare
+    , PrepareComposer
     , ErrorHandler
     , lazyComposer
     , $composer
 } from 'wezi-composer'
 
-type ComposeHandlers = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
-
 type ListenOptions = {
     port?: number
     , composer?: Composer
 }
+
+type WeziCompose = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
@@ -24,20 +24,20 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     }
 }
 
-const composeHandlers = (prepare: Prepare, handlers: ComposerHandlerMix[]) => handlers.map((handler) => {
+const composeHandlers = (prepare: PrepareComposer, handlers: ComposerHandlerMix[]) => handlers.map((handler) => {
     if (handler.id === $composer) return handler(prepare)
     return handler
 })
 
-export const listen = (compose: ComposeHandlers, { port = 3000, composer }: ListenOptions = {}): Server => {
-    const run = composer ? compose(composer) : compose(lazyComposer)
+export const listen = (weziCompose: WeziCompose, { port = 3000, composer }: ListenOptions = {}): Server => {
+    const run = composer ? weziCompose(composer) : weziCompose(lazyComposer)
     const server = http.createServer(run)
     server.listen(port)
     return server
 }
 
-export function wezi(errorHandler: ErrorHandler, ...handlers: (ComposerHandler | Handler)[]): ComposeHandlers
-export function wezi(errorHandler: ErrorHandler, ...handlers: any[]): ComposeHandlers {
+export function wezi(errorHandler: ErrorHandler, ...handlers: (ComposerHandler | Handler)[]): WeziCompose
+export function wezi(errorHandler: ErrorHandler, ...handlers: any[]): WeziCompose {
     return (composer: Composer) => {
         const prepare = composer(errorHandler)
         const composedHandlers = composeHandlers(prepare, handlers)

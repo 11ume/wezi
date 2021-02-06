@@ -1,4 +1,4 @@
-import { Prepare, $composer } from 'wezi-composer'
+import { PrepareComposer, $composer } from 'wezi-composer'
 import { Context, Handler, ComposerHandler } from 'wezi-types'
 import matchit, { Matcher, Found } from 'matchit-radix-tree'
 
@@ -15,7 +15,7 @@ const replyHead = (context: Context): void => {
     context.res.end(null, null, null)
 }
 
-const dispatchRoute = (found: Found, prepare: Prepare, context: Context): void => {
+const dispatchRoute = (found: Found, prepare: PrepareComposer, context: Context): void => {
     if (context.req.method === 'HEAD') {
         replyHead(context)
         return
@@ -31,7 +31,7 @@ const dispatchRoute = (found: Found, prepare: Prepare, context: Context): void =
     dispatch(context, found.params)
 }
 
-const findRouteMatch = (matcher: Matcher, prepare: Prepare) => (context: Context, payload: unknown): void => {
+const findRouteMatch = (matcher: Matcher, prepare: PrepareComposer) => (context: Context, payload: unknown): void => {
     const found = matcher.lookup(context.req.method, context.req.url)
     if (found) {
         dispatchRoute(found, prepare, context)
@@ -46,7 +46,7 @@ const prepareRouterStack = (matcher: Matcher, entities: RouteEntity[]) => entiti
         matcher.create(entity.method, entity.path, ...entity.handlers)
     })
 
-const prepareRoutes = (matcher: Matcher, entities: RouteEntity[], prepare: Prepare) => {
+const prepareRoutes = (matcher: Matcher, entities: RouteEntity[], prepare: PrepareComposer) => {
     prepareRouterStack(matcher, entities)
     return findRouteMatch(matcher, prepare)
 }
@@ -60,7 +60,7 @@ const createRouteEntity = (method: string) => (path: string, ...handlers: Handle
 }
 
 export const createRouter = (...entities: RouteEntity[]) => {
-    const match: ComposerHandler = (prepare: Prepare) => {
+    const match: ComposerHandler = (prepare: PrepareComposer) => {
         const matcher = matchit()
         return prepareRoutes(matcher, entities, prepare)
     }

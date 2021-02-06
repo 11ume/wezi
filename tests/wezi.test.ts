@@ -1,10 +1,11 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import wezi, { listen } from 'wezi'
-import { Context } from 'wezi-types'
-import { text, json, buffer } from 'wezi-receive'
-import { server, serverError } from './helpers'
 import createError from 'wezi-error'
+import { Context, Handler } from 'wezi-types'
+import { text, json, buffer } from 'wezi-receive'
+import { createComposer } from 'wezi-composer'
+import { server, serverError } from './helpers'
 
 test('server listen lazy', async (t) => {
     const w = wezi(null, () => 'hello')
@@ -177,3 +178,19 @@ test('response only whit status code and whitout custom status message', async (
     t.is(res.statusText, 'Multiple Choices')
 })
 
+test('create custom composer', async (t) => {
+    const w = wezi(null, () => 'hello')
+    const execute = (context: Context, handler: Handler) => {
+        const val = handler(context)
+        context.res.end(val)
+    }
+    const composer = createComposer(null, null, execute)
+    listen(w, {
+        port: 3004
+        , composer
+    })
+    const res = await fetch('http://localhost:3004')
+    const body = await res.text()
+
+    t.is(body, 'hello')
+})

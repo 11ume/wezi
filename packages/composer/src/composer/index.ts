@@ -8,11 +8,16 @@ import {
     , Dispatch
 } from 'wezi-types'
 
-export type Prepare = (main: boolean, ...handlers: Handler[]) => Dispatch
 export type Composer = (errorHandlerCustom: ErrorHandler) => (main: boolean, ...handlers: Handler[]) => Dispatch
+export type PrepareComposer = (main: boolean, ...handlers: Handler[]) => Dispatch
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 export type ErrorHandler = (context: Context, error: Error) => void
+export type ErrorHandlerPatch = (context: Context, error: Error, errorHandler: ErrorHandler) => void
 export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
+
+const patchErrorHandler = (errorHandler: ErrorHandlerPatch, customErrorHandler: ErrorHandler) => (context: Context, error: Error) => {
+    errorHandler(context, error, customErrorHandler)
+}
 
 const createNext = (context: Context, dispatch: Dispatch): Next => {
     return function next(payload?: unknown): void {
@@ -44,10 +49,11 @@ const createContext = (context: Context, dispatch: Dispatch, errorHandler: Error
     }
 }
 
-export const createComposer = (errorHandler: ErrorHandler, endHandler: EndHandler, executeHandler: ExecuteHandler) =>
+export const createComposer = (errorHandler: ErrorHandlerPatch, endHandler: EndHandler, executeHandler: ExecuteHandler) =>
     (customErrorHandler: ErrorHandler = defaultErrorHandler) => (main: boolean, ...handlers: Handler[]): Dispatch => {
+        const errHandler = errorHandler ? patchErrorHandler(errorHandler, customErrorHandler) : customErrorHandler
         let inc = 0
-        const errHandler = errorHandler ?? customErrorHandler
+
         return function dispatch(context: Context, payload?: unknown): void {
             if (inc < handlers.length) {
                 const handler = handlers[inc++]
