@@ -1,16 +1,16 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import wezi, { listen } from 'wezi'
-import createError from 'wezi-error'
+import createError, { InternalError } from 'wezi-error'
 import { Context, Handler } from 'wezi-types'
 import { text, json, buffer } from 'wezi-receive'
-import { createComposer } from 'wezi-composer'
+import { createComposer, ErrorHandler } from 'wezi-composer'
 import { server, serverError } from './helpers'
 
 test('server listen lazy', async (t) => {
-    const w = wezi(null, () => 'hello')
+    const w = wezi(() => 'hello')
 
-    listen(w)
+    listen(w())
     const res = await fetch('http://localhost:3000')
     const body = await res.text()
 
@@ -28,10 +28,10 @@ test('create custom error handler and throw error inside handler whit listen fn'
         throw createError(400, 'Bad Request')
     }
 
-    const w = wezi(errorHandler, fail)
+    const w = wezi(fail)
 
     const promListen = () => new Promise((r) => {
-        const ln = listen(w, {
+        const ln = listen(w(errorHandler), {
             port: 3001
         })
 
@@ -179,13 +179,13 @@ test('response only whit status code and whitout custom status message', async (
 })
 
 test('create custom composer', async (t) => {
-    const w = wezi(null, () => 'hello')
-    const execute = (context: Context, handler: Handler) => {
-        const val = handler(context)
-        context.res.end(val)
+    const w = wezi(() => 'hello')
+    const execute = (c: Context, handler: Handler) => {
+        const val = handler(c)
+        c.res.end(val)
     }
     const composer = createComposer(null, null, execute)
-    listen(w, {
+    listen(w(), {
         port: 3004
         , composer
     })
@@ -193,4 +193,38 @@ test('create custom composer', async (t) => {
     const body = await res.text()
 
     t.is(body, 'hello')
+})
+
+test('create custom composer whit error handler', async (t) => {
+    const errorHandler = (c: Context, error: Partial<InternalError>) => {
+        const message = error.message
+        c.res.statusCode = error.code
+        c.res.end(message)
+    }
+
+    const errorHandlerPath = (c: Context, error: Error, customErrHandler: ErrorHandler) => {
+        customErrHandler(c, error)
+    }
+
+    const fail = () => {
+        throw createError(500, 'Internal Error')
+    }
+
+    const w = wezi(fail)
+    const execute = (c: Context, handler: Handler) => {
+        try { handler(c) } catch (err) {
+            c.panic(err)
+        }
+    }
+
+    const composer = createComposer(errorHandlerPath, null, execute)
+    listen(w(errorHandler), {
+        port: 3005
+        , composer
+    })
+    const res = await fetch('http://localhost:3005')
+    const body = await res.text()
+
+    t.is(res.status, 500)
+    t.is(body, 'Internal Error')
 })

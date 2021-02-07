@@ -13,6 +13,7 @@ type ListenOptions = {
     , composer?: Composer
 }
 
+type WeziPrepare = (errorHandler?: ErrorHandler) => (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
 type WeziCompose = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
@@ -36,9 +37,9 @@ export const listen = (weziCompose: WeziCompose, { port = 3000, composer }: List
     return server
 }
 
-export function wezi(errorHandler: ErrorHandler, ...handlers: (ComposerHandler | Handler)[]): WeziCompose
-export function wezi(errorHandler: ErrorHandler, ...handlers: any[]): WeziCompose {
-    return (composer: Composer) => {
+export function wezi(...handlers: (ComposerHandler | Handler)[]): WeziPrepare
+export function wezi(...handlers: any[]): WeziPrepare {
+    return (errorHandler?: ErrorHandler) => (composer: Composer) => {
         const prepare = composer(errorHandler)
         const composedHandlers = composeHandlers(prepare, handlers)
         return (req: IncomingMessage, res: ServerResponse): void => {
