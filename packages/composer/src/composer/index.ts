@@ -1,4 +1,5 @@
 import { createError } from 'wezi-error'
+import { defaultErrorHandler } from './handlers'
 import {
     Next
     , Panic
@@ -7,10 +8,16 @@ import {
     , Dispatch
 } from 'wezi-types'
 
-export type Composer = (main: boolean, ...handlers: Handler[]) => Dispatch
+export type Composer = (errorHandlerCustom: ErrorHandler) => (main: boolean, ...handlers: Handler[]) => Dispatch
+export type PrepareComposer = (main: boolean, ...handlers: Handler[]) => Dispatch
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 export type ErrorHandler = (context: Context, error: Error) => void
+export type ErrorHandlerProxy = (context: Context, error: Error, errorHandler: ErrorHandler) => void
 export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
+
+const makeErrorHandlerProxy = (errorHandler: ErrorHandlerProxy, customErrorHandler: ErrorHandler) => (context: Context, error: Error) => {
+    errorHandler(context, error, customErrorHandler)
+}
 
 const createNext = (context: Context, dispatch: Dispatch): Next => {
     return function next(payload?: unknown): void {
@@ -42,16 +49,20 @@ const createContext = (context: Context, dispatch: Dispatch, errorHandler: Error
     }
 }
 
-export const createComposer = (errorHandler: ErrorHandler, endHandler: EndHandler, executeHandler: ExecuteHandler): Composer => (main: boolean, ...handlers: Handler[]): Dispatch => {
-    let inc = 0
-    return function dispatch(context: Context, payload?: unknown): void {
-        if (inc < handlers.length) {
-            const handler = handlers[inc++]
-            const newContext = createContext(context, dispatch, errorHandler)
-            setImmediate(executeHandler, newContext, handler, payload)
-            return
-        }
+export const createComposer = (errorHandlerProxy: ErrorHandlerProxy, endHandler: EndHandler, executeHandler: ExecuteHandler) =>
+    (customErrorHandler: ErrorHandler = defaultErrorHandler): PrepareComposer => {
+        const errorHandler = errorHandlerProxy ? makeErrorHandlerProxy(errorHandlerProxy, customErrorHandler) : customErrorHandler
+        return (main: boolean, ...handlers: Handler[]): Dispatch => {
+            let inc = 0
+            return function dispatch(context: Context, payload?: unknown): void {
+                if (inc < handlers.length) {
+                    const handler = handlers[inc++]
+                    const newContext = createContext(context, dispatch, errorHandler)
+                    setImmediate(executeHandler, newContext, handler, payload)
+                    return
+                }
 
-        main && setImmediate(endHandler, context, errorHandler)
+                main && setImmediate(endHandler, context, errorHandler)
+            }
+        }
     }
-}

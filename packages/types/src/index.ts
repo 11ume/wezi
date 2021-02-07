@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { Composer } from 'wezi-composer'
+import { PrepareComposer } from 'wezi-composer'
 
 export interface Context {
     readonly req: IncomingMessage
@@ -15,19 +15,18 @@ export type Shared<E> = {
     values: () => E
 }
 
-export interface ComposerHandlerMix extends Function {
+export interface Handlers extends Function {
     id?: symbol
     (context: Context, payload?: any): any
-    (composer: Composer): Handler
+    (prepare: PrepareComposer): Handler
 }
 
 export interface ComposerHandler extends Function {
     id?: symbol
-    (composer: Composer): Handler
+    (prepare: PrepareComposer): Handler
 }
 
 export type Next = <T>(payload?: T) => void
 export type Panic = (error: Error) => void
 export type Handler = (context: Context, payload?: any) => any
-export type ErrorHandler = (context: Context, error: Error) => void
 export type Dispatch = (context: Context, payload?: unknown) => void

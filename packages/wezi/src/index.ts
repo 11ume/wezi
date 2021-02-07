@@ -1,13 +1,20 @@
 import http, { Server, IncomingMessage, ServerResponse } from 'http'
-import { Context, Handler, ComposerHandler, ComposerHandlerMix } from 'wezi-types'
-import { Composer, $composer, lazyComposer } from 'wezi-composer'
-
-type ComposeHandlers = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
+import { Context, Handler, ComposerHandler, Handlers } from 'wezi-types'
+import {
+    Composer
+    , PrepareComposer
+    , ErrorHandler
+    , lazyComposer
+    , $composer
+} from 'wezi-composer'
 
 type ListenOptions = {
     port?: number
     , composer?: Composer
 }
+
+type WeziPrepare = (errorHandler?: ErrorHandler) => (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
+type WeziCompose = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
@@ -18,26 +25,26 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     }
 }
 
-const composeHandlers = (composer: Composer, handlers: ComposerHandlerMix[]) => handlers.map((handler) => {
-    if (handler.id === $composer) return handler(composer)
+const composeHandlers = (prepare: PrepareComposer, handlers: Handlers[]) => handlers.map((handler) => {
+    if (handler.id === $composer) return handler(prepare)
     return handler
 })
 
-export const listen = (compose: ComposeHandlers, { port = 3000, composer }: ListenOptions = {}): Server => {
-    const run = composer ? compose(composer) : compose(lazyComposer)
+export const listen = (weziCompose: WeziCompose, { port = 3000, composer }: ListenOptions = {}): Server => {
+    const run = composer ? weziCompose(composer) : weziCompose(lazyComposer)
     const server = http.createServer(run)
     server.listen(port)
     return server
 }
 
-export function wezi(...handlers: (ComposerHandler | Handler)[]): ComposeHandlers
-export function wezi(...handlers: any[]): ComposeHandlers {
-    return (composer: Composer) => {
-        const composedHandlers = composeHandlers(composer, handlers)
+export function wezi(...handlers: (ComposerHandler | Handler)[]): WeziPrepare
+export function wezi(...handlers: any[]): WeziPrepare {
+    return (errorHandler?: ErrorHandler) => (composer: Composer) => {
+        const prepare = composer(errorHandler)
+        const composedHandlers = composeHandlers(prepare, handlers)
         return (req: IncomingMessage, res: ServerResponse): void => {
-            const dispatch = composer(true, ...composedHandlers)
+            const dispatch = prepare(true, ...composedHandlers)
             dispatch(createContext(req, res))
         }
     }
 }
-

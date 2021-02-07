@@ -1,5 +1,5 @@
+import { PrepareComposer, $composer } from 'wezi-composer'
 import { Context, Handler, ComposerHandler } from 'wezi-types'
-import { Composer, $composer } from 'wezi-composer'
 import matchit, { Matcher, Found } from 'matchit-radix-tree'
 
 type RouteEntity = {
@@ -15,26 +15,26 @@ const replyHead = (context: Context): void => {
     context.res.end(null, null, null)
 }
 
-const dispatchRoute = (found: Found, composer: Composer, context: Context): void => {
+const dispatchRoute = (found: Found, prepare: PrepareComposer, context: Context): void => {
     if (context.req.method === 'HEAD') {
         replyHead(context)
         return
     }
 
     if (found.handlers) {
-        const dispatch = composer(false, ...found.handlers)
+        const dispatch = prepare(false, ...found.handlers)
         dispatch(context, found.params)
         return
     }
 
-    const dispatch = composer(false, found.handler)
+    const dispatch = prepare(false, found.handler)
     dispatch(context, found.params)
 }
 
-const findRouteMatch = (matcher: Matcher, composer: Composer) => (context: Context, payload: unknown): void => {
+const findRouteMatch = (matcher: Matcher, prepare: PrepareComposer) => (context: Context, payload: unknown): void => {
     const found = matcher.lookup(context.req.method, context.req.url)
     if (found) {
-        dispatchRoute(found, composer, context)
+        dispatchRoute(found, prepare, context)
         return
     }
 
@@ -46,9 +46,9 @@ const prepareRouterStack = (matcher: Matcher, entities: RouteEntity[]) => entiti
         matcher.create(entity.method, entity.path, ...entity.handlers)
     })
 
-const prepareRoutes = (matcher: Matcher, entities: RouteEntity[], composer: Composer) => {
+const prepareRoutes = (matcher: Matcher, entities: RouteEntity[], prepare: PrepareComposer) => {
     prepareRouterStack(matcher, entities)
-    return findRouteMatch(matcher, composer)
+    return findRouteMatch(matcher, prepare)
 }
 
 const createRouteEntity = (method: string) => (path: string, ...handlers: Handler[]): RouteEntity => {
@@ -60,9 +60,9 @@ const createRouteEntity = (method: string) => (path: string, ...handlers: Handle
 }
 
 export const createRouter = (...entities: RouteEntity[]) => {
-    const match: ComposerHandler = (composer: Composer) => {
+    const match: ComposerHandler = (prepare: PrepareComposer) => {
         const matcher = matchit()
-        return prepareRoutes(matcher, entities, composer)
+        return prepareRoutes(matcher, entities, prepare)
     }
 
     Object.defineProperty(match, 'id', {
