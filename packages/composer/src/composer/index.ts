@@ -12,10 +12,10 @@ export type Composer = (errorHandlerCustom: ErrorHandler) => (main: boolean, ...
 export type PrepareComposer = (main: boolean, ...handlers: Handler[]) => Dispatch
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 export type ErrorHandler = (context: Context, error: Error) => void
-export type ErrorHandlerPatch = (context: Context, error: Error, errorHandler: ErrorHandler) => void
+export type ErrorHandlerProxy = (context: Context, error: Error, errorHandler: ErrorHandler) => void
 export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
 
-const patchErrorHandler = (errorHandler: ErrorHandlerPatch, customErrorHandler: ErrorHandler) => (context: Context, error: Error) => {
+const makeErrorHandlerProxy = (errorHandler: ErrorHandlerProxy, customErrorHandler: ErrorHandler) => (context: Context, error: Error) => {
     errorHandler(context, error, customErrorHandler)
 }
 
@@ -49,19 +49,20 @@ const createContext = (context: Context, dispatch: Dispatch, errorHandler: Error
     }
 }
 
-export const createComposer = (errorHandler: ErrorHandlerPatch, endHandler: EndHandler, executeHandler: ExecuteHandler) =>
-    (customErrorHandler: ErrorHandler = defaultErrorHandler) => (main: boolean, ...handlers: Handler[]): Dispatch => {
-        const errHandler = errorHandler ? patchErrorHandler(errorHandler, customErrorHandler) : customErrorHandler
-        let inc = 0
+export const createComposer = (errorHandlerProxy: ErrorHandlerProxy, endHandler: EndHandler, executeHandler: ExecuteHandler) =>
+    (customErrorHandler: ErrorHandler = defaultErrorHandler): PrepareComposer => {
+        const errorHandler = errorHandlerProxy ? makeErrorHandlerProxy(errorHandlerProxy, customErrorHandler) : customErrorHandler
+        return (main: boolean, ...handlers: Handler[]): Dispatch => {
+            let inc = 0
+            return function dispatch(context: Context, payload?: unknown): void {
+                if (inc < handlers.length) {
+                    const handler = handlers[inc++]
+                    const newContext = createContext(context, dispatch, errorHandler)
+                    setImmediate(executeHandler, newContext, handler, payload)
+                    return
+                }
 
-        return function dispatch(context: Context, payload?: unknown): void {
-            if (inc < handlers.length) {
-                const handler = handlers[inc++]
-                const newContext = createContext(context, dispatch, errHandler)
-                setImmediate(executeHandler, newContext, handler, payload)
-                return
+                main && setImmediate(endHandler, context, errorHandler)
             }
-
-            main && setImmediate(endHandler, context, errHandler)
         }
     }

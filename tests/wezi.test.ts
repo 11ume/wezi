@@ -195,15 +195,15 @@ test('create custom composer', async (t) => {
     t.is(body, 'hello')
 })
 
-test('create custom composer whit error handler', async (t) => {
+test('create custom composer whit error proxy handler', async (t) => {
     const errorHandler = (c: Context, error: Partial<InternalError>) => {
         const message = error.message
         c.res.statusCode = error.code
         c.res.end(message)
     }
 
-    const errorHandlerPath = (c: Context, error: Error, customErrHandler: ErrorHandler) => {
-        customErrHandler(c, error)
+    const errorHandlerProxy = (c: Context, error: Error, customErrorHandler: ErrorHandler) => {
+        customErrorHandler(c, error)
     }
 
     const fail = () => {
@@ -217,7 +217,7 @@ test('create custom composer whit error handler', async (t) => {
         }
     }
 
-    const composer = createComposer(errorHandlerPath, null, execute)
+    const composer = createComposer(errorHandlerProxy, null, execute)
     listen(w(errorHandler), {
         port: 3005
         , composer

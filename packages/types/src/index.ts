@@ -15,7 +15,7 @@ export type Shared<E> = {
     values: () => E
 }
 
-export interface ComposerHandlerMix extends Function {
+export interface Handlers extends Function {
     id?: symbol
     (context: Context, payload?: any): any
     (prepare: PrepareComposer): Handler

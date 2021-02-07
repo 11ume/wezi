@@ -1,5 +1,5 @@
 import http, { Server, IncomingMessage, ServerResponse } from 'http'
-import { Context, Handler, ComposerHandler, ComposerHandlerMix } from 'wezi-types'
+import { Context, Handler, ComposerHandler, Handlers } from 'wezi-types'
 import {
     Composer
     , PrepareComposer
@@ -25,7 +25,7 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     }
 }
 
-const composeHandlers = (prepare: PrepareComposer, handlers: ComposerHandlerMix[]) => handlers.map((handler) => {
+const composeHandlers = (prepare: PrepareComposer, handlers: Handlers[]) => handlers.map((handler) => {
     if (handler.id === $composer) return handler(prepare)
     return handler
 })
