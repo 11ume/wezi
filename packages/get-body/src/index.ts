@@ -1,14 +1,14 @@
 import { Readable } from 'stream'
 import createError from 'wezi-error'
 
-type Payload<T> = {
-   body: T
-   length: number
-}
-
 type Data<T> = {
     body: T
     received: number
+}
+
+type Payload<T> = {
+    body: T
+    length: number
 }
 
 type Resolve<T> = (value: T) => void
@@ -33,14 +33,14 @@ const onError = <T>(data: Data<T>, reject: Reject) => (error: Error) => {
 }
 
 const onAborted = <T>(data: Data<T>, reject: Reject) => () => {
-    const err = createError(400, `request error on read body abort, received: ${data}`)
+    const err = createError(400, `request error on read body abort, received: ${data.received}`)
     reject(err)
 }
 
 const getBodyBuffer = (readable: Readable) => new Promise((resolve, reject) => {
     const data = {
-        received: 0
-        , body: Buffer.from('')
+        body: Buffer.from('')
+        , received: 0
     }
 
     const onData = (chunk: Buffer) => {
@@ -64,13 +64,12 @@ const getBodyBuffer = (readable: Readable) => new Promise((resolve, reject) => {
 })
 
 const getBodyString = (readable: Readable) => new Promise((resolve, reject) => {
-    readable.setEncoding('utf8')
     const data = {
-        received: 0
-        , body: ''
+        body: ''
+        , received: 0
     }
 
-    const onData = (chunk: Buffer) => {
+    const onData = (chunk: string) => {
         data.received += chunk.length
         data.body = data.body += chunk
     }
@@ -83,6 +82,7 @@ const getBodyString = (readable: Readable) => new Promise((resolve, reject) => {
         readable.off('aborted', onAborted(data, reject))
     }
 
+    readable.setEncoding('utf8')
     readable.on('close', cleanup)
     readable.on('data', onData)
     readable.on('end', onEnd(data, resolve, reject))
@@ -90,9 +90,9 @@ const getBodyString = (readable: Readable) => new Promise((resolve, reject) => {
     readable.on('aborted', onAborted(data, reject))
 })
 
-export function getBody(readable: Readable, str?: true): Promise<Payload<string>>
-export function getBody(readable: Readable, str?: false): Promise<Payload<Buffer>>
-export function getBody(readable: Readable, str?: boolean) {
-    if (str) return getBodyString(readable)
-    return getBodyBuffer(readable)
+export function getBody(readable: Readable, raw?: false): Promise<Payload<string>>
+export function getBody(readable: Readable, raw?: true): Promise<Payload<Buffer>>
+export function getBody(readable: Readable, raw?: boolean) {
+    if (raw) return getBodyBuffer(readable)
+    return getBodyString(readable)
 }
