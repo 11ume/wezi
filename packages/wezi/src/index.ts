@@ -5,11 +5,13 @@ import {
     , PrepareComposer
     , ErrorHandler
     , lazyComposer
+    , noLazyComposer
     , $composer
 } from 'wezi-composer'
 
 type ListenOptions = {
     port?: number
+    , lazy?: boolean
     , composer?: Composer
 }
 
@@ -30,8 +32,8 @@ const composeHandlers = (prepare: PrepareComposer, handlers: Handlers[]) => hand
     return handler
 })
 
-export const listen = (weziCompose: WeziCompose, { port = 3000, composer }: ListenOptions = {}): Server => {
-    const run = composer ? weziCompose(composer) : weziCompose(lazyComposer)
+export const listen = (weziCompose: WeziCompose, { port = 3000, lazy = true, composer }: ListenOptions = {}): Server => {
+    const run = composer ? weziCompose(composer) : weziCompose(lazy ? lazyComposer : noLazyComposer)
     const server = http.createServer(run)
     server.listen(port)
     return server

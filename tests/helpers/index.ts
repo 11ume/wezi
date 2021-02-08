@@ -18,3 +18,13 @@ export function serverError(errorHandler: ErrorHandler, ...handlers: any[]) {
     return listen(http.createServer(run))
 }
 
+export const giveMeOneAdress = (portBase: number) => {
+    let port = portBase
+    return () => {
+        port += 1
+        return {
+            port
+            , url: `http://localhost:${port}`
+        }
+    }
+}
