@@ -5,19 +5,73 @@ import createError, { InternalError } from 'wezi-error'
 import { Context, Handler } from 'wezi-types'
 import { text, json, buffer } from 'wezi-receive'
 import { createComposer, ErrorHandler } from 'wezi-composer'
-import { server, serverError } from './helpers'
+import { server, serverError, giveMeOneAdress } from './helpers'
+
+const getAddress = giveMeOneAdress(3000)
 
 test('server listen lazy', async (t) => {
     const w = wezi(() => 'hello')
-
-    listen(w())
-    const res = await fetch('http://localhost:3000')
+    const { port, url } = getAddress()
+    listen(w(), {
+        port
+    })
+    const res = await fetch(url)
     const body = await res.text()
 
     t.is(body, 'hello')
 })
 
+test('server listen no lazy reply, must not emit write after end error', async (t) => {
+    const w = wezi((c: Context) => {
+        c.res.end('hello')
+        return 'never'
+    })
+    const { port, url } = getAddress()
+    listen(w(), {
+        port
+        , lazy: false
+    })
+    const res = await fetch(url)
+    const body = await res.text()
+
+    t.is(res.status, 200)
+    t.is(body, 'hello')
+})
+
+test('server listen no lazy reply, throw error', async (t) => {
+    const w = wezi(() => {
+        throw createError(500, 'Internal Error')
+    })
+    const { port, url } = getAddress()
+    listen(w(), {
+        port
+        , lazy: false
+    })
+    const res = await fetch(url)
+    const body: { message: string } = await res.json()
+
+    t.is(res.status, 500)
+    t.is(body.message, 'Internal Error')
+})
+
+test('server listen no lazy reply, throw error inside of promise', async (t) => {
+    const w = wezi(async () => {
+        throw createError(400, 'Bad Request')
+    })
+    const { port, url } = getAddress()
+    listen(w(), {
+        port
+        , lazy: false
+    })
+    const res = await fetch(url)
+    const body: { message: string } = await res.json()
+
+    t.is(res.status, 400)
+    t.is(body.message, 'Bad Request')
+})
+
 test('create custom error handler and throw error inside handler whit listen fn', async (t) => {
+    const { port, url } = getAddress()
     const errorHandler = (c: Context, error: Error) => {
         const message = error.message
         c.res.statusCode = 400
@@ -32,14 +86,14 @@ test('create custom error handler and throw error inside handler whit listen fn'
 
     const promListen = () => new Promise((r) => {
         const ln = listen(w(errorHandler), {
-            port: 3001
+            port
         })
 
         ln.on('listening', r)
     })
 
     await promListen()
-    const res = await fetch('http://localhost:3001')
+    const res = await fetch(url)
     const message = await res.text()
 
     t.is(res.status, 400)
@@ -179,6 +233,7 @@ test('response only whit status code and whitout custom status message', async (
 })
 
 test('create custom composer', async (t) => {
+    const { port, url } = getAddress()
     const w = wezi(() => 'hello')
     const execute = (c: Context, handler: Handler) => {
         const val = handler(c)
@@ -186,16 +241,17 @@ test('create custom composer', async (t) => {
     }
     const composer = createComposer(null, null, execute)
     listen(w(), {
-        port: 3004
+        port
         , composer
     })
-    const res = await fetch('http://localhost:3004')
+    const res = await fetch(url)
     const body = await res.text()
 
     t.is(body, 'hello')
 })
 
 test('create custom composer whit error proxy handler', async (t) => {
+    const { port, url } = getAddress()
     const errorHandler = (c: Context, error: Partial<InternalError>) => {
         const message = error.message
         c.res.statusCode = error.code
@@ -219,10 +275,10 @@ test('create custom composer whit error proxy handler', async (t) => {
 
     const composer = createComposer(errorHandlerProxy, null, execute)
     listen(w(errorHandler), {
-        port: 3005
+        port
         , composer
     })
-    const res = await fetch('http://localhost:3005')
+    const res = await fetch(url)
     const body = await res.text()
 
     t.is(res.status, 500)
