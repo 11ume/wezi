@@ -1,0 +1,7 @@
+*.build.tsbuildinfo
+.eslintrc
+.vscode
+tsconfig.build.json
+tsconfig.json
+test
+dev

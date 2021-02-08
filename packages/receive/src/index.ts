@@ -1,6 +1,6 @@
 import { IncomingMessage } from 'http'
 import { Context } from 'wezi-types'
-import fastGetBody from 'fast-get-body'
+import getBody from 'wezi-get-body'
 import { parseJSON } from './utils'
 
 type CacheWeakMap<T = any> = WeakMap<IncomingMessage, T>
@@ -15,7 +15,7 @@ const handleGetBody = <T = void>(context: Context, weakMap: CacheWeakMap<T>, get
 const toBuffer = () => {
     const weakMap: CacheWeakMap<Buffer> = new WeakMap()
     return (context: Context): Promise<Buffer> => handleGetBody<Buffer>(context, weakMap, async () => {
-        const payload = await fastGetBody(context.req)
+        const payload = await getBody(context.req, false)
         weakMap.set(context.req, payload.body)
         return payload.body
     })
@@ -24,7 +24,7 @@ const toBuffer = () => {
 const toJson = () => {
     const weakMap: CacheWeakMap = new WeakMap()
     return <T>(context: Context): Promise<T> => handleGetBody<T>(context, weakMap, async () => {
-        const payload = await fastGetBody(context.req, true)
+        const payload = await getBody(context.req, true)
         const body = parseJSON<T>(payload.body)
         weakMap.set(context.req, body)
         return body
@@ -34,7 +34,7 @@ const toJson = () => {
 const toText = () => {
     const weakMap: CacheWeakMap<string> = new WeakMap()
     return (context: Context): Promise<string> => handleGetBody<string>(context, weakMap, async () => {
-        const payload = await fastGetBody(context.req, true)
+        const payload = await getBody(context.req, true)
         weakMap.set(context.req, payload.body)
         return payload.body
     })
