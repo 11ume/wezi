@@ -17,7 +17,8 @@
     },
     "dependencies": {
         "wezi-error": "^1.0.0-alpha.17",
-        "wezi-types": "^1.0.0-alpha.18"
+        "wezi-types": "^1.0.0-alpha.18",
+        "wezi-get-body": "^1.0.0-alpha.18"
     },
     "type": "module"
 }
