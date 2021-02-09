@@ -17,6 +17,5 @@
     },
     "dependencies": {
         "wezi-error": "^1.0.0-alpha.17"
-    },
-    "type": "module"
+    }
 }

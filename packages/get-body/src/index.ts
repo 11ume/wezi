@@ -11,12 +11,21 @@ type Payload<T> = {
     length: number
 }
 
+type OnData<T> = (data: Data<T>) => (chunk: T) => void
 type Resolve<T> = (value: T) => void
 type Reject = (err: Error) => void
 
+const bindEvent = <T>(readable: Readable, event: string, fn: (value?: T) => void) => {
+    const handler = fn
+    readable.on(event, handler)
+    return () => {
+        readable.off(event, handler)
+    }
+}
+
 const onEnd = <T>(data: Data<T>, resolve: Resolve<Payload<T>>, reject: Reject) => (error?: Error) => {
     if (error) {
-        const err = createError(400, `request error on read body end, received: ${data.received}`, error)
+        const err = createError(400, `error on read body end, received: ${data.received}`, error)
         reject(err)
         return
     }
@@ -28,71 +37,49 @@ const onEnd = <T>(data: Data<T>, resolve: Resolve<Payload<T>>, reject: Reject) =
 }
 
 const onError = <T>(data: Data<T>, reject: Reject) => (error: Error) => {
-    const err = createError(400, `request error on read body, received: ${data.received}`, error)
+    const err = createError(400, `error on read body, received: ${data.received}`, error)
     reject(err)
 }
 
 const onAborted = <T>(data: Data<T>, reject: Reject) => () => {
-    const err = createError(400, `request error on read body abort, received: ${data.received}`)
+    const err = createError(400, `error on read body abort, received: ${data.received}`)
     reject(err)
 }
 
-const getBodyBuffer = (readable: Readable) => new Promise((resolve, reject) => {
+const onDataBuffer = (data: Data<Buffer>) => (chunk: Buffer) => {
+    data.received += chunk.length
+    data.body = Buffer.concat([data.body, chunk])
+}
+
+const onDataString = (data: Data<string>) => (chunk: string) => {
+    data.received += chunk.length
+    data.body = data.body += chunk
+}
+
+const getRawBody = <T>(readable: Readable, body: T, onData: OnData<T>) => new Promise((resolve, reject) => {
     const data = {
-        body: Buffer.from('')
+        body
         , received: 0
     }
 
-    const onData = (chunk: Buffer) => {
-        data.received += chunk.length
-        data.body = Buffer.concat([data.body, chunk])
+    const unBindEnd = bindEvent(readable, 'end', onEnd(data, resolve, reject))
+    const unBindData = bindEvent(readable, 'data', onData(data))
+    const unBindError = bindEvent(readable, 'error', onError(data, reject))
+    const unBindAborted = bindEvent(readable, 'aborted', onAborted(data, reject))
+    const unBindClose = bindEvent(readable, 'close', cleanup)
+
+    function cleanup() {
+        unBindEnd()
+        unBindData()
+        unBindError()
+        unBindAborted()
+        unBindClose()
     }
-
-    const cleanup = () => {
-        readable.off('close', cleanup)
-        readable.off('data', onData)
-        readable.off('end', onEnd(data, resolve, reject))
-        readable.off('error', onError(data, reject))
-        readable.off('aborted', onAborted(data, reject))
-    }
-
-    readable.on('close', cleanup)
-    readable.on('data', onData)
-    readable.on('end', onEnd(data, resolve, reject))
-    readable.on('error', onError(data, reject))
-    readable.on('aborted', onAborted(data, reject))
-})
-
-const getBodyString = (readable: Readable) => new Promise((resolve, reject) => {
-    const data = {
-        body: ''
-        , received: 0
-    }
-
-    const onData = (chunk: string) => {
-        data.received += chunk.length
-        data.body = data.body += chunk
-    }
-
-    const cleanup = () => {
-        readable.off('close', cleanup)
-        readable.off('data', onData)
-        readable.off('end', onEnd(data, resolve, reject))
-        readable.off('error', onError(data, reject))
-        readable.off('aborted', onAborted(data, reject))
-    }
-
-    readable.setEncoding('utf8')
-    readable.on('close', cleanup)
-    readable.on('data', onData)
-    readable.on('end', onEnd(data, resolve, reject))
-    readable.on('error', onError(data, reject))
-    readable.on('aborted', onAborted(data, reject))
 })
 
 export function getBody(readable: Readable, raw?: false): Promise<Payload<string>>
 export function getBody(readable: Readable, raw?: true): Promise<Payload<Buffer>>
 export function getBody(readable: Readable, raw?: boolean) {
-    if (raw) return getBodyBuffer(readable)
-    return getBodyString(readable)
+    if (raw) return getRawBody(readable, Buffer.from(''), onDataBuffer)
+    return getRawBody(readable, '', onDataString)
 }

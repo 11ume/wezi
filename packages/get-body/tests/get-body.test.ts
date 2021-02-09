@@ -1,11 +1,12 @@
 import test from 'ava'
 import net, { Socket } from 'net'
-import http, { IncomingMessage, ServerResponse } from 'http'
+import http, { IncomingMessage, RequestListener, ServerResponse } from 'http'
 import fetch from 'node-fetch'
 import testListen from 'test-listen'
 import fastGetBody from '..'
+import { InternalError } from 'wezi-error'
 
-const listen = (fn) => testListen(http.createServer(fn))
+const listen = (fn: RequestListener) => testListen(http.createServer(fn))
 
 test('parse http request readable payload buffer', async (t) => {
     const message = JSON.stringify({
@@ -75,10 +76,7 @@ test('parse http request readable throw if connection is aborted', async (t) => 
         })
     })
 
-    try {
-        await abort()
-    } catch (err) {
-        t.is(err.code, 400)
-        t.is(err.message, `request error on read body abort, received: ${3}`)
-    }
+    const err = await t.throwsAsync<InternalError>(abort)
+    t.is(err.code, 400)
+    t.is(err.message, 'error on read body abort, received: 3')
 })

@@ -16,7 +16,6 @@
         "prepublishOnly": "yarn run build"
     },
     "dependencies": {
-        "fast-get-body": "^0.1.0",
         "wezi-error": "^1.0.0-alpha.17",
         "wezi-types": "^1.0.0-alpha.18"
     },
