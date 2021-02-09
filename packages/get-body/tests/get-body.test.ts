@@ -51,7 +51,7 @@ test('parse http request readable payload string', async (t) => {
     t.is(body.length, messageLength)
 })
 
-test('parse http request readable throw if connection is aborted', async (t) => {
+test('parse http request readable throw error if connection is aborted', async (t) => {
     const abort = () => new Promise((resolve) => {
         let socket: Socket = null
         const server = http.createServer((req) => {
@@ -77,6 +77,46 @@ test('parse http request readable throw if connection is aborted', async (t) => 
     })
 
     const err = await t.throwsAsync<InternalError>(abort)
-    t.is(err.code, 400)
+    t.is(err.code, 500)
     t.is(err.message, 'error on read body abort, received: 3')
+})
+
+test('parse http request readable invoke error event', async (t) => {
+    const error = () => new Promise(async (resolve) => {
+        const url = await listen(async (req: IncomingMessage, res: ServerResponse) => {
+            resolve(fastGetBody(req, true))
+            req.emit('error', new Error('error message'))
+            res.end()
+        })
+
+        fetch(url, {
+            method: 'POST'
+            , body: 'foo'
+        })
+    })
+
+    const err = await t.throwsAsync<InternalError>(error)
+    t.is(err.message, 'error on read body, received: 0')
+    t.is(err.originalError.message, 'error message')
+    t.is(err.code, 500)
+})
+
+test('parse http request readable invoke on end error event', async (t) => {
+    const error = () => new Promise(async (resolve) => {
+        const url = await listen(async (req: IncomingMessage, res: ServerResponse) => {
+            resolve(fastGetBody(req, true))
+            req.emit('end', new Error('error message'))
+            res.end()
+        })
+
+        fetch(url, {
+            method: 'POST'
+            , body: 'foo'
+        })
+    })
+
+    const err = await t.throwsAsync<InternalError>(error)
+    t.is(err.message, 'error on read body end, received: 0')
+    t.is(err.originalError.message, 'error message')
+    t.is(err.code, 500)
 })

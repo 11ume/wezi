@@ -25,7 +25,7 @@ const bindEvent = <T>(readable: Readable, event: string, fn: (value?: T) => void
 
 const onEnd = <T>(data: Data<T>, resolve: Resolve<Payload<T>>, reject: Reject) => (error?: Error) => {
     if (error) {
-        const err = createError(400, `error on read body end, received: ${data.received}`, error)
+        const err = createError(500, `error on read body end, received: ${data.received}`, error)
         reject(err)
         return
     }
@@ -37,12 +37,12 @@ const onEnd = <T>(data: Data<T>, resolve: Resolve<Payload<T>>, reject: Reject) =
 }
 
 const onError = <T>(data: Data<T>, reject: Reject) => (error: Error) => {
-    const err = createError(400, `error on read body, received: ${data.received}`, error)
+    const err = createError(500, `error on read body, received: ${data.received}`, error)
     reject(err)
 }
 
 const onAborted = <T>(data: Data<T>, reject: Reject) => () => {
-    const err = createError(400, `error on read body abort, received: ${data.received}`)
+    const err = createError(500, `error on read body abort, received: ${data.received}`)
     reject(err)
 }
 
