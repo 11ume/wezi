@@ -17,6 +17,9 @@
       "wezi-error": [
         "packages/error"
       ],
+      "wezi-get-body": [
+        "packages/get-body"
+      ],
       "wezi-query": [
         "packages/querystring"
       ],
