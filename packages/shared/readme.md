@@ -1,6 +1,6 @@
 #### wezi-shared
 
-#### Share properies between multiple handlers whiout side effects
+#### Share properties between multiple handlers whiout side effects
 
 > This module use a Weakmap object to store a volatile value like the readable stream http Request, when request is destroyed the property is garbage collected, whiout posibilities of some memory leak. 
 
