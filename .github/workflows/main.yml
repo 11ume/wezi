@@ -1,6 +1,18 @@
 name: ci
 
-on: [push, pull_request]
+on:
+  push:
+    paths-ignore:
+      - '**/README.md'
+      - '**/readme.md'
+      - 'README.md'
+      - 'readme.md'
+  pull_request:
+    paths-ignore:
+      - '**/README.md'
+      - '**/readme.md'
+      - 'README.md'
+      - 'readme.md'
 
 jobs:
   build:
