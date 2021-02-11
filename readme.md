@@ -11,7 +11,7 @@
 <br>
 
 <p align="center"> 
-    Wezi is a simple, small, expressive and incredibly fast library 
+    Wezi is a simple, small, incredibly fast and adaptive library 
     <br>
     to create robust web applications like polar bears! 
 <p>
@@ -29,7 +29,7 @@
 
 <br>
 
-> ⚠️ Wezi is currently under development, the documentation is coming!.
+> ⚠️ Wezi is currently under development.
 
 <br>
 
