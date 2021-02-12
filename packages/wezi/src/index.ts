@@ -1,8 +1,8 @@
-import http, { Server, IncomingMessage, ServerResponse } from 'http'
+import http, { Server, IncomingMessage, ServerResponse, RequestListener } from 'http'
 import { Context, Handler, ComposerHandler, Handlers } from 'wezi-types'
 import {
     Composer
-    , PrepareComposer
+    , PreparedComposer
     , ErrorHandler
     , lazyComposer
     , noLazyComposer
@@ -16,7 +16,7 @@ type ListenOptions = {
 }
 
 type WeziPrepare = (errorHandler?: ErrorHandler) => (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
-type WeziCompose = (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
+type WeziCompose = (composer: Composer) => RequestListener
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
@@ -27,8 +27,8 @@ const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     }
 }
 
-const composeHandlers = (prepare: PrepareComposer, handlers: Handlers[]) => handlers.map((handler) => {
-    if (handler.id === $composer) return handler(prepare)
+const composeHandlers = (preparedComposer: PreparedComposer, handlers: Handlers[]) => handlers.map((handler) => {
+    if (handler.id === $composer) return handler(preparedComposer)
     return handler
 })
 
@@ -41,11 +41,11 @@ export const listen = (weziCompose: WeziCompose, { port = 3000, lazy = true, com
 
 export function wezi(...handlers: (ComposerHandler | Handler)[]): WeziPrepare
 export function wezi(...handlers: any[]): WeziPrepare {
-    return (errorHandler?: ErrorHandler) => (composer: Composer) => {
-        const prepare = composer(errorHandler)
-        const composedHandlers = composeHandlers(prepare, handlers)
+    return (errorHandler?: ErrorHandler) => (composer: Composer): RequestListener => {
+        const preparedComposer = composer(errorHandler)
+        const composedHandlers = composeHandlers(preparedComposer, handlers)
         return (req: IncomingMessage, res: ServerResponse): void => {
-            const dispatch = prepare(true, ...composedHandlers)
+            const dispatch = preparedComposer(true, ...composedHandlers)
             dispatch(createContext(req, res))
         }
     }

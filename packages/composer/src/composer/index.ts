@@ -9,7 +9,7 @@ import {
 } from 'wezi-types'
 
 export type Composer = (errorHandlerCustom: ErrorHandler) => (main: boolean, ...handlers: Handler[]) => Dispatch
-export type PrepareComposer = (main: boolean, ...handlers: Handler[]) => Dispatch
+export type PreparedComposer = (main: boolean, ...handlers: Handler[]) => Dispatch
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 export type ErrorHandler = (context: Context, error: Error) => void
 export type ErrorHandlerProxy = (context: Context, error: Error, errorHandler: ErrorHandler) => void
@@ -50,7 +50,7 @@ const createContext = (context: Context, dispatch: Dispatch, errorHandler: Error
 }
 
 export const createComposer = (errorHandlerProxy: ErrorHandlerProxy, endHandler: EndHandler, executeHandler: ExecuteHandler) =>
-    (customErrorHandler: ErrorHandler = defaultErrorHandler): PrepareComposer => {
+    (customErrorHandler: ErrorHandler = defaultErrorHandler): PreparedComposer => {
         const errorHandler = errorHandlerProxy ? makeErrorHandlerProxy(errorHandlerProxy, customErrorHandler) : customErrorHandler
         return (main: boolean, ...handlers: Handler[]): Dispatch => {
             let inc = 0

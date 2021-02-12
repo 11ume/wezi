@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http'
-import { PrepareComposer } from 'wezi-composer'
+import { PreparedComposer } from 'wezi-composer'
 
 export interface Context {
     readonly req: IncomingMessage
@@ -18,12 +18,12 @@ export type Shared<E> = {
 export interface Handlers extends Function {
     id?: symbol
     (context: Context, payload?: any): any
-    (prepare: PrepareComposer): Handler
+    (prepare: PreparedComposer): Handler
 }
 
 export interface ComposerHandler extends Function {
     id?: symbol
-    (prepare: PrepareComposer): Handler
+    (preparedComposer: PreparedComposer): Handler
 }
 
 export type Next = <T>(payload?: T) => void
