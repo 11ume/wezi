@@ -1,5 +1,5 @@
 {
-    "name": "wezi",
+    "name": "wezi-dev",
     "version": "1.0.0-alpha.18",
     "description": "",
     "main": "dist/index.js",
@@ -19,6 +19,5 @@
         "wezi-composer": "^1.0.0-alpha.18",
         "wezi-error": "^1.0.0-alpha.17",
         "wezi-types": "^1.0.0-alpha.18"
-    },
-    "type": "module"
+    }
 }

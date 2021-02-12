@@ -9,14 +9,15 @@ import {
     , $composer
 } from 'wezi-composer'
 
-type ListenOptions = {
+export type WeziCompose = (composer: Composer) => RequestListener
+
+export type ListenOptions = {
     port?: number
     , lazy?: boolean
     , composer?: Composer
 }
 
 type WeziPrepare = (errorHandler?: ErrorHandler) => (composer: Composer) => (req: IncomingMessage, res: ServerResponse) => void
-type WeziCompose = (composer: Composer) => RequestListener
 
 const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
