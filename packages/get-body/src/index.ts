@@ -56,7 +56,7 @@ const onDataString = (data: Data<string>) => (chunk: string) => {
     data.body = data.body += chunk
 }
 
-const getRawBody = <T>(readable: Readable, body: T, onData: OnData<T>) => new Promise((resolve, reject) => {
+const getRawBody = <T>(readable: Readable, body: T, onData: OnData<T>): Promise<Payload<T>> => new Promise((resolve, reject) => {
     const data = {
         body
         , received: 0
@@ -77,9 +77,9 @@ const getRawBody = <T>(readable: Readable, body: T, onData: OnData<T>) => new Pr
     }
 })
 
-export function getBody(readable: Readable, raw?: false): Promise<Payload<string>>
-export function getBody(readable: Readable, raw?: true): Promise<Payload<Buffer>>
-export function getBody(readable: Readable, raw?: boolean) {
-    if (raw) return getRawBody(readable, Buffer.from(''), onDataBuffer)
-    return getRawBody(readable, '', onDataString)
+export function getBody(readable: Readable, raw: false): Promise<Payload<string>>
+export function getBody(readable: Readable, raw: true): Promise<Payload<Buffer>>
+export function getBody(readable: Readable, raw: boolean) {
+    if (raw) return getRawBody<Buffer>(readable, Buffer.from(''), onDataBuffer)
+    return getRawBody<string>(readable, '', onDataString)
 }

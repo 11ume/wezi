@@ -12,8 +12,7 @@ const handleGetBody = <T = void>(context: Context, weakMap: CacheWeakMap<T>, get
     return getBodyFn()
 }
 
-const toBuffer = () => {
-    const weakMap: CacheWeakMap<Buffer> = new WeakMap()
+const toBuffer = (weakMap: CacheWeakMap<Buffer>) => {
     return (context: Context): Promise<Buffer> => handleGetBody<Buffer>(context, weakMap, async () => {
         const payload = await getBody(context.req, true)
         weakMap.set(context.req, payload.body)
@@ -21,8 +20,7 @@ const toBuffer = () => {
     })
 }
 
-const toJson = () => {
-    const weakMap: CacheWeakMap = new WeakMap()
+const toJson = (weakMap: CacheWeakMap<any>) => {
     return <T>(context: Context): Promise<T> => handleGetBody<T>(context, weakMap, async () => {
         const payload = await getBody(context.req, false)
         const body = parseJSON<T>(payload.body)
@@ -31,8 +29,7 @@ const toJson = () => {
     })
 }
 
-const toText = () => {
-    const weakMap: CacheWeakMap<string> = new WeakMap()
+const toText = (weakMap: CacheWeakMap<string>) => {
     return (context: Context): Promise<string> => handleGetBody<string>(context, weakMap, async () => {
         const payload = await getBody(context.req, false)
         weakMap.set(context.req, payload.body)
@@ -40,7 +37,8 @@ const toText = () => {
     })
 }
 
-export const text = toText()
-export const json = toJson()
-export const buffer = toBuffer()
+const weakmap = new WeakMap()
+export const text = toText(weakmap)
+export const json = toJson(weakmap)
+export const buffer = toBuffer(weakmap)
 
