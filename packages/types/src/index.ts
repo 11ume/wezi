@@ -4,8 +4,8 @@ import { PreparedComposer } from 'wezi-composer'
 export interface Context {
     readonly req: IncomingMessage
     readonly res: ServerResponse
-    readonly next: Next
-    readonly panic: Panic
+    next: Next
+    panic: Panic
 }
 
 export type Shared<E> = {
@@ -29,4 +29,5 @@ export interface ComposerHandler extends Function {
 export type Next = <T>(payload?: T) => void
 export type Panic = (error: Error) => void
 export type Handler = (context: Context, payload?: any) => any
+export type ErrorHandler = (context: Context, error: Error) => void
 export type Dispatch = (context: Context, payload?: unknown) => void
