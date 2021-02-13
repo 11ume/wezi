@@ -1,7 +1,6 @@
 import * as send from 'wezi-send'
-import { Context, Handler } from 'wezi-types'
+import { Context, Handler, ErrorHandler } from 'wezi-types'
 import { InternalError, createError } from 'wezi-error'
-import { ErrorHandler } from '.'
 import { reply, replyPromise } from './reply'
 import { isPromise } from './utils'
 

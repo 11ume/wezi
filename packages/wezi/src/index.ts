@@ -1,9 +1,14 @@
 import http, { Server, IncomingMessage, ServerResponse, RequestListener } from 'http'
-import { Context, Handler, ComposerHandler, Handlers } from 'wezi-types'
+import {
+    Context
+    , Handler
+    , ComposerHandler
+    , Handlers
+    , ErrorHandler
+} from 'wezi-types'
 import {
     Composer
     , PreparedComposer
-    , ErrorHandler
     , lazyComposer
     , noLazyComposer
     , $composer

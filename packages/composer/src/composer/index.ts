@@ -5,13 +5,13 @@ import {
     , Panic
     , Context
     , Handler
+    , ErrorHandler
     , Dispatch
 } from 'wezi-types'
 
 export type Composer = (errorHandlerCustom: ErrorHandler) => (main: boolean, ...handlers: Handler[]) => Dispatch
 export type PreparedComposer = (main: boolean, ...handlers: Handler[]) => Dispatch
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
-export type ErrorHandler = (context: Context, error: Error) => void
 export type ErrorHandlerProxy = (context: Context, error: Error, errorHandler: ErrorHandler) => void
 export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
 

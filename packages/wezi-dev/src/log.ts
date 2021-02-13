@@ -21,7 +21,7 @@ const isJson = (req: IncomingMessage) => req.headers['content-type'].indexOf('ap
 const payloadIsNotEmpty = (req: IncomingMessage) => req.headers['content-length'] > '0'
 
 export const logReply = async (context: Context, start: Date, requestIndex: number) => {
-    logLine(`#${requestIndex} reply ${chalk.bold(context.req.method)} ${context.req.url}`, start)
+    logLine(`#${requestIndex} ${chalk.bold(context.req.method)} ${context.req.url}`, start)
 
     if (payloadIsNotEmpty(context.req) && isJson(context.req)) {
         try {
@@ -32,10 +32,6 @@ export const logReply = async (context: Context, start: Date, requestIndex: numb
             console.log(`JSON body could not be parsed: ${err.message} \n`)
         }
     }
-}
-
-export const logNext = async (context: Context, start: Date, requestIndex: number) => {
-    logLine(`#${requestIndex} next ${chalk.bold(context.req.method)} ${context.req.url}`, start)
 }
 
 export const logStatusCode = (statusCode: number) => {
