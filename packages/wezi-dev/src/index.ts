@@ -1,10 +1,11 @@
 import { Server } from 'http'
 import { WeziCompose, ListenOptions, listen as devListen } from 'wezi'
 import { Context, ErrorHandler } from 'wezi-types'
-import { InternalError } from 'wezi-error'
 import { lazyComposer, noLazyComposer } from 'wezi-composer'
+import { InternalError } from 'wezi-error'
 
 const logger = (c: Context) => c.next()
+
 const errrHandler = (customErrorHandler?: ErrorHandler) => (context: Context, error: Partial<InternalError>) => {
     console.log(error.stack)
     customErrorHandler && customErrorHandler(context, error as Error)
