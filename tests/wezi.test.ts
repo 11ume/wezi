@@ -2,9 +2,9 @@ import test from 'ava'
 import fetch from 'node-fetch'
 import wezi, { listen } from 'wezi'
 import createError, { InternalError } from 'wezi-error'
-import { Context, Handler } from 'wezi-types'
+import { Context, Handler, ErrorHandler } from 'wezi-types'
 import { text, json, buffer } from 'wezi-receive'
-import { createComposer, ErrorHandler } from 'wezi-composer'
+import { createComposer } from 'wezi-composer'
 import { server, serverError, giveMeOneAdress } from './helpers'
 
 const getAddress = giveMeOneAdress(3000)

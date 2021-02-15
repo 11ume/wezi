@@ -1,8 +1,8 @@
 import http from 'http'
 import listen from 'test-listen'
 import wezi from 'wezi'
-import { ErrorHandler, defaultErrorHandler, lazyComposer } from 'wezi-composer'
-import { ComposerHandler, Handler } from 'wezi-types'
+import { defaultErrorHandler, lazyComposer } from 'wezi-composer'
+import { ComposerHandler, Handler, ErrorHandler } from 'wezi-types'
 
 export function server(...handlers: (ComposerHandler | Handler)[]): Promise<string>
 export function server(...handlers: any[]) {

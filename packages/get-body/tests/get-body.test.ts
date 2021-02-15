@@ -55,7 +55,7 @@ test('parse http request readable throw error if connection is aborted', async (
     const abort = () => new Promise((resolve) => {
         let socket: Socket = null
         const server = http.createServer((req) => {
-            resolve(fastGetBody(req))
+            resolve(fastGetBody(req, true))
             server.close()
             socket.destroy()
         })
