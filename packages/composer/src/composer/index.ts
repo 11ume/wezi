@@ -1,5 +1,5 @@
 import { createError } from 'wezi-error'
-import { defaultErrorHandler } from './handlers'
+import { errorHandler as defaultErrorHandler } from './handlers'
 import {
     Next
     , Panic
