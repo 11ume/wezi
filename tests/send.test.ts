@@ -149,7 +149,7 @@ test('send stream readable', async (t) => {
     readable.push('foo')
     readable.push(null)
 
-    const fn = (c: Context) => stream(c, 200, readable)
+    const fn = (c: Context) => stream(c, readable)
     const url = await server(fn)
     const res = await fetch(url)
     const body = await res.text()
@@ -161,7 +161,7 @@ test('send stream readable', async (t) => {
 
 test('send file read stream', async (t) => {
     const readable = fs.createReadStream('./package.json')
-    const fn = (c: Context) => stream(c, 200, readable)
+    const fn = (c: Context) => stream(c, readable)
 
     const url = await server(fn)
     const res = await fetch(url)
@@ -173,7 +173,7 @@ test('send file read stream', async (t) => {
 })
 
 test('send buffer', async (t) => {
-    const fn = (c: Context) => buffer(c, 200, Buffer.from('foo'))
+    const fn = (c: Context) => buffer(c, Buffer.from('foo'))
 
     const url = await server(fn)
     const res = await fetch(url)

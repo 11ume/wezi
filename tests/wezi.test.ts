@@ -1,10 +1,9 @@
 import test from 'ava'
 import fetch from 'node-fetch'
 import wezi, { listen } from 'wezi'
-import createError, { InternalError } from 'wezi-error'
-import { Context, Handler, ErrorHandler } from 'wezi-types'
+import createError from 'wezi-error'
+import { Context } from 'wezi-types'
 import { text, json, buffer } from 'wezi-receive'
-import { createComposer } from 'wezi-composer'
 import { server, serverError, giveMeOneAdress } from './helpers'
 
 const getAddress = giveMeOneAdress(3000)
@@ -12,9 +11,7 @@ const getAddress = giveMeOneAdress(3000)
 test('server listen lazy', async (t) => {
     const w = wezi(() => 'hello')
     const { port, url } = getAddress()
-    listen(w(), {
-        port
-    })
+    listen(w(), port)
     const res = await fetch(url)
     const body = await res.text()
 
@@ -27,10 +24,7 @@ test('server listen no lazy reply, must not emit write after end error', async (
         return 'never'
     })
     const { port, url } = getAddress()
-    listen(w(), {
-        port
-        , lazy: false
-    })
+    listen(w(), port)
     const res = await fetch(url)
     const body = await res.text()
 
@@ -43,10 +37,7 @@ test('server listen no lazy reply, throw error', async (t) => {
         throw createError(500, 'Internal Error')
     })
     const { port, url } = getAddress()
-    listen(w(), {
-        port
-        , lazy: false
-    })
+    listen(w(), port)
     const res = await fetch(url)
     const body: { message: string } = await res.json()
 
@@ -59,10 +50,7 @@ test('server listen no lazy reply, throw error inside of promise', async (t) => 
         throw createError(400, 'Bad Request')
     })
     const { port, url } = getAddress()
-    listen(w(), {
-        port
-        , lazy: false
-    })
+    listen(w(), port)
     const res = await fetch(url)
     const body: { message: string } = await res.json()
 
@@ -85,10 +73,7 @@ test('create custom error handler and throw error inside handler whit listen fn'
     const w = wezi(fail)
 
     const promListen = () => new Promise((r) => {
-        const ln = listen(w(errorHandler), {
-            port
-        })
-
+        const ln = listen(w(errorHandler), port)
         ln.on('listening', r)
     })
 
@@ -230,57 +215,4 @@ test('response only whit status code and whitout custom status message', async (
 
     t.is(res.status, 300)
     t.is(res.statusText, 'Multiple Choices')
-})
-
-test('create custom composer', async (t) => {
-    const { port, url } = getAddress()
-    const w = wezi(() => 'hello')
-    const execute = (c: Context, handler: Handler) => {
-        const val = handler(c)
-        c.res.end(val)
-    }
-    const composer = createComposer(null, null, execute)
-    listen(w(), {
-        port
-        , composer
-    })
-    const res = await fetch(url)
-    const body = await res.text()
-
-    t.is(body, 'hello')
-})
-
-test('create custom composer whit error proxy handler', async (t) => {
-    const { port, url } = getAddress()
-    const errorHandler = (c: Context, error: Partial<InternalError>) => {
-        const message = error.message
-        c.res.statusCode = error.code
-        c.res.end(message)
-    }
-
-    const errorHandlerProxy = (c: Context, error: Error, customErrorHandler: ErrorHandler) => {
-        customErrorHandler(c, error)
-    }
-
-    const fail = () => {
-        throw createError(500, 'Internal Error')
-    }
-
-    const w = wezi(fail)
-    const execute = (c: Context, handler: Handler) => {
-        try { handler(c) } catch (err) {
-            c.panic(err)
-        }
-    }
-
-    const composer = createComposer(errorHandlerProxy, null, execute)
-    listen(w(errorHandler), {
-        port
-        , composer
-    })
-    const res = await fetch(url)
-    const body = await res.text()
-
-    t.is(res.status, 500)
-    t.is(body, 'Internal Error')
 })

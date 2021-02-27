@@ -3,7 +3,7 @@ import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
 import { isJsonable, isReadable } from './utils'
 
-export const stream = (context: Context, statusCode = 200, payload: Readable): void => {
+export const stream = (context: Context, payload: Readable, statusCode = 200): void => {
     const type = context.res.getHeader('Content-Type')
     const contentType = type || 'application/octet-stream'
 
@@ -15,7 +15,7 @@ export const stream = (context: Context, statusCode = 200, payload: Readable): v
     payload.pipe(context.res)
 }
 
-export const buffer = (context: Context, statusCode = 200, payload: Buffer): void => {
+export const buffer = (context: Context, payload: Buffer, statusCode = 200): void => {
     const type = context.res.getHeader('Content-Type')
     const contentType = type || 'application/octet-stream'
 
@@ -76,11 +76,11 @@ export const send = (context: Context, statusCode?: number, payload?: any): void
     }
 
     if (Buffer.isBuffer(payload)) {
-        return buffer(context, statusCode, payload)
+        return buffer(context, payload, statusCode)
     }
 
     if (isReadable(payload)) {
-        return stream(context, statusCode, payload)
+        return stream(context, payload, statusCode)
     }
 
     context.panic(createError(500, 'cannot send, payload is not a valid'))
