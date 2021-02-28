@@ -40,9 +40,6 @@
       ],
       "wezi": [
         "packages/wezi"
-      ],
-      "wezi-dev": [
-        "packages/wezi-dev"
       ]
     }
   },
