@@ -1,12 +1,10 @@
 import test from 'ava'
 import fetch from 'node-fetch'
+import { Readable } from 'stream'
 import { Context } from 'wezi-types'
-import { text, json, buffer } from 'wezi-receive'
+import * as send from 'wezi-send'
+import * as receive from 'wezi-receive'
 import { server } from './helpers'
-
-type ErrorPayload = {
-    message: string
-};
 
 test('receive json', async (t) => {
     type Character = {
@@ -22,7 +20,11 @@ test('receive json', async (t) => {
         }
     ]
 
-    const fn = async (c: Context) => json<Character[]>(c)
+    const fn = async (c: Context) => {
+        const body = await receive.json<Character[]>(c)
+        send.json(c, body)
+    }
+
     const url = await server(fn)
     const res = await fetch(url, {
         method: 'POST'
@@ -30,6 +32,7 @@ test('receive json', async (t) => {
     })
 
     const body: Character[] = await res.json()
+
     t.is(res.headers.get('content-type'), 'application/json charset=utf-8')
     t.is(body[0].name, 't800')
     t.is(body[1].name, 'John Connor')
@@ -37,10 +40,8 @@ test('receive json', async (t) => {
 
 test('json parse error', async (t) => {
     const fn = async (c: Context) => {
-        const body = await json(c)
-        return {
-            body
-        }
+        const body = await receive.json(c)
+        send.json(c, body)
     }
 
     const url = await server(fn)
@@ -57,36 +58,79 @@ test('json parse error', async (t) => {
 
 test('receive buffer', async (t) => {
     const fn = async (c: Context) => {
-        const body = await buffer(c)
+        const body = await receive.buffer(c)
         t.true(Buffer.isBuffer(body))
-        return body
+        send.buffer(c, body)
     }
+
     const url = await server(fn)
     const res = await fetch(url, {
         method: 'POST'
-        , body: Buffer.from('🐻')
+        , body: Buffer.from('foo')
     })
 
     const body = await res.text()
-    t.is(body, '🐻')
+
+    t.is(res.headers.get('content-type'), 'application/octet-stream')
+    t.is(body, 'foo')
 })
 
 test('receive text', async (t) => {
-    const fn = async (c: Context) => text(c)
+    const fn = async (c: Context) => {
+        const body = await receive.text(c)
+        t.true(typeof body === 'string')
+        send.text(c, body)
+    }
+
     const url = await server(fn)
     const res = await fetch(url, {
         method: 'POST'
-        , body: '🐻 im a grizzly bear'
+        , body: 'foo im a grizzly bear'
     })
 
     const body = await res.text()
-    t.is(body, '🐻 im a grizzly bear')
+
+    t.is(res.headers.get('content-type'), 'text/plain charset=utf-8')
+    t.is(body, 'foo im a grizzly bear')
 })
 
-test('json should throw 400 on empty body with no headers', async (t) => {
-    const fn = async (c: Context) => json(c)
-    const url = await server(fn)
+test('receive stream', async (t) => {
+    const readable = new Readable()
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    readable._read = () => { }
+    readable.push('foo')
+    readable.push(', bar')
+    readable.push(null)
 
+    const fn = async (c: Context) => {
+        const body = await receive.text(c)
+        t.true(typeof body === 'string')
+        send.text(c, body)
+    }
+
+    const url = await server(fn)
+    const res = await fetch(url, {
+        method: 'POST'
+        , body: readable
+    })
+
+    const body = await res.text()
+
+    t.is(res.headers.get('content-type'), 'text/plain charset=utf-8')
+    t.is(body, 'foo, bar')
+})
+
+test('json should throw 400 on empty body', async (t) => {
+    type ErrorPayload = {
+        message: string
+    }
+
+    const fn = async (c: Context) => {
+        const body = await receive.json(c)
+        send.json(c, body)
+    }
+
+    const url = await server(fn)
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
@@ -96,9 +140,9 @@ test('json should throw 400 on empty body with no headers', async (t) => {
 
 test('json cache works', async (t) => {
     const fn = async (c: Context) => {
-        const bodyOne = await json(c)
-        const bodyTwo = await json(c)
-        t.deepEqual(bodyOne, bodyTwo)
+        const bodyOne = await receive.json(c)
+        const bodyTwo = await receive.json(c)
+        t.true(bodyOne === bodyTwo)
         c.res.end()
     }
 
@@ -106,7 +150,7 @@ test('json cache works', async (t) => {
     const res = await fetch(url, {
         method: 'POST'
         , body: JSON.stringify({
-            foo: 'fooy'
+            foo: 'foo'
         })
     })
 

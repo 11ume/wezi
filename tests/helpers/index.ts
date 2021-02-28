@@ -1,6 +1,6 @@
 import http from 'http'
-import listen from 'test-listen'
 import wezi from 'wezi'
+import listen from 'test-listen'
 import { ComposerHandler, Handler, ErrorHandler } from 'wezi-types'
 
 export function server(...handlers: (ComposerHandler | Handler)[]): Promise<string>

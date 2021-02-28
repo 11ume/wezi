@@ -3,13 +3,14 @@ import fetch from 'node-fetch'
 import wezi, { listen } from 'wezi'
 import createError from 'wezi-error'
 import { Context } from 'wezi-types'
-import { text, json, buffer } from 'wezi-receive'
+import * as send from 'wezi-send'
+import * as receive from 'wezi-receive'
 import { server, serverError, giveMeOneAdress } from './helpers'
 
 const getAddress = giveMeOneAdress(3000)
 
-test('server listen lazy', async (t) => {
-    const w = wezi(() => 'hello')
+test('server listen', async (t) => {
+    const w = wezi((c: Context) => send.text(c, 'hello'))
     const { port, url } = getAddress()
     listen(w(), port)
     const res = await fetch(url)
@@ -18,21 +19,7 @@ test('server listen lazy', async (t) => {
     t.is(body, 'hello')
 })
 
-test('server listen no lazy reply, must not emit write after end error', async (t) => {
-    const w = wezi((c: Context) => {
-        c.res.end('hello')
-        return 'never'
-    })
-    const { port, url } = getAddress()
-    listen(w(), port)
-    const res = await fetch(url)
-    const body = await res.text()
-
-    t.is(res.status, 200)
-    t.is(body, 'hello')
-})
-
-test('server listen no lazy reply, throw error', async (t) => {
+test('server listen throw error', async (t) => {
     const w = wezi(() => {
         throw createError(500, 'Internal Error')
     })
@@ -45,7 +32,7 @@ test('server listen no lazy reply, throw error', async (t) => {
     t.is(body.message, 'Internal Error')
 })
 
-test('server listen no lazy reply, throw error inside of promise', async (t) => {
+test('server listen throw error inside of promise', async (t) => {
     const w = wezi(async () => {
         throw createError(400, 'Bad Request')
     })
@@ -135,7 +122,10 @@ test('parse and reply same received json', async (t) => {
         name: string
     }
 
-    const handler = (c: Context): Promise<Character> => json(c)
+    const handler = async (c: Context) => {
+        const body: Character = await receive.json(c)
+        send.json(c, body)
+    }
 
     const url = await server(handler)
     const res = await fetch(url, {
@@ -151,7 +141,10 @@ test('parse and reply same received json', async (t) => {
 })
 
 test('parse and reply same received buffer', async (t) => {
-    const handler = (c: Context) => buffer(c)
+    const handler = async (c: Context) => {
+        const body = await receive.buffer(c)
+        send.buffer(c, body)
+    }
 
     const url = await server(handler)
     const res = await fetch(url, {
@@ -165,7 +158,10 @@ test('parse and reply same received buffer', async (t) => {
 })
 
 test('parse and reply same received text', async (t) => {
-    const handler = (c: Context) => text(c)
+    const handler = async (c: Context) => {
+        const text = await receive.text(c)
+        send.text(c, text)
+    }
 
     const url = await server(handler)
     const res = await fetch(url, {

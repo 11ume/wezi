@@ -1,7 +1,8 @@
 import * as receive from 'wezi-receive'
 import test from 'ava'
 import fetch from 'node-fetch'
-import { Context } from 'wezi-types'
+import { Context } from 'wezi'
+import { empty, json, text } from 'wezi-send'
 import { createError } from 'wezi-error'
 import router, {
     get
@@ -14,7 +15,7 @@ import router, {
 import { server } from './helpers'
 
 test('base path', async (t) => {
-    const greet = () => 'hello'
+    const greet = (c: Context) => text(c, 'hello')
     const r = router(
         get('/', greet)
     )
@@ -26,8 +27,8 @@ test('base path', async (t) => {
 })
 
 test('not found', async (t) => {
-    const foo = () => 'foo'
-    const bar = () => 'bar'
+    const foo = (c: Context) => text(c, 'foo')
+    const bar = (c: Context) => text(c, 'bar')
     const r = router(
         get('/foo', foo)
         , get('/bar', bar)
@@ -42,7 +43,7 @@ test('not found', async (t) => {
 })
 
 test('pattern match /(.*)', async (t) => {
-    const greet = () => 'hello'
+    const greet = (c: Context) => text(c, 'hello')
     const r = router(
         get('*', greet)
     )
@@ -73,12 +74,12 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
     }
 
     const r = router(
-        get('/users', () => responses.getAll)
-        , get('/users/:id', (_: Context, params: Payload) => params.id)
-        , post('/users', () => responses.create)
-        , put('/users', () => responses.put)
-        , patch('/users', () => responses.patch)
-        , del('/users', () => responses.delete)
+        get('/users', (c: Context) => text(c, responses.getAll))
+        , get('/users/:id', (c: Context, params: Payload) => text(c, params.id))
+        , post('/users', (c: Context) => text(c, responses.create))
+        , put('/users', (c: Context) => text(c, responses.put))
+        , patch('/users', (c: Context) => text(c, responses.patch))
+        , del('/users', (c: Context) => text(c, responses.delete))
     )
     const url = await server(r)
     const getAllres = await fetch(`${url}/users`)
@@ -113,10 +114,10 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
 
 test('different routes whit static paths, method get', async (t) => {
     const r = router(
-        get('/foo', () => ({
+        get('/foo', (c: Context) => json(c, {
             name: 'foo'
         }))
-        , get('/bar', () => ({
+        , get('/bar', (c: Context) => json(c, {
             name: 'bar'
         }))
     )
@@ -134,9 +135,9 @@ test('different routes whit static paths, method get', async (t) => {
     t.is(bodyBar.name, 'bar')
 })
 
-test('different routes whit return null', async (t) => {
+test('different routes whit return empty', async (t) => {
     const r = router(
-        get('/foo', () => null)
+        get('/foo', (c: Context) => empty(c))
     )
     const url = await server(r)
     const res = await fetch(`${url}/foo`)
@@ -151,7 +152,7 @@ test('routes with multi params', async (t) => {
         foo: string
         bar: string
     }
-    const greet = (_context: Context, params: Payload) => `${params.foo} ${params.bar}`
+    const greet = (c: Context, params: Payload) => text(c, `${params.foo} ${params.bar}`)
     const r = router(
         get('/hello/:foo/:bar', greet)
     )
@@ -164,7 +165,7 @@ test('routes with multi params', async (t) => {
 })
 
 test('multiple matching routes', async (t) => {
-    const withPath = () => 'Hello world'
+    const withPath = (c: Context) => text(c, 'Hello world')
     const withParam = () => t.fail('Clashing route should not have been called')
 
     const r = router(
@@ -180,7 +181,7 @@ test('multiple matching routes', async (t) => {
 })
 
 test('match head, match route and return empty body', async (t) => {
-    const ping = () => 'hello'
+    const ping = (c: Context) => text(c, 'hello')
     const r = router(
         head('/hello', ping)
     )
@@ -202,7 +203,7 @@ test('multiple routes handlers', async (t) => {
         if (payload.name !== 'john') throw createError(400, 'Bad request')
         context.next(payload)
     }
-    const getChar = (_context: Context, params: Payload) => params.name
+    const getChar = (c: Context, params: Payload) => text(c, params.name)
     const r = router(
         get('/character/:name', checkChar, getChar)
     )
@@ -220,7 +221,7 @@ test('multiple routes handlers fail next', async (t) => {
         if (char.name && char.power) context.next(payload)
         else throw createError(400, 'Bad request')
     }
-    const getChar = () => null
+    const getChar = (c: Context) => text(c, 'never')
     const r = router(
         post('/character', checkChar, getChar)
     )

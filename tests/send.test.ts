@@ -5,14 +5,15 @@ import { Readable } from 'stream'
 import { Context } from 'wezi-types'
 import { server } from './helpers'
 import {
-    send
-    , empty
+    empty
+    , text
+    , json
     , buffer
     , stream
 } from 'wezi-send'
 
 test('send text string message', async (t) => {
-    const fn = (c: Context) => send(c, 200, 'hello')
+    const fn = (c: Context) => text(c, 'hello')
 
     const url = await server(fn)
     const res = await fetch(url)
@@ -24,7 +25,7 @@ test('send text string message', async (t) => {
 })
 
 test('send text number message', async (t) => {
-    const fn = (c: Context) => send(c, 200, 1)
+    const fn = (c: Context) => text(c, '1')
 
     const url = await server(fn)
     const res = await fetch(url)
@@ -36,7 +37,7 @@ test('send text number message', async (t) => {
 })
 
 test('send json message', async (t) => {
-    const fn = (c: Context) => send(c, 200, {
+    const fn = (c: Context) => json(c, {
         message: 'hello'
     })
 
@@ -59,9 +60,9 @@ test('send empty', async (t) => {
 })
 
 test('send payload whit status code', async (t) => {
-    const fn = (c: Context) => send(c, 401, {
+    const fn = (c: Context) => json(c, {
         message: 'hello'
-    })
+    }, 401)
 
     const url = await server(fn)
     const res = await fetch(url)
@@ -71,75 +72,6 @@ test('send payload whit status code', async (t) => {
     t.is(body.message, 'hello')
     t.is(res.headers.get('Content-Length'), '19')
     t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
-})
-
-test('send direct lazy message', async (t) => {
-    const fn = () => 'hello'
-
-    const url = await server(fn)
-    const res = await fetch(url)
-    const body = await res.text()
-
-    t.is(res.status, 200)
-    t.is(res.headers.get('Content-Type'), 'text/plain charset=utf-8')
-    t.is(res.headers.get('Content-Length'), '5')
-    t.is(body, 'hello')
-})
-
-test('send direct lazy json', async (t) => {
-    const fn = () => ({
-        message: 'hello'
-    })
-
-    const url = await server(fn)
-    const res = await fetch(url)
-    const body: { message: string } = await res.json()
-
-    t.is(res.status, 200)
-    t.is(res.headers.get('Content-Length'), '19')
-    t.is(res.headers.get('Content-Type'), 'application/json charset=utf-8')
-    t.is(body.message, 'hello')
-})
-
-test('send direct lazy buffer', async (t) => {
-    const fn = () => Buffer.from('foo')
-
-    const url = await server(fn)
-    const res = await fetch(url)
-    const body = await res.text()
-
-    t.is(res.status, 200)
-    t.is(res.headers.get('Content-Length'), '3')
-    t.is(res.headers.get('Content-Type'), 'application/octet-stream')
-    t.is(body, 'foo')
-})
-
-test('send direct lazy readable', async (t) => {
-    const readable = new Readable()
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    readable._read = () => { }
-    readable.push('foo')
-    readable.push(',bar')
-    readable.push(null)
-
-    const fn = () => readable
-
-    const url = await server(fn)
-    const res = await fetch(url)
-    const body = await res.text()
-
-    t.is(res.status, 200)
-    t.is(res.headers.get('Content-Type'), 'application/octet-stream')
-    t.is(body, 'foo,bar')
-})
-
-test('send direct lazy Not Content 204', async (t) => {
-    const fn = () => null
-
-    const url = await server(fn)
-    const res = await fetch(url)
-
-    t.is(res.status, 204)
 })
 
 test('send stream readable', async (t) => {
@@ -190,12 +122,14 @@ test('send must throws error when is invoked whit invalid content', async (t) =>
         message: string
     }
 
-    const fn = (c: Context) => send(c, 400, Symbol('test'))
+    const fn = (c: Context) => text(c, {
+        foo: 'foo'
+    } as any)
 
     const url = await server(fn)
     const res = await fetch(url)
     const body: ErrorPayload = await res.json()
 
     t.is(res.status, 500)
-    t.is(body.message, 'cannot send, payload is not a valid')
+    t.is(body.message, 'The "string" argument must be of type string or an instance of Buffer or ArrayBuffer. Received an instance of Object')
 })

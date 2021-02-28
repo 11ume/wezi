@@ -15,10 +15,8 @@ export type PreparedComposer = (main: boolean, ...handlers: Handler[]) => Dispat
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
 
-export const $composer = Symbol('composer')
-
 const defaultErrorHandler = (context: Context, error: Partial<InternalError>): void => {
-    const status = error.code ?? 500
+    const status = error.statusCode ?? 500
     const message = error.message || 'unknown'
     const payload = {
         message
@@ -70,6 +68,8 @@ const createContext = (context: Context, dispatch: Dispatch, errorHandler: Error
         , panic: createPanic(context, errorHandler)
     }
 }
+
+export const $composer = Symbol('composer')
 
 export const createComposer = (errorHandler: ErrorHandler = defaultErrorHandler): PreparedComposer => {
     return (main: boolean, ...handlers: Handler[]): Dispatch => {
