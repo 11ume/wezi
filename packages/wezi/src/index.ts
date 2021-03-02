@@ -2,13 +2,13 @@ import http, { Server, IncomingMessage, ServerResponse, RequestListener } from '
 import {
     Context
     , Handler
-    , ComposerHandler
     , HandlerMuti
     , ErrorHandler
+    , ComposerHandler
 } from 'wezi-types'
 import {
-    PreparedComposer
-    , createComposer
+    createComposer
+    , PreparedComposer
     , $composer
 } from 'wezi-composer'
 
@@ -28,9 +28,9 @@ const composeHandlers = (preparedComposer: PreparedComposer, handlers: HandlerMu
     return handler
 })
 
-export const listen = (listener: RequestListener, port = 3000): Server => {
+export const listen = (listener: RequestListener, port = 3000, host?: string): Server => {
     const server = http.createServer(listener)
-    server.listen(port)
+    server.listen(port, host)
     return server
 }
 
