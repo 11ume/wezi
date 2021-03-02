@@ -67,8 +67,9 @@ const createRouteEntity = (method: string) => (path: string | Handler, ...handle
     }
 }
 
-export const namespace = (name: string, ...entities: RouteEntity[]): RouteEntity[] => entities.map(entity => ({
+export const route = (name: string, ...handlers: Handler[]) => (...entities: RouteEntity[]): RouteEntity[] => entities.map(entity => ({
     ...entity
+    , handlers: [...handlers, ...entity.handlers]
     , path: `${name}${entity.path}`
 }))
 

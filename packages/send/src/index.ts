@@ -59,3 +59,11 @@ export const empty = (context: Context, statusCode = 204): void => {
 
     context.res.end(null, null, null)
 }
+
+export const ok = (context: Context): void => {
+    context.res.writeHead(200, {
+        'Content-Length': '0'
+    })
+
+    context.res.end(null, null, null)
+}
