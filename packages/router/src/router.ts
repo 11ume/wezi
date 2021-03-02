@@ -42,7 +42,7 @@ const findRouteMatch = (matcher: Matcher, preparedComposer: PreparedComposer) =>
 }
 
 const prepareRouterStack = (matcher: Matcher, entities: RouteEntity[]) => entities
-    .forEach((entity) => {
+    .forEach(entity => {
         matcher.create(entity.method, entity.path, ...entity.handlers)
     })
 
@@ -51,7 +51,15 @@ const prepareRoutes = (matcher: Matcher, entities: RouteEntity[], preparedCompos
     return findRouteMatch(matcher, preparedComposer)
 }
 
-const createRouteEntity = (method: string) => (path: string, ...handlers: Handler[]): RouteEntity => {
+const createRouteEntity = (method: string) => (path: string | Handler, ...handlers: Handler[]): RouteEntity => {
+    if (typeof path === 'function') {
+        return {
+            path: ''
+            , method
+            , handlers: [path, ...handlers]
+        }
+    }
+
     return {
         path
         , method
@@ -59,10 +67,16 @@ const createRouteEntity = (method: string) => (path: string, ...handlers: Handle
     }
 }
 
-export const createRouter = (...entities: RouteEntity[]) => {
+export const namespace = (name: string, ...entities: RouteEntity[]): RouteEntity[] => entities.map(entity => ({
+    ...entity
+    , path: `${name}${entity.path}`
+}))
+
+export const createRouter = (...entities: RouteEntity[] | RouteEntity[][]) => {
+    const entitiesFlat = entities.flat()
     const match: ComposerHandler = (preparedComposer: PreparedComposer) => {
         const matcher = matchit()
-        return prepareRoutes(matcher, entities, preparedComposer)
+        return prepareRoutes(matcher, entitiesFlat, preparedComposer)
     }
 
     Object.defineProperty(match, 'id', {

@@ -7,6 +7,7 @@ export {
     , head
     , patch
     , options
+    , namespace
 } from './src/router'
 
 export default createRouter
