@@ -73,7 +73,7 @@ export const route = (name: string, ...handlers: Handler[]) => (...entities: Rou
     , path: `${name}${entity.path}`
 }))
 
-export const createRouter = (...entities: RouteEntity[] | RouteEntity[][]) => {
+export const createRouter = (...entities: (RouteEntity | RouteEntity[])[]) => {
     const entitiesFlat = entities.flat()
     const match: ComposerHandler = (preparedComposer: PreparedComposer) => {
         const matcher = matchit()

@@ -11,6 +11,7 @@ import router, {
     , put
     , del
     , patch
+    , route
 } from 'wezi-router'
 import { server } from './helpers'
 
@@ -235,3 +236,71 @@ test('multiple routes handlers fail next', async (t) => {
 
     t.is(res.status, 400)
 })
+
+test('create route wiht namespace', async (t) => {
+    const foo = (c: Context) => text(c, 'foo')
+    const r = router(route('/foo')(get(foo)))
+    const url = await server(r)
+    const res = await fetch(`${url}/foo`)
+    const body = await res.text()
+
+    t.is(res.status, 200)
+    t.is(body, 'foo')
+})
+
+test('create route wiht namespace and two route entities', async (t) => {
+    const foo = (c: Context, params: { id: string }) => text(c, params.id)
+    const bar = (c: Context, params: { id: string }) => text(c, params.id)
+    const r = router(route('/foo/:id')(get(foo), put(bar)))
+    const url = await server(r)
+    const res = await fetch(`${url}/foo/123`)
+    const resPut = await fetch(`${url}/foo/321`, {
+        method: 'put'
+    })
+    const body = await res.text()
+    const bodyPut = await resPut.text()
+
+    t.is(res.status, 200)
+    t.is(resPut.status, 200)
+    t.is(body, '123')
+    t.is(bodyPut, '321')
+})
+
+test('create route wiht namespace with handler and two route entities', async (t) => {
+    type Params = {
+        id: string
+        next: string
+        pass: string
+    }
+
+    const next = (c: Context, params: { id: string }) => c.next({
+        ...params
+        , next: 'next'
+    })
+    const pass = (c: Context, params: { id: string }) => c.next({
+        ...params
+        , pass: 'pass'
+    })
+    const foo = (c: Context, params: Params) => json(c, params)
+    const bar = (c: Context, params: { id: string }) => json(c, params)
+    const r = router(route('/foo/:id', next, pass)(get(foo), get(bar)))
+    const url = await server(r)
+    const res = await fetch(`${url}/foo/123`)
+    const resTwo = await fetch(`${url}/foo/321`)
+    const body: Params = await res.json()
+    const bodyTwo: Params = await resTwo.json()
+
+    t.is(res.status, 200)
+    t.is(resTwo.status, 200)
+    t.deepEqual(body, {
+        id: '123'
+        , next: 'next'
+        , pass: 'pass'
+    })
+    t.deepEqual(bodyTwo, {
+        id: '321'
+        , next: 'next'
+        , pass: 'pass'
+    })
+})
+
