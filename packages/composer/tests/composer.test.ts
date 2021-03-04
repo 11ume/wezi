@@ -3,12 +3,12 @@ import fetch from 'node-fetch'
 import * as send from 'wezi-send'
 import { Context } from 'wezi-types'
 import { server, createContext } from './helpers'
-import { createComposer } from '..'
+import { composer } from '..'
 
 test('main composer single handler, send.text :200', async (t) => {
     const url = await server((req, res) => {
         const greet = (c: Context) => send.text(c, 'hello')
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, greet)
         const context = createContext({
             req
@@ -28,7 +28,7 @@ test('main composer single handler, send.text :200', async (t) => {
 test('main composer single handler, send.empty :204', async (t) => {
     const url = await server((req, res) => {
         const empty = (c: Context) => send.empty(c)
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, empty)
         const context = createContext({
             req
@@ -49,7 +49,7 @@ test('main composer multi handler, direct return in first handler, send.empty :2
     const url = await server((req, res) => {
         const empty = (c: Context) => send.empty(c)
         const greet = (c: Context) => send.text(c, 'hi')
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, empty, greet)
         const context = createContext({
             req
@@ -70,7 +70,7 @@ test('main composer multi handler, direct return in second handler, next() send.
     const url = await server((req, res) => {
         const empty = (c: Context) => c.next()
         const greet = (c: Context) => send.empty(c)
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, empty, greet)
         const context = createContext({
             req
@@ -91,7 +91,7 @@ test('main composer multi handler, direct return in first handler, send.text :20
     const url = await server((req, res) => {
         const greet = (c: Context) => send.text(c, 'hello')
         const never = (c: Context) => send.text(c, 'never')
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, greet, never)
         const context = createContext({
             req
@@ -112,7 +112,7 @@ test('main composer multi handler, direct return in second handler, next() send.
     const url = await server((req, res) => {
         const next = (c: Context) => c.next()
         const greet = (c: Context) => send.text(c, 'hello')
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, next, greet)
         const context = createContext({
             req
@@ -133,7 +133,7 @@ test('main composer multi handlers, pass parameters whit next(), next(string), s
     const url = await server((req, res) => {
         const next = (c: Context) => c.next('hello')
         const greet = (c: Context, message: string) => send.text(c, message)
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, next, greet)
         const context = createContext({
             req
@@ -161,7 +161,7 @@ test('main composer multi handlers async, pass parameters whit next(), next(stri
             t.is(message, 'hello')
             send.text(c, message)
         }
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, next, greet)
         const context = createContext({
             req
