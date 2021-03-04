@@ -1,9 +1,7 @@
 import { Readable } from 'stream'
 import { Context } from 'wezi-types'
-import { createError } from 'wezi-error'
-import { isJsonable, isReadable } from './utils'
 
-export const stream = (context: Context, statusCode = 200, payload: Readable): void => {
+export const stream = (context: Context, payload: Readable, statusCode = 200): void => {
     const type = context.res.getHeader('Content-Type')
     const contentType = type || 'application/octet-stream'
 
@@ -15,7 +13,7 @@ export const stream = (context: Context, statusCode = 200, payload: Readable): v
     payload.pipe(context.res)
 }
 
-export const buffer = (context: Context, statusCode = 200, payload: Buffer): void => {
+export const buffer = (context: Context, payload: Buffer, statusCode = 200): void => {
     const type = context.res.getHeader('Content-Type')
     const contentType = type || 'application/octet-stream'
 
@@ -62,26 +60,10 @@ export const empty = (context: Context, statusCode = 204): void => {
     context.res.end(null, null, null)
 }
 
-export const send = (context: Context, statusCode?: number, payload?: any): void => {
-    if (isJsonable(payload)) {
-        return json(context, payload, statusCode)
-    }
+export const ok = (context: Context): void => {
+    context.res.writeHead(200, {
+        'Content-Length': '0'
+    })
 
-    if (typeof payload === 'string') {
-        return text(context, payload, statusCode)
-    }
-
-    if (typeof payload === 'number') {
-        return text(context, payload.toString(), statusCode)
-    }
-
-    if (Buffer.isBuffer(payload)) {
-        return buffer(context, statusCode, payload)
-    }
-
-    if (isReadable(payload)) {
-        return stream(context, statusCode, payload)
-    }
-
-    context.panic(createError(500, 'cannot send, payload is not a valid'))
+    context.res.end(null, null, null)
 }

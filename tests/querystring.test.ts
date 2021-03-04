@@ -1,8 +1,9 @@
 import test from 'ava'
 import fetch from 'node-fetch'
-import { Context } from 'wezi'
 import router, { get } from 'wezi-router'
 import queryParser from 'wezi-query'
+import { text } from 'wezi-send'
+import { Context } from 'wezi'
 import { server } from './helpers'
 
 test('get query string params', async (t) => {
@@ -13,7 +14,7 @@ test('get query string params', async (t) => {
 
     const greet = (c: Context) => {
         const query = queryParser<Query>(c)
-        return `${query.name} ${query.surname}`
+        text(c, `${query.name} ${query.surname}`)
     }
     const url = await server(greet)
     const res = await fetch(`${url}/users?name=foo&surname=bar`)
@@ -30,7 +31,7 @@ test('get query string params whit router flow', async (t) => {
 
     const greet = (c: Context) => {
         const query = queryParser<Query>(c)
-        return `${query.name} ${query.surname}`
+        text(c, `${query.name} ${query.surname}`)
     }
     const r = router(
         get('/users', greet)

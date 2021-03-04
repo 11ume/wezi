@@ -1,20 +1,19 @@
 import http from 'http'
-import listen from 'test-listen'
 import wezi from 'wezi'
-import { defaultErrorHandler, lazyComposer } from 'wezi-composer'
+import listen from 'test-listen'
 import { ComposerHandler, Handler, ErrorHandler } from 'wezi-types'
 
 export function server(...handlers: (ComposerHandler | Handler)[]): Promise<string>
 export function server(...handlers: any[]) {
-    const compose = wezi(...handlers)
-    const run = compose(defaultErrorHandler)(lazyComposer)
+    const w = wezi(...handlers)
+    const run = w()
     return listen(http.createServer(run))
 }
 
 export function serverError(errorHandler: ErrorHandler, ...handlers: (ComposerHandler | Handler)[]): Promise<string>
 export function serverError(errorHandler: ErrorHandler, ...handlers: any[]) {
-    const compose = wezi(...handlers)
-    const run = compose(errorHandler)(lazyComposer)
+    const w = wezi(...handlers)
+    const run = w(errorHandler)
     return listen(http.createServer(run))
 }
 

@@ -1,11 +1,12 @@
 import test from 'ava'
 import fetch from 'node-fetch'
+import * as send from 'wezi-send'
 import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
 import { server, createContext } from './helpers'
-import { lazyComposer as composer } from '..'
+import { createComposer } from '..'
 
-test('main composer end response if all higher are executed, and none of them has ended the response, errorHandler<Error:400>', async (t) => {
+test('main composer end response if all higher are executed, and none of them has ended the response :400>', async (t) => {
     const foo = (c: Context) => c.next()
     const bar = (c: Context) => c.next()
     const url = await server((req, res) => {
@@ -14,7 +15,7 @@ test('main composer end response if all higher are executed, and none of them ha
             , res
         })
 
-        const prepare = composer()
+        const prepare = createComposer()
         const dispatch = prepare(true, foo, bar)
         dispatch(context)
     })
@@ -28,11 +29,11 @@ test('main composer end response if all higher are executed, and none of them ha
     })
 })
 
-test('main composer multi handler async, direct promise error return in first handler, next<Error:400>', async (t) => {
+test('main composer multi handler async, direct promise error return in first handler, panic(Error(400)) :400', async (t) => {
     const url = await server((req, res) => {
         const check = (c: Context) => c.panic(createError(400))
-        const never = () => Promise.resolve('hello')
-        const prepare = composer()
+        const never = (c: Context) => send.text(c, 'hello')
+        const prepare = createComposer()
         const dispatch = prepare(true, check, never)
         const context = createContext({
             req
@@ -51,11 +52,11 @@ test('main composer multi handler async, direct promise error return in first ha
     })
 })
 
-test('main composer multi handler async, direct promise error return in second handler, next<empty>, direct<Promise<Error>:400>', async (t) => {
+test('main composer multi handler async, direct promise error return in second handler, next(), errorHandler(Error(400)) :400>', async (t) => {
     const url = await server((req, res) => {
         const next = (c: Context) => c.next()
         const greet = () => Promise.reject(createError(400))
-        const prepare = composer()
+        const prepare = createComposer()
         const dispatch = prepare(true, next, greet)
         const context = createContext({
             req
@@ -74,13 +75,13 @@ test('main composer multi handler async, direct promise error return in second h
     })
 })
 
-test('main composer multi handler, throw error inside first handler, <Error>', async (t) => {
+test('main composer multi handler, throw error inside first handler, errorHandler(Error(500)) :500', async (t) => {
     const url = await server((req, res) => {
         const err = () => {
             throw new Error('Something wrong is happened')
         }
         const never = () => 'hello'
-        const prepare = composer()
+        const prepare = createComposer()
         const dispatch = prepare(true, err, never)
         const context = createContext({
             req
@@ -99,9 +100,9 @@ test('main composer multi handler, throw error inside first handler, <Error>', a
     })
 })
 
-test('main composer call panic whiout pass an error, panic<not error type>', async (t) => {
+test('main composer call panic whiout pass an error, panic({ foo:"foo" })', async (t) => {
     const url = await server((req, res) => {
-        const prepare = composer()
+        const prepare = createComposer()
         const dispatch = prepare(true, (c: Context) => c.panic({
             foo: 'foo'
         } as any))
@@ -122,9 +123,9 @@ test('main composer call panic whiout pass an error, panic<not error type>', asy
     })
 })
 
-test('main composer end the response if higher-order handlers are executed and none of them have call end, next<empty> next<empty>', async (t) => {
+test('main composer end the response if higher-order handlers are executed and none of them have call end, next() next()', async (t) => {
     const url = await server((req, res) => {
-        const prepare = composer()
+        const prepare = createComposer()
         const dispatch = prepare(true, (c: Context) => c.next(), (c: Context) => c.next())
         const context = createContext({
             req

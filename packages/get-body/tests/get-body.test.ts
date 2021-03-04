@@ -77,7 +77,7 @@ test('parse http request readable throw error if connection is aborted', async (
     })
 
     const err = await t.throwsAsync<InternalError>(abort)
-    t.is(err.code, 500)
+    t.is(err.statusCode, 500)
     t.is(err.message, 'error on read body abort, received: 3')
 })
 
@@ -96,9 +96,9 @@ test('parse http request readable invoke error event', async (t) => {
     })
 
     const err = await t.throwsAsync<InternalError>(error)
+    t.is(err.statusCode, 500)
     t.is(err.message, 'error on read body, received: 0')
     t.is(err.originalError.message, 'error message')
-    t.is(err.code, 500)
 })
 
 test('parse http request readable invoke on end error event', async (t) => {
@@ -116,7 +116,7 @@ test('parse http request readable invoke on end error event', async (t) => {
     })
 
     const err = await t.throwsAsync<InternalError>(error)
+    t.is(err.statusCode, 500)
     t.is(err.message, 'error on read body end, received: 0')
     t.is(err.originalError.message, 'error message')
-    t.is(err.code, 500)
 })
