@@ -77,5 +77,5 @@ test('parse query string whiout query string params', (t) => {
     }
 
     const query = qs(ctx as any)
-    t.is(query, null)
+    t.deepEqual(query, {})
 })
