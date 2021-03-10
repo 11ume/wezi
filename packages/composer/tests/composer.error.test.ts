@@ -4,7 +4,7 @@ import * as send from 'wezi-send'
 import { Context } from 'wezi-types'
 import { createError } from 'wezi-error'
 import { server, createContext } from './helpers'
-import { createComposer } from '..'
+import { composer } from '..'
 
 test('main composer end response if all higher are executed, and none of them has ended the response :400>', async (t) => {
     const foo = (c: Context) => c.next()
@@ -15,7 +15,7 @@ test('main composer end response if all higher are executed, and none of them ha
             , res
         })
 
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, foo, bar)
         dispatch(context)
     })
@@ -33,7 +33,7 @@ test('main composer multi handler async, direct promise error return in first ha
     const url = await server((req, res) => {
         const check = (c: Context) => c.panic(createError(400))
         const never = (c: Context) => send.text(c, 'hello')
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, check, never)
         const context = createContext({
             req
@@ -56,7 +56,7 @@ test('main composer multi handler async, direct promise error return in second h
     const url = await server((req, res) => {
         const next = (c: Context) => c.next()
         const greet = () => Promise.reject(createError(400))
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, next, greet)
         const context = createContext({
             req
@@ -81,7 +81,7 @@ test('main composer multi handler, throw error inside first handler, errorHandle
             throw new Error('Something wrong is happened')
         }
         const never = () => 'hello'
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, err, never)
         const context = createContext({
             req
@@ -102,7 +102,7 @@ test('main composer multi handler, throw error inside first handler, errorHandle
 
 test('main composer call panic whiout pass an error, panic({ foo:"foo" })', async (t) => {
     const url = await server((req, res) => {
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, (c: Context) => c.panic({
             foo: 'foo'
         } as any))
@@ -125,7 +125,7 @@ test('main composer call panic whiout pass an error, panic({ foo:"foo" })', asyn
 
 test('main composer end the response if higher-order handlers are executed and none of them have call end, next() next()', async (t) => {
     const url = await server((req, res) => {
-        const prepare = createComposer()
+        const prepare = composer()
         const dispatch = prepare(true, (c: Context) => c.next(), (c: Context) => c.next())
         const context = createContext({
             req

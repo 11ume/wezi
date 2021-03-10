@@ -7,8 +7,8 @@ import {
     , ComposerHandler
 } from 'wezi-types'
 import {
-    createComposer
-    , PreparedComposer
+    PreparedComposer
+    , composer
     , $composer
 } from 'wezi-composer'
 
@@ -35,7 +35,7 @@ export const listen = (listener: RequestListener, port = 3000, host?: string): S
 }
 
 export const wezi: Wezi = (...handlers: any[]) => (errorHandler?: ErrorHandler): RequestListener => {
-    const preparedComposer = createComposer(errorHandler)
+    const preparedComposer = composer(errorHandler)
     const composedHandlers = composeHandlers(preparedComposer, handlers)
     return (req: IncomingMessage, res: ServerResponse): void => {
         const dispatch = preparedComposer(true, ...composedHandlers)
