@@ -51,17 +51,17 @@ const prepareRoutes = (matcher: Matcher, entities: RouteEntity[], preparedCompos
     return findRouteMatch(matcher, preparedComposer)
 }
 
-const createRouteEntity = (method: string) => (path: string | Handler, ...handlers: Handler[]): RouteEntity => {
-    if (typeof path === 'function') {
+const createRouteEntity = (method: string) => (pathOrHandler: string | Handler, ...handlers: Handler[]): RouteEntity => {
+    if (typeof pathOrHandler === 'function') {
         return {
             path: ''
             , method
-            , handlers: [path, ...handlers]
+            , handlers: [pathOrHandler, ...handlers]
         }
     }
 
     return {
-        path
+        path: pathOrHandler
         , method
         , handlers
     }
