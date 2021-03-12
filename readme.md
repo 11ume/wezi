@@ -37,14 +37,12 @@
 
 <br>
 
-* **Small** To be easy and fast to learn.
+* **Small** To be easy and fast to learn, easy to adapt.
 * **Simple** Focused on simplicity, hides the complexity and respect the [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle.
+* **High control** Extremely versatile, low level abstraction, you have the control.
 * **Fast** High performance.
 * **Focus opt-in**: All features are opt-in.  
 * **Async** Implements an enhanced async control of handlers execution.
-* **Modular** Extremely versatile.
-* **Middlwares** Implements a middleware logic.
-* **ES6 modules** Native ESM modules syntax support.
 
 <br>
 
@@ -68,9 +66,11 @@ npm install wezi
 
 ```ts
 import wezi, { listen } from 'wezi'
+import { text } from 'wezi-send'
 
-const greet = () => 'Hi!'
-listen(wezi(greet))
+const greet = (c) => text(c, 'Hi!')
+const w = wezi(greet)
+listen(w())
 ```
 
 <br>
