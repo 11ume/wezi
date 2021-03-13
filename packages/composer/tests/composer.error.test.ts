@@ -16,8 +16,8 @@ test('main composer end response if all higher are executed, and none of them ha
         })
 
         const prepare = composer()
-        const dispatch = prepare(true, foo, bar)
-        dispatch(context)
+        const run = prepare(true, foo, bar)
+        run(context)
     })
 
     const res = await fetch(url)
@@ -34,13 +34,13 @@ test('main composer multi handler async, direct promise error return in first ha
         const check = (c: Context) => c.panic(createError(400))
         const never = (c: Context) => send.text(c, 'hello')
         const prepare = composer()
-        const dispatch = prepare(true, check, never)
+        const run = prepare(true, check, never)
         const context = createContext({
             req
             , res
         })
 
-        dispatch(context)
+        run(context)
     })
 
     const res = await fetch(url)
@@ -57,13 +57,13 @@ test('main composer multi handler async, direct promise error return in second h
         const next = (c: Context) => c.next()
         const greet = () => Promise.reject(createError(400))
         const prepare = composer()
-        const dispatch = prepare(true, next, greet)
+        const run = prepare(true, next, greet)
         const context = createContext({
             req
             , res
         })
 
-        dispatch(context)
+        run(context)
     })
 
     const res = await fetch(url)
@@ -82,13 +82,13 @@ test('main composer multi handler, throw error inside first handler, errorHandle
         }
         const never = () => 'hello'
         const prepare = composer()
-        const dispatch = prepare(true, err, never)
+        const run = prepare(true, err, never)
         const context = createContext({
             req
             , res
         })
 
-        dispatch(context)
+        run(context)
     })
 
     const res = await fetch(url)
@@ -103,7 +103,7 @@ test('main composer multi handler, throw error inside first handler, errorHandle
 test('main composer call panic whiout pass an error, panic({ foo:"foo" })', async (t) => {
     const url = await server((req, res) => {
         const prepare = composer()
-        const dispatch = prepare(true, (c: Context) => c.panic({
+        const run = prepare(true, (c: Context) => c.panic({
             foo: 'foo'
         } as any))
         const context = createContext({
@@ -111,7 +111,7 @@ test('main composer call panic whiout pass an error, panic({ foo:"foo" })', asyn
             , res
         })
 
-        dispatch(context)
+        run(context)
     })
 
     const res = await fetch(url)
@@ -126,13 +126,13 @@ test('main composer call panic whiout pass an error, panic({ foo:"foo" })', asyn
 test('main composer end the response if higher-order handlers are executed and none of them have call end, next() next()', async (t) => {
     const url = await server((req, res) => {
         const prepare = composer()
-        const dispatch = prepare(true, (c: Context) => c.next(), (c: Context) => c.next())
+        const run = prepare(true, (c: Context) => c.next(), (c: Context) => c.next())
         const context = createContext({
             req
             , res
         })
 
-        dispatch(context)
+        run(context)
     })
 
     const res = await fetch(url)

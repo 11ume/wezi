@@ -1,10 +1,10 @@
 import http, { Server, IncomingMessage, ServerResponse, RequestListener } from 'http'
 import { Context, Handler, ErrorHandler, ComposerHandler } from 'wezi-types'
-import { composer, getComposerHandlers } from 'wezi-composer'
+import { composer, prepareComposerHandlers } from 'wezi-composer'
 
-type Wezi = (...handlers: (Handler | ComposerHandler)[]) => (errorHandler?: ErrorHandler) => RequestListener
+export type Wezi = (...handlers: (Handler | ComposerHandler)[]) => (errorHandler?: ErrorHandler) => RequestListener
 
-const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
+export const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
         req
         , res
@@ -21,9 +21,9 @@ export const listen = (listener: RequestListener, port = 3000, host?: string): S
 
 export const wezi: Wezi = (...handlers: any[]) => (errorHandler?: ErrorHandler): RequestListener => {
     const preparedComposer = composer(errorHandler)
-    const composedHandlers = getComposerHandlers(preparedComposer, handlers)
+    const composedHandlers = prepareComposerHandlers(preparedComposer, handlers)
     return (req: IncomingMessage, res: ServerResponse): void => {
-        const dispatch = preparedComposer(true, ...composedHandlers)
-        dispatch(createContext(req, res))
+        const run = preparedComposer(true, ...composedHandlers)
+        run(createContext(req, res))
     }
 }

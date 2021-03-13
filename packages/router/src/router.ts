@@ -15,26 +15,26 @@ const replyHead = (context: Context): void => {
     context.res.end(null, null, null)
 }
 
-const dispatchRoute = (found: Found, preparedComposer: PreparedComposer, context: Context): void => {
+const handlerRouteResolver = (found: Found, preparedComposer: PreparedComposer, context: Context): void => {
     if (context.req.method === 'HEAD') {
         replyHead(context)
         return
     }
 
     if (found.handlers) {
-        const dispatch = preparedComposer(false, ...found.handlers)
-        dispatch(context, found.params)
+        const run = preparedComposer(false, ...found.handlers)
+        run(context, found.params)
         return
     }
 
-    const dispatch = preparedComposer(false, found.handler)
-    dispatch(context, found.params)
+    const run = preparedComposer(false, found.handler)
+    run(context, found.params)
 }
 
-const findRouteMatch = (matcher: Matcher, preparedComposer: PreparedComposer) => (context: Context, payload: unknown): void => {
+const matchRoute = (matcher: Matcher, preparedComposer: PreparedComposer) => (context: Context, payload: unknown): void => {
     const found = matcher.lookup(context.req.method, context.req.url)
     if (found) {
-        dispatchRoute(found, preparedComposer, context)
+        handlerRouteResolver(found, preparedComposer, context)
         return
     }
 
@@ -48,7 +48,7 @@ const prepareRouterStack = (matcher: Matcher, entities: RouteEntity[]) => entiti
 
 const prepareRoutes = (matcher: Matcher, entities: RouteEntity[], preparedComposer: PreparedComposer) => {
     prepareRouterStack(matcher, entities)
-    return findRouteMatch(matcher, preparedComposer)
+    return matchRoute(matcher, preparedComposer)
 }
 
 const createRouteEntity = (method: string) => (pathOrHandler: string | Handler, ...handlers: Handler[]): RouteEntity => {
