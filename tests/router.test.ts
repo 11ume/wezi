@@ -266,6 +266,39 @@ test('create route wiht namespace and two route entities', async (t) => {
     t.is(bodyPut, '321')
 })
 
+test('create route wiht namespace whit entity path', async (t) => {
+    const foo = (c: Context, params: { id: string }) => text(c, params.id)
+    const r = router(route('/foo')(get('/bar', foo)))
+    const url = await server(r)
+    const res = await fetch(`${url}/foo/bar`)
+    const body = await res.text()
+
+    t.is(res.status, 200)
+    t.is(body, '123')
+})
+
+test('create route wiht namespace whit entity path and params on first entity', async (t) => {
+    const foo = (c: Context, params: { id: string }) => text(c, params.id)
+    const r = router(route('/foo/:id')(get('/bar', foo)))
+    const url = await server(r)
+    const res = await fetch(`${url}/foo/123/bar`)
+    const body = await res.text()
+
+    t.is(res.status, 200)
+    t.is(body, '123')
+})
+
+test('create route wiht namespace whit entity path and params on the last entity', async (t) => {
+    const foo = (c: Context, params: { name: string, surname: string }) => text(c, `${params.name} ${params.surname}`)
+    const r = router(route('/foo/:name')(get('/bar/:surname', foo)))
+    const url = await server(r)
+    const res = await fetch(`${url}/foo/john/bar/connor`)
+    const body = await res.text()
+
+    t.is(res.status, 200)
+    t.is(body, 'john connor')
+})
+
 test('create route wiht namespace with handler and two route entities', async (t) => {
     type Params = {
         id: string
