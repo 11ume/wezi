@@ -5,7 +5,8 @@ import { Readable } from 'stream'
 import { Context } from 'wezi-types'
 import { server } from './helpers'
 import {
-    empty
+    ok
+    , empty
     , text
     , json
     , buffer
@@ -132,4 +133,13 @@ test('send must throws error when is invoked with invalid content', async (t) =>
 
     t.is(res.status, 500)
     t.is(body.message, 'The "string" argument must be of type string or an instance of Buffer or ArrayBuffer. Received an instance of Object')
+})
+
+test('send ok', async (t) => {
+    const fn = (c: Context) => ok(c)
+    const url = await server(fn)
+    const res = await fetch(url)
+
+    t.is(res.status, 200)
+    t.is(res.headers.get('Content-Length'), '0')
 })
