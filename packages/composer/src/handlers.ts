@@ -1,11 +1,7 @@
-import * as send from 'wezi-send'
 import { InternalError, createError } from 'wezi-error'
+import { Context, Handler, ErrorHandler } from 'wezi-types'
+import { json } from 'wezi-send'
 import { isPromise } from './utils'
-import {
-    Context
-    , Handler
-    , ErrorHandler
-} from 'wezi-types'
 
 export const errorHandler = (context: Context, error: Partial<InternalError>): void => {
     const status = error.statusCode ?? 500
@@ -14,7 +10,7 @@ export const errorHandler = (context: Context, error: Partial<InternalError>): v
         message
     }
 
-    send.json(context, payload, status)
+    json(context, payload, status)
 }
 
 export const executeHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>): void => {

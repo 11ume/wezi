@@ -5,6 +5,7 @@ import {
     , Context
     , Handler
     , ErrorHandler
+    , HandlerMuti
     , Dispatch
 } from 'wezi-types'
 
@@ -44,6 +45,11 @@ const createContext = (context: Context, dispatch: Dispatch, errorHandler: Error
 }
 
 export const $composer = Symbol('composer')
+
+export const getComposerHandlers = (preparedComposer: PreparedComposer, handlers: HandlerMuti[]) => handlers.map(handler => {
+    if (handler.id === $composer) return handler(preparedComposer)
+    return handler
+})
 
 export const createComposer = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHandler: ExecuteHandler): PreparedComposer => {
     return (main: boolean, ...handlers: Handler[]): Dispatch => {

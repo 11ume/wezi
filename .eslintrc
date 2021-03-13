@@ -44,15 +44,15 @@
                 },
                 "ObjectPattern": {
                     "multiline": true,
-                    "minProperties": 5
+                    "minProperties": 6
                 },
                 "ImportDeclaration": {
                     "multiline": true,
-                    "minProperties": 5
+                    "minProperties": 6
                 },
                 "ExportDeclaration": {
                     "multiline": true,
-                    "minProperties": 5
+                    "minProperties": 6
                 }
             }
         ],
