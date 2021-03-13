@@ -61,7 +61,7 @@ test('pattern match /(.*)', async (t) => {
     t.is(bodyTwo, 'hello')
 })
 
-test('different routes whit static paths diferent methods (CRUD)', async (t) => {
+test('different routes with static paths diferent methods (CRUD)', async (t) => {
     type Payload = {
         id: string
     }
@@ -113,7 +113,7 @@ test('different routes whit static paths diferent methods (CRUD)', async (t) => 
     t.deepEqual(bodyDelete, responses.delete)
 })
 
-test('different routes whit static paths, method get', async (t) => {
+test('different routes with static paths, method get', async (t) => {
     const r = router(
         get('/foo', (c: Context) => json(c, {
             name: 'foo'
@@ -136,7 +136,7 @@ test('different routes whit static paths, method get', async (t) => {
     t.is(bodyBar.name, 'bar')
 })
 
-test('different routes whit return empty', async (t) => {
+test('different routes with return empty', async (t) => {
     const r = router(
         get('/foo', (c: Context) => empty(c))
     )
@@ -266,8 +266,8 @@ test('create route wiht namespace and two route entities', async (t) => {
     t.is(bodyPut, '321')
 })
 
-test('create route wiht namespace whit entity path', async (t) => {
-    const foo = (c: Context, params: { id: string }) => text(c, params.id)
+test('create route wiht namespace with entity path', async (t) => {
+    const foo = (c: Context) => text(c, '123')
     const r = router(route('/foo')(get('/bar', foo)))
     const url = await server(r)
     const res = await fetch(`${url}/foo/bar`)
@@ -277,7 +277,7 @@ test('create route wiht namespace whit entity path', async (t) => {
     t.is(body, '123')
 })
 
-test('create route wiht namespace whit entity path and params on first entity', async (t) => {
+test('create route wiht namespace with entity path and params on first entity', async (t) => {
     const foo = (c: Context, params: { id: string }) => text(c, params.id)
     const r = router(route('/foo/:id')(get('/bar', foo)))
     const url = await server(r)
@@ -288,7 +288,7 @@ test('create route wiht namespace whit entity path and params on first entity', 
     t.is(body, '123')
 })
 
-test('create route wiht namespace whit entity path and params on the last entity', async (t) => {
+test('create route wiht namespace with entity path and params on the last entity', async (t) => {
     const foo = (c: Context, params: { name: string, surname: string }) => text(c, `${params.name} ${params.surname}`)
     const r = router(route('/foo/:name')(get('/bar/:surname', foo)))
     const url = await server(r)
