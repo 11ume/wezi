@@ -7,13 +7,13 @@ test('create simple error', (t) => {
     t.is(err.message, 'ok')
 })
 
-test('create error whit message', (t) => {
+test('create error with message', (t) => {
     const err = createError(500, 'invalid json')
     t.is(err.statusCode, 500)
     t.is(err.message, 'invalid json')
 })
 
-test('create error whitout message', (t) => {
+test('create error without message', (t) => {
     const err = createError(400)
     t.is(err.message, '')
 })

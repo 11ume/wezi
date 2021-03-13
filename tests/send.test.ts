@@ -59,7 +59,7 @@ test('send empty', async (t) => {
     t.is(res.status, 204)
 })
 
-test('send payload whit status code', async (t) => {
+test('send payload with status code', async (t) => {
     const fn = (c: Context) => json(c, {
         message: 'hello'
     }, 401)
@@ -117,7 +117,7 @@ test('send buffer', async (t) => {
     t.is(body, 'foo')
 })
 
-test('send must throws error when is invoked whit invalid content', async (t) => {
+test('send must throws error when is invoked with invalid content', async (t) => {
     type ErrorPayload = {
         message: string
     }

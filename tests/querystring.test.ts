@@ -23,7 +23,7 @@ test('get query string params', async (t) => {
     t.is(body, 'foo bar')
 })
 
-test('get query string params whit router flow', async (t) => {
+test('get query string params with router flow', async (t) => {
     type Query = {
         name: string
         surname: string

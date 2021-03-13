@@ -129,7 +129,7 @@ test('main composer multi handler, direct return in second handler, next() send.
     t.is(body, 'hello')
 })
 
-test('main composer multi handlers, pass parameters whit next(), next(string), send.text :200>', async (t) => {
+test('main composer multi handlers, pass parameters with next(), next(string), send.text :200>', async (t) => {
     const url = await server((req, res) => {
         const next = (c: Context) => c.next('hello')
         const greet = (c: Context, message: string) => send.text(c, message)
@@ -150,7 +150,7 @@ test('main composer multi handlers, pass parameters whit next(), next(string), s
     t.is(r, 'hello')
 })
 
-test('main composer multi handlers async, pass parameters whit next(), next(string), send.text :200', async (t) => {
+test('main composer multi handlers async, pass parameters with next(), next(string), send.text :200', async (t) => {
     const delay = (time: number, msg: string) => new Promise((r) => setTimeout(r, time, msg))
     const url = await server((req, res) => {
         const next = async (c: Context) => {

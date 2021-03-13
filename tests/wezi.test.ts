@@ -45,7 +45,7 @@ test('server listen throw error inside of promise', async (t) => {
     t.is(body.message, 'Bad Request')
 })
 
-test('create custom error handler and throw error inside handler whit listen fn', async (t) => {
+test('create custom error handler and throw error inside handler with listen fn', async (t) => {
     const { port, url } = getAddress()
     const errorHandler = (c: Context, error: Error) => {
         const message = error.message
@@ -174,7 +174,7 @@ test('parse and reply same received text', async (t) => {
     t.is(body, '🐻 im a small polar bear')
 })
 
-test('response only whit status code', async (t) => {
+test('response only with status code', async (t) => {
     const handler = ({ res }: Context) => {
         res.statusCode = 420
         res.end()
@@ -186,7 +186,7 @@ test('response only whit status code', async (t) => {
     t.is(res.status, 420)
 })
 
-test('response only whit status code and custom status message', async (t) => {
+test('response only with status code and custom status message', async (t) => {
     const handler = ({ res }: Context) => {
         res.statusCode = 420
         res.statusMessage = 'Enhance your calm'
@@ -200,7 +200,7 @@ test('response only whit status code and custom status message', async (t) => {
     t.is(res.statusText, 'Enhance your calm')
 })
 
-test('response only whit status code and whitout custom status message', async (t) => {
+test('response only with status code and without custom status message', async (t) => {
     const handler = ({ res }: Context) => {
         res.statusCode = 300
         res.end()
