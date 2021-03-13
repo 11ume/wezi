@@ -49,9 +49,9 @@ export const createComposer = (endHandler: EndHandler, errorHandler: ErrorHandle
     return (main: boolean, ...handlers: Handler[]): Dispatch => {
         let inc = 0
         return function dispatch(context: Context, payload?: unknown): void {
+            const newContext = createContext(context, dispatch, errorHandler)
             if (inc < handlers.length) {
                 const handler = handlers[inc++]
-                const newContext = createContext(context, dispatch, errorHandler)
                 setImmediate(executeHandler, newContext, handler, payload)
                 return
             }
