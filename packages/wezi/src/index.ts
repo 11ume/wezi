@@ -22,8 +22,6 @@ export const listen = (listener: RequestListener, port = 3000, host?: string): S
 export const wezi: Wezi = (...handlers: any[]) => (errorHandler?: ErrorHandler): RequestListener => {
     const preparedComposer = composer(errorHandler)
     const composedHandlers = prepareComposerHandlers(preparedComposer, handlers)
-    return (req: IncomingMessage, res: ServerResponse): void => {
-        const run = preparedComposer(true, ...composedHandlers)
-        run(createContext(req, res))
-    }
+    const run = preparedComposer(true, ...composedHandlers)
+    return (req: IncomingMessage, res: ServerResponse): void => run(createContext(req, res))
 }

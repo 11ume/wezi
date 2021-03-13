@@ -30,4 +30,4 @@ export type Next = <T>(payload?: T) => void
 export type Panic = (error: Error) => void
 export type Handler = (context: Context, payload?: any) => any
 export type ErrorHandler = (context: Context, error: Error) => void
-export type Run = (context: Context, payload?: unknown) => void
+export type Run = (context: Context, payload?: unknown, inc?: number) => void
