@@ -85,7 +85,7 @@ type GreetParams = {
     id?: string
 }
 
-const validateId = (c: Context, params: GreetParams) => params.id
+const validateParams = (c: Context, params: GreetParams) => params.id
     ? c.next(params.id)
     : c.panic(createError(400, 'the param "id", is required'))
 
@@ -95,7 +95,7 @@ const getOne = (c: Context, id: string) => json(c, {
     , surname: 'bar'
 })
 
-const r = router(get('/users/:id', validateId, getOne))
+const r = router(get('/users/:id', validateParams, getOne))
 const w = wezi(r)
 
 listen(w())
