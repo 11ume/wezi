@@ -38,7 +38,7 @@
 <br>
 
 * **Small** Easy to learn and adapt.
-* **simplicity** Based on laws of simplicity.
+* **Simplicity** Based on laws of simplicity.
 * **Fast** Performance really near to native.
 * **High control** Extremely versatile, low level abstraction, you have the control.
 * **Focus opt-in**: All features are opt-in.  
