@@ -6,13 +6,13 @@ import {
     , Handler
     , ErrorHandler
     , HandlerMuti
-    , Run
 } from 'wezi-types'
 
 export type Composer = (errorHandlerCustom: ErrorHandler) => (main: boolean, ...handlers: Handler[]) => Run
 export type PreparedComposer = (main: boolean, ...handlers: Handler[]) => Run
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
+type Run = (context: Context, payload?: unknown, inc?: number) => void
 
 const createNext = (context: Context, run: Run, increment: number): Next => {
     return function next(payload?: unknown): void {
