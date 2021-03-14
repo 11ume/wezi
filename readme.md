@@ -63,6 +63,7 @@ npm install wezi
 </div>
 
 ## Functionalities preview
+ 
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -73,6 +74,9 @@ listen(w())
 ```
 
 <br>
+
+> Simple rounting 
+
 
 ```ts
 import wezi, { Context, listen } from 'wezi'
@@ -101,6 +105,36 @@ listen(w())
 
 ```bash
 curl http://localhost:3000/users/123
+```
+
+<br>
+
+> Share data between multiple handlers whiout side effects 
+
+
+```ts
+import wezi, { Context, listen } from 'wezi'
+import { text } from 'wezi-send'
+import { shared } from 'wezi-shared'
+
+type Shareable = {
+    session: string
+}
+
+const pass = (c: Context) => {
+    const shareable = shared<Shareable>(c)
+    shareable.set('session', '123')
+    c.next()
+}
+
+const greet = (c: Context) => {
+    const shareable = shared<Shareable>(c)
+    const session = shareable.get('session')
+    text(c, session)
+}
+
+const w = wezi(pass, greet)
+listen(w())
 ```
 
 <br>
