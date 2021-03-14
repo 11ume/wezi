@@ -11,9 +11,9 @@
 <br>
 
 <p align="center"> 
-    Wezi is a small, minimalist, incredibly fast and adaptive library
+    Wezi is small, minimalist, fast, adaptive, library 
     <br>
-    to create robust web applications like polar bears. 
+    to create web applications like polar bears. 
 <p>
 
 <br>
