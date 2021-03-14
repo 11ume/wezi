@@ -109,7 +109,7 @@ curl http://localhost:3000/users/123
 
 <br>
 
-> Share data between multiple handlers whiout side effects 
+> Share data between multiple handlers wihtout side effects 
 
 
 ```ts
