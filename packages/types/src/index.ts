@@ -4,8 +4,8 @@ import { PreparedComposer } from 'wezi-composer'
 export interface Context {
     readonly req: IncomingMessage
     readonly res: ServerResponse
-    next: Next
-    panic: Panic
+    readonly next: Next
+    readonly panic: Panic
 }
 
 export type Shared<E> = {

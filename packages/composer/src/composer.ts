@@ -12,7 +12,7 @@ export type Composer = (errorHandlerCustom: ErrorHandler) => (main: boolean, ...
 export type PreparedComposer = (main: boolean, ...handlers: Handler[]) => Run
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
-type Run = (context: Context, payload?: unknown, inc?: number) => void
+type Run = (context: Context, payload?: unknown, increment?: number) => void
 
 const createNext = (context: Context, run: Run, increment: number): Next => {
     return function next(payload?: unknown): void {
@@ -38,7 +38,8 @@ const createPanic = (context: Context, errorHandler: ErrorHandler): Panic => {
 
 const createContext = (context: Context, run: Run, increment: number, errorHandler: ErrorHandler): Context => {
     return {
-        ...context
+        req: context.req
+        , res: context.res
         , next: createNext(context, run, increment)
         , panic: createPanic(context, errorHandler)
     }
