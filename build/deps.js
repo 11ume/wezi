@@ -5,5 +5,6 @@ export default (deps = {}) => {
         , 'path'
         , 'http'
         , 'stream'
+        , 'querystring'
     ]
 }
