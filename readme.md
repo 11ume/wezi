@@ -62,7 +62,7 @@ npm install wezi
     <img src="https://github.com/11ume/wezi-assets/blob/main/hi2.png?raw=true" width="200" height="auto"/>
 </div>
 
-## Get started
+## Functionalities preview
 
 ```ts
 import wezi, { listen } from 'wezi'
@@ -77,8 +77,8 @@ listen(w())
 
 ```ts
 import wezi, { Context, listen } from 'wezi'
-import { json } from 'wezi-send'
 import router, { get } from 'wezi-router'
+import { json } from 'wezi-send'
 import createError from 'wezi-error'
 
 type GreetParams = {
