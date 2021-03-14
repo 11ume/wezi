@@ -88,7 +88,7 @@ type GetOneParams = {
     id?: string
 }
 
-const validateParams = (c: Context, params: GetOneParams) => params.id
+const validateGetOneParams = (c: Context, params: GetOneParams) => params.id
     ? c.next(params.id)
     : c.panic(createError(400, 'the param "id", is required'))
 
@@ -98,7 +98,7 @@ const getOne = (c: Context, id: string) => json(c, {
     , surname: 'bar'
 })
 
-const r = router(get('/users/:id', validateParams, getOne))
+const r = router(get('/users/:id', validateGetoneParams, getOne))
 const w = wezi(r)
 listen(w())
 ```
@@ -114,8 +114,8 @@ curl http://localhost:3000/users/123
 
 ```ts
 import wezi, { Context, listen } from 'wezi'
-import { ok } from 'wezi-send'
 import { shared } from 'wezi-shared'
+import { ok } from 'wezi-send'
 
 type Shareable = {
     id: string
