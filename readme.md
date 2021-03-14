@@ -37,7 +37,7 @@
 
 <br>
 
-* **Small** To be easy and fast to learn, easy to adapt.
+* **Small** To be easy and fast to learn and adapt.
 * **Simple** Focused on simplicity, hides the complexity and respect the [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle.
 * **Fast** Performance really near to native.
 * **High control** Extremely versatile, low level abstraction, you have the control.
