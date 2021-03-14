@@ -39,8 +39,8 @@
 
 * **Small** To be easy and fast to learn, easy to adapt.
 * **Simple** Focused on simplicity, hides the complexity and respect the [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it) principle.
+* **Fast** Performance really near to native.
 * **High control** Extremely versatile, low level abstraction, you have the control.
-* **Fast** High performance.
 * **Focus opt-in**: All features are opt-in.  
 * **Async** Implements an enhanced async control of handlers execution.
 
