@@ -81,11 +81,11 @@ import router, { get } from 'wezi-router'
 import { json } from 'wezi-send'
 import createError from 'wezi-error'
 
-type GreetParams = {
+type GetOneParams = {
     id?: string
 }
 
-const validateParams = (c: Context, params: GreetParams) => params.id
+const validateParams = (c: Context, params: GetOneParams) => params.id
     ? c.next(params.id)
     : c.panic(createError(400, 'the param "id", is required'))
 
@@ -97,12 +97,13 @@ const getOne = (c: Context, id: string) => json(c, {
 
 const r = router(get('/users/:id', validateParams, getOne))
 const w = wezi(r)
-
 listen(w())
 ```
 
 ```bash
 curl http://localhost:3000/users/123
 ```
+
+<br>
 
 > Note: If u are using **Javascript** remember enable ESM support in you package.json. [esm_enabling](https://nodejs.org/api/esm.html#esm_enabling)
