@@ -114,26 +114,29 @@ curl http://localhost:3000/users/123
 
 ```ts
 import wezi, { Context, listen } from 'wezi'
-import { text } from 'wezi-send'
+import { ok } from 'wezi-send'
 import { shared } from 'wezi-shared'
 
 type Shareable = {
-    session: string
+    id: string
 }
 
-const pass = (c: Context) => {
+const session = (c: Context) => {
     const shareable = shared<Shareable>(c)
-    shareable.set('session', '123')
+    shareable.set('id', 'foo')
     c.next()
 }
 
+const pass = (c: Context) => c.next()
+
 const greet = (c: Context) => {
     const shareable = shared<Shareable>(c)
-    const session = shareable.get('session')
-    text(c, session)
+    const id = shareable.get('id')
+    if (id === 'foo') return ok(c)
+    c.panic()
 }
 
-const w = wezi(pass, greet)
+const w = wezi(session, pass, greet)
 listen(w())
 ```
 
