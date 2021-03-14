@@ -1,6 +1,6 @@
 {
     "name": "wezi-types",
-    "version": "1.0.0-alpha.18",
+    "version": "1.0.0-alpha.19",
     "description": "",
     "main": "dist/index.js",
     "types": "index.ts",
