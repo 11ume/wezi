@@ -8,13 +8,13 @@ import {
     , HandlerMuti
 } from 'wezi-types'
 
-export type Composer = (errorHandlerCustom: ErrorHandler) => (main: boolean, ...handlers: Handler[]) => Run
-export type PreparedComposer = (main: boolean, ...handlers: Handler[]) => Run
+export type Composer = (errorHandlerCustom: ErrorHandler) => (main: boolean, ...handlers: Handler[]) => RunComposer
+export type PrepareComposer = (main: boolean, ...handlers: Handler[]) => RunComposer
+export type RunComposer = (context: Context, payload?: unknown, increment?: number) => void
 export type EndHandler = (context: Context, errorHandler: ErrorHandler) => void
 export type ExecuteHandler = (context: Context, handler: Handler, payload: unknown | Promise<unknown>) => void
-type Run = (context: Context, payload?: unknown, increment?: number) => void
 
-const createNext = (context: Context, run: Run, increment: number): Next => {
+const createNext = (context: Context, run: RunComposer, increment: number): Next => {
     return function next(payload?: unknown): void {
         if (payload === undefined) {
             run(context, undefined, increment)
@@ -36,7 +36,7 @@ const createPanic = (context: Context, errorHandler: ErrorHandler): Panic => {
     }
 }
 
-const createContext = (context: Context, run: Run, increment: number, errorHandler: ErrorHandler): Context => {
+const createContext = (context: Context, run: RunComposer, increment: number, errorHandler: ErrorHandler): Context => {
     return {
         req: context.req
         , res: context.res
@@ -47,17 +47,17 @@ const createContext = (context: Context, run: Run, increment: number, errorHandl
 
 export const $composer = Symbol('composer')
 
-export const prepareComposerHandlers = (preparedComposer: PreparedComposer, handlers: HandlerMuti[]) => handlers.map(handler => {
-    if (handler.id === $composer) return handler(preparedComposer)
+export const prepareComposerHandlers = (prepareComposer: PrepareComposer, handlers: HandlerMuti[]) => handlers.map(handler => {
+    if (handler.id === $composer) return handler(prepareComposer)
     return handler
 })
 
-export const createComposer = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHandler: ExecuteHandler): PreparedComposer => {
-    return (main: boolean, ...handlers: Handler[]): Run => function run(context: Context, payload?: unknown, inc = -1): void {
-        const increment = inc + 1
-        const newContext = createContext(context, run, increment, errorHandler)
-        if (increment < handlers.length) {
-            const handler = handlers[increment]
+export const createComposer = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHandler: ExecuteHandler): PrepareComposer => {
+    return (main: boolean, ...handlers: Handler[]): RunComposer => function run(context: Context, payload?: unknown, increment = -1): void {
+        const inc = increment + 1
+        const newContext = createContext(context, run, inc, errorHandler)
+        if (inc < handlers.length) {
+            const handler = handlers[inc]
             setImmediate(executeHandler, newContext, handler, payload)
             return
         }
