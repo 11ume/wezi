@@ -68,8 +68,7 @@ npm install wezi
 import wezi, { listen } from 'wezi'
 import { text } from 'wezi-send'
 
-const greet = (c) => text(c, 'Hi!')
-const w = wezi(greet)
+const w = wezi(c => text(c, 'Hi!'))
 listen(w())
 ```
 
