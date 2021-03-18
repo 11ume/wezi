@@ -15,13 +15,13 @@ export type Shared<E> = {
     values: () => E
 }
 
-export interface HandlerMuti extends Function {
+export interface HandlerOrComposer extends Function {
     id?: symbol
     (context: Context, payload?: any): any
-    (prepare: PrepareComposer): Handler
+    (prepareComposer: PrepareComposer): Handler
 }
 
-export interface ComposerHandler extends Function {
+export interface HandlerComposer extends Function {
     id?: symbol
     (prepareComposer: PrepareComposer): Handler
 }

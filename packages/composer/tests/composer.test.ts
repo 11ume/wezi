@@ -9,7 +9,7 @@ test('main composer single handler, send.text :200', async (t) => {
     const url = await server((req, res) => {
         const greet = (c: Context) => send.text(c, 'hello')
         const prepare = composer()
-        const run = prepare(true, greet)
+        const run = prepare(greet)
         const context = createContext({
             req
             , res
@@ -29,7 +29,7 @@ test('main composer single handler, send.empty :204', async (t) => {
     const url = await server((req, res) => {
         const empty = (c: Context) => send.empty(c)
         const prepare = composer()
-        const run = prepare(true, empty)
+        const run = prepare(empty)
         const context = createContext({
             req
             , res
@@ -50,7 +50,7 @@ test('main composer multi handler, direct return in first handler, send.empty :2
         const empty = (c: Context) => send.empty(c)
         const greet = (c: Context) => send.text(c, 'hi')
         const prepare = composer()
-        const run = prepare(true, empty, greet)
+        const run = prepare(empty, greet)
         const context = createContext({
             req
             , res
@@ -71,7 +71,7 @@ test('main composer multi handler, direct return in second handler, next() send.
         const empty = (c: Context) => c.next()
         const greet = (c: Context) => send.empty(c)
         const prepare = composer()
-        const run = prepare(true, empty, greet)
+        const run = prepare(empty, greet)
         const context = createContext({
             req
             , res
@@ -92,7 +92,7 @@ test('main composer multi handler, direct return in first handler, send.text :20
         const greet = (c: Context) => send.text(c, 'hello')
         const never = (c: Context) => send.text(c, 'never')
         const prepare = composer()
-        const run = prepare(true, greet, never)
+        const run = prepare(greet, never)
         const context = createContext({
             req
             , res
@@ -113,7 +113,7 @@ test('main composer multi handler, direct return in second handler, next() send.
         const next = (c: Context) => c.next()
         const greet = (c: Context) => send.text(c, 'hello')
         const prepare = composer()
-        const run = prepare(true, next, greet)
+        const run = prepare(next, greet)
         const context = createContext({
             req
             , res
@@ -134,7 +134,7 @@ test('main composer multi handlers, pass parameters with next(), next(string), s
         const next = (c: Context) => c.next('hello')
         const greet = (c: Context, message: string) => send.text(c, message)
         const prepare = composer()
-        const run = prepare(true, next, greet)
+        const run = prepare(next, greet)
         const context = createContext({
             req
             , res
@@ -162,7 +162,7 @@ test('main composer multi handlers async, pass parameters with next(), next(stri
             send.text(c, message)
         }
         const prepare = composer()
-        const run = prepare(true, next, greet)
+        const run = prepare(next, greet)
         const context = createContext({
             req
             , res

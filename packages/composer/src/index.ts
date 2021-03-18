@@ -1,5 +1,6 @@
 import { ErrorHandler } from 'wezi-types'
-import { createComposer } from './composer'
-import * as handlers from './handlers'
+import { createComposer, createComposerMain } from './composer'
+import { endHandler, errorHandler, executeHandler } from './handlers'
 
-export const composer = (errorHandler: ErrorHandler = handlers.errorHandler) => createComposer(handlers.endHandler, errorHandler, handlers.executeHandler)
+export const composer = (errHandler: ErrorHandler = errorHandler) => createComposer(errHandler, executeHandler)
+export const composerMain = (errHandler: ErrorHandler = errorHandler) => createComposerMain(endHandler, errHandler, executeHandler)
