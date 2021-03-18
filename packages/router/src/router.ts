@@ -35,7 +35,7 @@ const matchRoute = (matcher: Matcher) => (context: Context, payload: unknown): v
 }
 
 const prepareRouterStack = (matcher: Matcher, prepareComposer: PrepareComposer, entities: RouteEntity[]) => entities
-    .forEach(entity => matcher.create(entity.method, entity.path, prepareComposer(false, ...entity.handlers)))
+    .forEach(entity => matcher.create(entity.method, entity.path, prepareComposer(...entity.handlers)))
 
 const prepareRoutes = (matcher: Matcher, entities: RouteEntity[], prepareComposer: PrepareComposer) => {
     prepareRouterStack(matcher, prepareComposer, entities)
