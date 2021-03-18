@@ -4,8 +4,8 @@ import {
     , Panic
     , Context
     , Handler
+    , HandlerOrComposer
     , ErrorHandler
-    , HandlerMuti
 } from 'wezi-types'
 
 export type Composer = (errorHandlerCustom: ErrorHandler) => (main: boolean, ...handlers: Handler[]) => RunComposer
@@ -47,32 +47,33 @@ const createContext = (context: Context, run: RunComposer, increment: number, er
 
 export const $composer = Symbol('composer')
 
-export const prepareComposerHandlers = (prepareComposer: PrepareComposer, handlers: HandlerMuti[]) => handlers.map(handler => {
+export const prepareComposerHandlers = (prepareComposer: PrepareComposer, handlers: HandlerOrComposer[]) => handlers.map(handler => {
     if (handler.id === $composer) return handler(prepareComposer)
     return handler
 })
 
-export const createComposerMain = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHandler: ExecuteHandler): PrepareComposer => {
-    return (...handlers: Handler[]): RunComposer => function run(context: Context, payload?: unknown, increment = -1): void {
-        const inc = increment + 1
-        const newContext = createContext(context, run, inc, errorHandler)
-        if (inc < handlers.length) {
-            const handler = handlers[inc]
-            executeHandler(newContext, handler, payload)
-            return
-        }
-
-        endHandler(context, errorHandler)
-    }
-}
-
 export const createComposer = (errorHandler: ErrorHandler, executeHandler: ExecuteHandler): PrepareComposer => {
-    return (...handlers: Handler[]): RunComposer => function run(context: Context, payload?: unknown, increment = -1): void {
-        const inc = increment + 1
-        const newContext = createContext(context, run, inc, errorHandler)
-        if (inc < handlers.length) {
-            const handler = handlers[inc]
-            executeHandler(newContext, handler, payload)
+    return (...handlers: Handler[]): RunComposer => {
+        return function run(context: Context, payload?: unknown, increment = -1): void {
+            const inc = increment + 1
+            const ctx = createContext(context, run, inc, errorHandler)
+            executeHandler(ctx, handlers[inc], payload)
         }
     }
 }
+
+export const createComposerMain = (endHandler: EndHandler, errorHandler: ErrorHandler, executeHandler: ExecuteHandler): PrepareComposer => {
+    return (...handlers: Handler[]): RunComposer => {
+        return function run(context: Context, payload?: unknown, increment = -1): void {
+            const inc = increment + 1
+            const ctx = createContext(context, run, inc, errorHandler)
+            if (inc < handlers.length) {
+                executeHandler(ctx, handlers[inc], payload)
+                return
+            }
+
+            endHandler(context, errorHandler)
+        }
+    }
+}
+

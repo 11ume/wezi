@@ -1,8 +1,8 @@
 import http, { Server, IncomingMessage, ServerResponse, RequestListener } from 'http'
-import { Context, Handler, ErrorHandler, ComposerHandler } from 'wezi-types'
+import { Context, Handler, ErrorHandler, HandlerComposer } from 'wezi-types'
 import { composer, composerMain, prepareComposerHandlers } from 'wezi-composer'
 
-export type Wezi = (...handlers: (Handler | ComposerHandler)[]) => (errorHandler?: ErrorHandler) => RequestListener
+export type Wezi = (...handlers: (Handler | HandlerComposer)[]) => (errorHandler?: ErrorHandler) => RequestListener
 
 export const createContext = (req: IncomingMessage, res: ServerResponse): Context => {
     return {
