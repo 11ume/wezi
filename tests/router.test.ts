@@ -27,20 +27,35 @@ test('base path', async (t) => {
     t.is(body, 'hello')
 })
 
-test('not found', async (t) => {
+test('not found, managed  by end handler', async (t) => {
     const foo = (c: Context) => text(c, 'foo')
     const bar = (c: Context) => text(c, 'bar')
     const r = router(
         get('/foo', foo)
         , get('/bar', bar)
     )
-    const notFound = (c: Context) => c.panic(createError(404))
-    const url = await serverRouter(r, notFound)
+    const url = await serverRouter(r)
     const res = await fetch(url)
     const body: { message: string } = await res.json()
 
     t.is(res.status, 404)
     t.is(body.message, 'unknown')
+})
+
+test('not found custom', async (t) => {
+    const foo = (c: Context) => text(c, 'foo')
+    const bar = (c: Context) => text(c, 'bar')
+    const r = router(
+        get('/foo', foo)
+        , get('/bar', bar)
+    )
+    const notFound = (c: Context) => c.panic(createError(404, 'Not Found'))
+    const url = await serverRouter(r, notFound)
+    const res = await fetch(url)
+    const body: { message: string } = await res.json()
+
+    t.is(res.status, 404)
+    t.is(body.message, 'Not Found')
 })
 
 test('pattern match /(.*)', async (t) => {
