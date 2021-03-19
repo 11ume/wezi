@@ -32,7 +32,7 @@ test('main composer multi handler async, direct promise error return in first ha
     const url = await server((req, res) => {
         const check = (c: Context) => c.panic(createError(400))
         const never = (c: Context) => send.text(c, 'hello')
-        const run = composer(undefined, check, never)
+        const run = composer()(check, never)
         const context = createContext({
             req
             , res
@@ -54,7 +54,7 @@ test('main composer multi handler async, direct promise error return in second h
     const url = await server((req, res) => {
         const next = (c: Context) => c.next()
         const greet = () => Promise.reject(createError(400))
-        const run = composer(undefined, next, greet)
+        const run = composer()(next, greet)
         const context = createContext({
             req
             , res
@@ -78,7 +78,7 @@ test('main composer multi handler, throw error inside first handler, errorHandle
             throw new Error('Something wrong is happened')
         }
         const never = () => 'hello'
-        const run = composer(undefined, err, never)
+        const run = composer()(err, never)
         const context = createContext({
             req
             , res
@@ -98,7 +98,7 @@ test('main composer multi handler, throw error inside first handler, errorHandle
 
 test('main composer call panic whiout pass an error, panic({ foo:"foo" })', async (t) => {
     const url = await server((req, res) => {
-        const run = composer(undefined, (c: Context) => c.panic({
+        const run = composer()((c: Context) => c.panic({
             foo: 'foo'
         } as any))
         const context = createContext({

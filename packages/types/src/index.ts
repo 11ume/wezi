@@ -15,8 +15,8 @@ export type Shared<E> = {
     values: () => E
 }
 
-export type Router = (prepareComposer: PrepareComposer) => Handler
 export type Next = <T>(payload?: T) => void
 export type Panic = (error: Error) => void
+export type Router = (prepareComposer: PrepareComposer) => Handler
 export type Handler = (context: Context, payload?: any) => any
 export type ErrorHandler = (context: Context, error: Error) => void
