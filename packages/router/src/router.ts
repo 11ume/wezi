@@ -42,7 +42,7 @@ const prepareRoutes = (matcher: Matcher, entities: RouteEntity[], prepareCompose
     return matchRoute(matcher)
 }
 
-const createRouteEntity = (method: string) => (pathOrHandler: string | Handler, ...handlers: Handler[]): RouteEntity => {
+export const createRouteEntity = (method: string) => (pathOrHandler: string | Handler, ...handlers: Handler[]): RouteEntity => {
     if (typeof pathOrHandler === 'function') {
         return {
             path: ''

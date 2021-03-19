@@ -8,6 +8,7 @@ export {
     , patch
     , options
     , route
+    , createRouteEntity
 } from './src/router'
 
 export default createRouter
