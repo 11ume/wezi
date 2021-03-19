@@ -1,5 +1,5 @@
-import { PrepareComposer, $composer } from 'wezi-composer'
-import { Context, Handler, HandlerComposer } from 'wezi-types'
+import { PrepareComposer } from 'wezi-composer'
+import { Context, Router, Handler } from 'wezi-types'
 import matchit, { Matcher, Found } from 'matchit-radix-tree'
 
 type RouteEntity = {
@@ -64,19 +64,12 @@ export const route = (name: string, ...handlers: Handler[]) => (...entities: Rou
     , path: `${name}${entity.path}`
 }))
 
-export const createRouter = (...entities: (RouteEntity | RouteEntity[])[]): HandlerComposer => {
+export const createRouter = (...entities: (RouteEntity | RouteEntity[])[]): Router => {
     const entitiesFlat = entities.flat()
-    const match = (prepareComposer: PrepareComposer) => {
+    return (prepareComposer: PrepareComposer) => {
         const matcher = matchit()
         return prepareRoutes(matcher, entitiesFlat, prepareComposer)
     }
-
-    Object.defineProperty(match, 'id', {
-        value: $composer
-        , writable: false
-    })
-
-    return match
 }
 
 export const get = createRouteEntity('GET')

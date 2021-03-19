@@ -4,7 +4,7 @@ import router, { get } from 'wezi-router'
 import queryParser from 'wezi-query'
 import { text } from 'wezi-send'
 import { Context } from 'wezi'
-import { server } from './helpers'
+import { server, serverRouter } from './helpers'
 
 test('get query string params', async (t) => {
     type Query = {
@@ -36,7 +36,7 @@ test('get query string params with router flow', async (t) => {
     const r = router(
         get('/users', greet)
     )
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/users?name=foo&surname=bar`)
     const body = await res.text()
 

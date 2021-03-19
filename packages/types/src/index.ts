@@ -15,17 +15,7 @@ export type Shared<E> = {
     values: () => E
 }
 
-export interface HandlerOrComposer extends Function {
-    id?: symbol
-    (context: Context, payload?: any): any
-    (prepareComposer: PrepareComposer): Handler
-}
-
-export interface HandlerComposer extends Function {
-    id?: symbol
-    (prepareComposer: PrepareComposer): Handler
-}
-
+export type Router = (prepareComposer: PrepareComposer) => Handler
 export type Next = <T>(payload?: T) => void
 export type Panic = (error: Error) => void
 export type Handler = (context: Context, payload?: any) => any

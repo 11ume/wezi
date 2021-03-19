@@ -13,14 +13,14 @@ import router, {
     , patch
     , route
 } from 'wezi-router'
-import { server } from './helpers'
+import { serverRouter } from './helpers'
 
 test('base path', async (t) => {
     const greet = (c: Context) => text(c, 'hello')
     const r = router(
         get('/', greet)
     )
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(url)
     const body = await res.text()
 
@@ -35,7 +35,7 @@ test('not found', async (t) => {
         , get('/bar', bar)
     )
     const notFound = (c: Context) => c.panic(createError(404))
-    const url = await server(r, notFound)
+    const url = await serverRouter(r, notFound)
     const res = await fetch(url)
     const body: { message: string } = await res.json()
 
@@ -48,7 +48,7 @@ test('pattern match /(.*)', async (t) => {
     const r = router(
         get('*', greet)
     )
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(url)
     const resTwo = await fetch(url)
     const body = await res.text()
@@ -61,7 +61,7 @@ test('pattern match /(.*)', async (t) => {
     t.is(bodyTwo, 'hello')
 })
 
-test('different routes with static paths diferent methods (CRUD)', async (t) => {
+test('different routes with static paths diferent methods', async (t) => {
     type Payload = {
         id: string
     }
@@ -82,7 +82,7 @@ test('different routes with static paths diferent methods (CRUD)', async (t) => 
         , patch('/users', (c: Context) => text(c, responses.patch))
         , del('/users', (c: Context) => text(c, responses.delete))
     )
-    const url = await server(r)
+    const url = await serverRouter(r)
     const getAllres = await fetch(`${url}/users`)
     const getByIdRes = await fetch(`${url}/users/1`)
     const createRes = await fetch(`${url}/users`, {
@@ -122,7 +122,7 @@ test('different routes with static paths, method get', async (t) => {
             name: 'bar'
         }))
     )
-    const url = await server(r)
+    const url = await serverRouter(r)
     const resFoo = await fetch(`${url}/foo`)
     const resBar = await fetch(`${url}/bar`)
 
@@ -140,7 +140,7 @@ test('different routes with return empty', async (t) => {
     const r = router(
         get('/foo', (c: Context) => empty(c))
     )
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/foo`)
     const body = await res.text()
 
@@ -157,7 +157,7 @@ test('routes with multi params', async (t) => {
     const r = router(
         get('/hello/:foo/:bar', greet)
     )
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/hello/foo/bar`)
     const body = await res.text()
 
@@ -173,7 +173,7 @@ test('multiple matching routes', async (t) => {
         get('/path', withPath)
         , get('/:param', withParam)
     )
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/path`)
     const body = await res.text()
 
@@ -186,7 +186,7 @@ test('match head, match route and return empty body', async (t) => {
     const r = router(
         head('/hello', ping)
     )
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/hello`, {
         method: 'head'
     })
@@ -208,7 +208,7 @@ test('multiple routes handlers', async (t) => {
     const r = router(
         get('/character/:name', checkChar, getChar)
     )
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/character/john`)
     const body = await res.text()
 
@@ -226,7 +226,7 @@ test('multiple routes handlers fail next', async (t) => {
     const r = router(
         post('/character', checkChar, getChar)
     )
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/character`, {
         method: 'post'
         , body: JSON.stringify({
@@ -240,7 +240,7 @@ test('multiple routes handlers fail next', async (t) => {
 test('create route wiht namespace', async (t) => {
     const foo = (c: Context) => text(c, 'foo')
     const r = router(route('/foo')(get(foo)))
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/foo`)
     const body = await res.text()
 
@@ -252,7 +252,7 @@ test('create route wiht namespace and two route entities', async (t) => {
     const foo = (c: Context, params: { id: string }) => text(c, params.id)
     const bar = (c: Context, params: { id: string }) => text(c, params.id)
     const r = router(route('/foo/:id')(get(foo), put(bar)))
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/foo/123`)
     const resPut = await fetch(`${url}/foo/321`, {
         method: 'put'
@@ -269,7 +269,7 @@ test('create route wiht namespace and two route entities', async (t) => {
 test('create route wiht namespace with entity path', async (t) => {
     const foo = (c: Context) => text(c, '123')
     const r = router(route('/foo')(get('/bar', foo)))
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/foo/bar`)
     const body = await res.text()
 
@@ -280,7 +280,7 @@ test('create route wiht namespace with entity path', async (t) => {
 test('create route wiht namespace with entity path and params on first entity', async (t) => {
     const foo = (c: Context, params: { id: string }) => text(c, params.id)
     const r = router(route('/foo/:id')(get('/bar', foo)))
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/foo/123/bar`)
     const body = await res.text()
 
@@ -291,7 +291,7 @@ test('create route wiht namespace with entity path and params on first entity', 
 test('create route wiht namespace with entity path and params on the last entity', async (t) => {
     const foo = (c: Context, params: { name: string, surname: string }) => text(c, `${params.name} ${params.surname}`)
     const r = router(route('/foo/:name')(get('/bar/:surname', foo)))
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/foo/john/bar/connor`)
     const body = await res.text()
 
@@ -317,7 +317,7 @@ test('create route wiht namespace with handler and two route entities', async (t
     const foo = (c: Context, params: Params) => json(c, params)
     const bar = (c: Context, params: { id: string }) => json(c, params)
     const r = router(route('/foo/:id', next, pass)(get(foo), get(bar)))
-    const url = await server(r)
+    const url = await serverRouter(r)
     const res = await fetch(`${url}/foo/123`)
     const resTwo = await fetch(`${url}/foo/321`)
     const body: Params = await res.json()
