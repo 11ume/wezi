@@ -23,6 +23,6 @@ export const executeHandler = (context: Context, handler: Handler, payload: unkn
 }
 
 export const endHandler = (context: Context, handler: ErrorHandler): void => {
-    const err = createError(404)
+    const err = createError(404, 'Not Found')
     handler(context, err)
 }

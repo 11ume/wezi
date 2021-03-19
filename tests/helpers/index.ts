@@ -1,20 +1,21 @@
 import http from 'http'
 import wezi from 'wezi'
 import listen from 'test-listen'
-import { Handler, HandlerComposer, ErrorHandler } from 'wezi-types'
+import { Router, Handler, ErrorHandler } from 'wezi-types'
 
-export function server(...handlers: (HandlerComposer | Handler)[]): Promise<string>
-export function server(...handlers: any[]) {
+export function server(...handlers: Handler[]) {
     const w = wezi(...handlers)
-    const run = w()
-    return listen(http.createServer(run))
+    return listen(http.createServer(w()))
 }
 
-export function serverError(errorHandler: ErrorHandler, ...handlers: (HandlerComposer | Handler)[]): Promise<string>
-export function serverError(errorHandler: ErrorHandler, ...handlers: any[]) {
+export function serverRouter(router: Router, ...handlers: Handler[]) {
     const w = wezi(...handlers)
-    const run = w(errorHandler)
-    return listen(http.createServer(run))
+    return listen(http.createServer(w(router)))
+}
+
+export function serverError(errorHandler: ErrorHandler, ...handlers: Handler[]) {
+    const w = wezi(...handlers)
+    return listen(http.createServer(w(undefined, errorHandler)))
 }
 
 export const giveMeOneAdress = (portBase: number) => {

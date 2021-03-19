@@ -15,8 +15,7 @@ test('main composer end response if all higher are executed, and none of them ha
             , res
         })
 
-        const prepare = composerMain()
-        const run = prepare(foo, bar)
+        const run = composerMain(undefined, foo, bar)
         run(context)
     })
 
@@ -25,7 +24,7 @@ test('main composer end response if all higher are executed, and none of them ha
 
     t.is(res.status, 404)
     t.deepEqual(body, {
-        message: 'unknown'
+        message: 'Not Found'
     })
 })
 
@@ -33,8 +32,7 @@ test('main composer multi handler async, direct promise error return in first ha
     const url = await server((req, res) => {
         const check = (c: Context) => c.panic(createError(400))
         const never = (c: Context) => send.text(c, 'hello')
-        const prepare = composer()
-        const run = prepare(check, never)
+        const run = composer()(check, never)
         const context = createContext({
             req
             , res
@@ -56,8 +54,7 @@ test('main composer multi handler async, direct promise error return in second h
     const url = await server((req, res) => {
         const next = (c: Context) => c.next()
         const greet = () => Promise.reject(createError(400))
-        const prepare = composer()
-        const run = prepare(next, greet)
+        const run = composer()(next, greet)
         const context = createContext({
             req
             , res
@@ -78,11 +75,10 @@ test('main composer multi handler async, direct promise error return in second h
 test('main composer multi handler, throw error inside first handler, errorHandler(Error(500)) :500', async (t) => {
     const url = await server((req, res) => {
         const err = () => {
-            throw new Error('Something wrong is happened')
+            throw new Error('Something wrong has happened')
         }
         const never = () => 'hello'
-        const prepare = composer()
-        const run = prepare(err, never)
+        const run = composer()(err, never)
         const context = createContext({
             req
             , res
@@ -96,14 +92,13 @@ test('main composer multi handler, throw error inside first handler, errorHandle
 
     t.is(res.status, 500)
     t.deepEqual(body, {
-        message: 'Something wrong is happened'
+        message: 'Something wrong has happened'
     })
 })
 
 test('main composer call panic whiout pass an error, panic({ foo:"foo" })', async (t) => {
     const url = await server((req, res) => {
-        const prepare = composer()
-        const run = prepare((c: Context) => c.panic({
+        const run = composer()((c: Context) => c.panic({
             foo: 'foo'
         } as any))
         const context = createContext({
@@ -125,8 +120,7 @@ test('main composer call panic whiout pass an error, panic({ foo:"foo" })', asyn
 
 test('main composer end the response if higher-order handlers are executed and none of them have call end, next() next()', async (t) => {
     const url = await server((req, res) => {
-        const prepare = composerMain()
-        const run = prepare((c: Context) => c.next(), (c: Context) => c.next())
+        const run = composerMain(undefined, (c: Context) => c.next(), (c: Context) => c.next())
         const context = createContext({
             req
             , res

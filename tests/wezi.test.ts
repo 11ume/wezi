@@ -60,7 +60,7 @@ test('create custom error handler and throw error inside handler with listen fn'
     const w = wezi(fail)
 
     const promListen = () => new Promise((r) => {
-        const ln = listen(w(errorHandler), port)
+        const ln = listen(w(undefined, errorHandler), port)
         ln.on('listening', r)
     })
 
