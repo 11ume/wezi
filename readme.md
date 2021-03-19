@@ -38,7 +38,7 @@
 
 * **Small** Easy to learn and adapt.
 * **Simplicity** Based on laws of simplicity.
-* **Fast** Performance really near to native.
+* **Fast** Performance really near to native 🔥.
 * **High control** Extremely versatile, low level abstraction, you have the control.
 * **Focus opt-in**: All features are opt-in.  
 * **Async** Implements an enhanced async control of handlers execution.
@@ -98,45 +98,12 @@ const getOne = (c: Context, id: string) => json(c, {
 })
 
 const r = router(get('/users/:id', validateGetoneParams, getOne))
-const w = wezi(r)
-listen(w())
+const w = wezi()
+listen(w(r))
 ```
 
 ```bash
 curl http://localhost:3000/users/123
-```
-
-<br>
-
-> Share data between multiple handlers wihtout side effects 
-
-
-```ts
-import wezi, { Context, listen } from 'wezi'
-import { shared } from 'wezi-shared'
-import { ok } from 'wezi-send'
-
-type Shareable = {
-    id: string
-}
-
-const session = (c: Context) => {
-    const shareable = shared<Shareable>(c)
-    shareable.set('id', 'foo')
-    c.next()
-}
-
-const pass = (c: Context) => c.next()
-
-const greet = (c: Context) => {
-    const shareable = shared<Shareable>(c)
-    const id = shareable.get('id')
-    if (id === 'foo') return ok(c)
-    c.panic()
-}
-
-const w = wezi(session, pass, greet)
-listen(w())
 ```
 
 <br>
