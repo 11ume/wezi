@@ -1,6 +1,6 @@
 {
     "name": "wezi-send",
-    "version": "1.0.0-alpha.18",
+    "version": "1.0.0-alpha.19",
     "description": "",
     "main": "dist/index.js",
     "types": "index.ts",
@@ -16,7 +16,7 @@
         "prepublishOnly": "yarn run build"
     },
     "dependencies": {
-        "wezi-types": "^1.0.0-alpha.18"
+        "wezi-types": "^1.0.0-alpha.19"
     },
     "type": "module"
 }
