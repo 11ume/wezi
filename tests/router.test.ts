@@ -39,7 +39,7 @@ test('not found, managed  by end handler', async (t) => {
     const body: { message: string } = await res.json()
 
     t.is(res.status, 404)
-    t.is(body.message, 'unknown')
+    t.is(body.message, 'Not Found')
 })
 
 test('not found custom', async (t) => {
@@ -49,13 +49,13 @@ test('not found custom', async (t) => {
         get('/foo', foo)
         , get('/bar', bar)
     )
-    const notFound = (c: Context) => c.panic(createError(404, 'Not Found'))
+    const notFound = (c: Context) => c.panic(createError(404, 'Not found custom'))
     const url = await serverRouter(r, notFound)
     const res = await fetch(url)
     const body: { message: string } = await res.json()
 
     t.is(res.status, 404)
-    t.is(body.message, 'Not Found')
+    t.is(body.message, 'Not found custom')
 })
 
 test('pattern match /(.*)', async (t) => {
