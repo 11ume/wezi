@@ -16,7 +16,6 @@ export const listen = (listener: RequestListener, port = 3000, host?: string): S
 }
 
 export const wezi = (...handlers: Handler[]) => (router?: Router, errorHandler?: ErrorHandler): RequestListener => {
-    const main = composer(errorHandler)
-    const dispatch = router ? composerMain(errorHandler, ...handlers, router(main)) : composerMain(errorHandler, ...handlers)
-    return (req: IncomingMessage, res: ServerResponse): void => dispatch(createContext(req, res))
+    const run = router ? composerMain(errorHandler, ...handlers, router(composer(errorHandler))) : composerMain(errorHandler, ...handlers)
+    return (req: IncomingMessage, res: ServerResponse): void => run(createContext(req, res))
 }
