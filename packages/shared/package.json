@@ -1,6 +1,6 @@
 {
     "name": "wezi-shared",
-    "version": "1.0.0-alpha.19",
+    "version": "1.0.0-y.0",
     "description": "",
     "main": "dist/index.js",
     "types": "index.ts",
@@ -16,7 +16,7 @@
         "prepublishOnly": "yarn run build"
     },
     "dependencies": {
-        "wezi-types": "^1.0.0-alpha.19"
+        "wezi-types": "^1.0.0-y.0"
     },
     "type": "module"
 }
