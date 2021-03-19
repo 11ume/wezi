@@ -24,7 +24,7 @@ test('main composer end response if all higher are executed, and none of them ha
 
     t.is(res.status, 404)
     t.deepEqual(body, {
-        message: 'unknown'
+        message: 'Not Found'
     })
 })
 
@@ -75,7 +75,7 @@ test('main composer multi handler async, direct promise error return in second h
 test('main composer multi handler, throw error inside first handler, errorHandler(Error(500)) :500', async (t) => {
     const url = await server((req, res) => {
         const err = () => {
-            throw new Error('Something wrong is happened')
+            throw new Error('Something wrong has happened')
         }
         const never = () => 'hello'
         const run = composer()(err, never)
@@ -92,7 +92,7 @@ test('main composer multi handler, throw error inside first handler, errorHandle
 
     t.is(res.status, 500)
     t.deepEqual(body, {
-        message: 'Something wrong is happened'
+        message: 'Something wrong has happened'
     })
 })
 
