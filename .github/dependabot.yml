@@ -1,0 +1,46 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "09:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: "@types/node"
+    versions:
+    - 14.14.28
+    - 14.14.30
+    - 14.14.31
+    - 15.0.0
+  - dependency-name: yargs-parser
+    versions:
+    - 15.0.1
+  - dependency-name: lerna
+    versions:
+    - 4.0.0
+  - dependency-name: "@typescript-eslint/parser"
+    versions:
+    - 4.15.2
+    - 4.16.1
+  - dependency-name: "@typescript-eslint/eslint-plugin"
+    versions:
+    - 4.15.2
+    - 4.16.1
+  - dependency-name: rollup
+    versions:
+    - 2.38.3
+    - 2.39.0
+    - 2.39.1
+    - 2.40.0
+  - dependency-name: eslint
+    versions:
+    - 7.19.0
+    - 7.20.0
+    - 7.21.0
+  - dependency-name: typescript
+    versions:
+    - 4.2.2
+  - dependency-name: rollup-plugin-typescript2
+    versions:
+    - 0.30.0
