@@ -26,12 +26,6 @@
 
 </div>
 
-<br>
-
-> ⚠️ Wezi is currently under development.
-
-<br>
-
 > Features
 
 <br>
