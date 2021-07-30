@@ -77,11 +77,11 @@ import router, { get } from 'wezi-router'
 import { json } from 'wezi-send'
 import createError from 'wezi-error'
 
-type GetOneParams = {
+type GetOneParam = {
     id?: string
 }
 
-const validateGetOneParams = (c: Context, params: GetOneParams) => params.id
+const validateGetOneParams = (c: Context, params: GetOneParam) => params.id
     ? c.next(params.id)
     : c.panic(createError(400, 'the param "id", is required'))
 
